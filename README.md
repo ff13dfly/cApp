@@ -1,2 +1,2 @@
 # cApp
-Anchor cApp
+Anchor cApp, pure on chain application.
