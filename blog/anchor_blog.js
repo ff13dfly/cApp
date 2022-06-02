@@ -20,7 +20,7 @@ var concat = require('gulp-concat');
 
 //目标配置
 var target = './';
-var min = 'anchorApp.min.js';
+var min = 'anchorBlog.min.js';
 var source = [
     'blog.js'
 ];

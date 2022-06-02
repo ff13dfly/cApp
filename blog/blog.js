@@ -14,7 +14,7 @@ const hash = function(n) { return Math.random().toString(36).substr(n != undefin
 const setting = {
     entryDefault: 'blog_list', //blog程序的入口，获取对应的数据列表；
     entryKey:'entry_anchor',    //blog的entryanchor
-    loadingDelay: 1500, //显示内容的delay
+    loadingDelay: 50, //显示内容的delay
     cls: {
         row: 'aa_' + hash(), //条目的class
     }
@@ -24,7 +24,6 @@ const self = {
         search(name, function(res) {
             if (res.blocknumber === 0) return ck && ck(false);
             viewer(res.blocknumber, res.anchor, res.owner, function(dt) {
-                //console.log(dt);
                 dt.blocknumber = res.blocknumber;
                 dt.owner = res.owner;
                 ck && ck(dt);
@@ -36,8 +35,6 @@ const self = {
         return localStorage[setting.entryKey];
     },
     getBlogList: function(list, ck, count, result) {
-        //console.log(list);
-        //console.log(count);
         if (count === undefined) {
             let index = 0;
             let result = [];
@@ -47,11 +44,7 @@ const self = {
         let index = count === undefined ? 0 : count;
         let anchorList = result === undefined ? [] : result;
 
-        //console.log('ready to get anchor data.');
-        //console.log(list[index]);
         self.getBlogAnchor(list[index], function(res) {
-            //console.log('get blog data:');
-            //console.log(res);
             res.name = list[index];
             anchorList.push(res);
             index++;
@@ -63,9 +56,10 @@ const self = {
         const toStr = tools.hex2str;
         const shorten = tools.shortenAddress;
         let dom = '';
+        console.log('anchor list is ready');
         for (let i = 0; i < list.length; i++) {
             const row = list[i];
-            console.log(row);
+
             if (!row.raw) continue;
             const ctx = JSON.parse(toStr(row.raw));
             dom += `<div class="${setting.cls.row}" link=${ctx.link?ctx.link:''}><h3>${ctx.title}</h3>
@@ -76,10 +70,10 @@ const self = {
                 <small>Block:</small>${row.blocknumber}<hr></p>
             </div>`;
         }
+        console.log('anchor dom is ready');
         return dom;
     },
     clickRow: function() {
-        //console.log('row clicked');
         var target = $(this).attr('link');
         console.log('row clicked, link:' + target);
     },
@@ -87,13 +81,11 @@ const self = {
         var dom = `<style>
             .${setting.cls.row} small{color:#BBBBBB}
         </style>`;
-        console.log(dom);
         $(con).append(dom);
     },
 };
 
 anchorApp = function(agent, con, jquery) {
-    //console.log("Anchor Application is ready." + con);
     search = agent.search;
     viewer = agent.view;
     writer = agent.write;
@@ -101,7 +93,6 @@ anchorApp = function(agent, con, jquery) {
     $ = jquery;
 
     self.getBlogAnchor(self.getEntry(), function(res) {
-        //console.log(res);
         if (!res || !res.raw) return false;
         const data = tools.hex2str(res.raw);
         if (!data) return false;

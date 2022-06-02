@@ -1,5 +1,10 @@
 # Test Data
 
+* blog cApp anchor : blog
+```
+{"type":"app"}
+```
+
 * blog entry anchor : blog_list
   ```
   {"list":["blog_a","blog_b","blog_c"]}

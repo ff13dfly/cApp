@@ -21,5 +21,5 @@ npm install gulp-concat
 
 #进入构建目录，执行gulpfile
 gulp
-cp anchorApp.min.js ../
+cp anchorBlog.min.js ../
 rm -rf $path/$folder
