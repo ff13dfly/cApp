@@ -12,7 +12,8 @@ let $ = null; //jquery的数据
 
 const hash = function(n) { return Math.random().toString(36).substr(n != undefined ? n : 6) };
 const setting = {
-    entry: 'blog_list', //blog程序的入口，获取对应的数据列表；
+    entryDefault: 'blog_list', //blog程序的入口，获取对应的数据列表；
+    entryKey:'entry_anchor',    //blog的entryanchor
     loadingDelay: 1500, //显示内容的delay
     cls: {
         row: 'aa_' + hash(), //条目的class
@@ -29,6 +30,10 @@ const self = {
                 ck && ck(dt);
             });
         });
+    },
+    getEntry:function(){
+        if(!localStorage[setting.entryKey]) return setting.entryDefault;
+        return localStorage[setting.entryKey];
     },
     getBlogList: function(list, ck, count, result) {
         //console.log(list);
@@ -93,11 +98,9 @@ anchorApp = function(agent, con, jquery) {
     viewer = agent.view;
     writer = agent.write;
     tools = agent.tools;
-
     $ = jquery;
-    console.log(agent);
 
-    self.getBlogAnchor(setting.entry, function(res) {
+    self.getBlogAnchor(self.getEntry(), function(res) {
         //console.log(res);
         if (!res || !res.raw) return false;
         const data = tools.hex2str(res.raw);
