@@ -31,7 +31,6 @@ const self = {
         let dom = '';
         for (let i = 0; i < list.length; i++) {
             const row = list[i];
-            console.log(row);
             if (row.protocol.type != 'data') continue; //过滤费数据类型的anchor
 
             const raw = toStr(row.raw);
