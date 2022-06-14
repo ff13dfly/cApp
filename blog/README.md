@@ -20,6 +20,15 @@ Blog cApp, you can write blog on Anchor network.
 {"type":"app"}
 ```
 
+- blog entry anchor : bbc
+  ```
+  {"list":["blog_c"]}
+  ```
+  protocol
+  ```
+  {"type":"data","format":"json"}
+  ```
+
 - blog entry anchor : blog_list
   ```
   {"list":["blog_a","blog_b","blog_c"]}
