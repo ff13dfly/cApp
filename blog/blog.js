@@ -2,6 +2,9 @@
 //1.执行逻辑，anchorApp已经在调用的时候创建了变量，使用eval执行这个问题。这样，anchorApp就作为程序启动的入口了
 //2. 传入3个参数 pok:polkadot网络读取的方法; con:dom容器的id ; jquery:jquery操作库
 
+//Blog加载逻辑
+//1.获取入口的blog数据
+
 let search = null; //搜索anchor的方法
 let viewer = null; //查看anchor的方法
 let writer = null; //写入anchor的方法
@@ -16,9 +19,14 @@ const setting = {
     entryKey:'entry_anchor',    //blog的entryanchor
     loadingDelay: 50, //显示内容的delay
     cls: {
-        row: 'aa_' + hash(), //条目的class
+        row: 'aa_' + hash(),    //条目的class
+        config:'aa_'+hash(),    //设置按钮的class
+        page:'aa_'+hash(),      //弹出页面的class
+        back:'aa_'+hash(),      //弹出页面返回按钮的class
+        body:'aa_'+hash(),      //弹出页面容器class
     }
 };
+
 const self = {
     getBlogAnchor: function(name, ck) {
         search(name, function(res) {
@@ -77,11 +85,39 @@ const self = {
         var target = $(this).attr('link');
         console.log('row clicked, link:' + target);
     },
+    getBar:function(){
+        return `<div class="row">
+            <div class="col-8">cBlog,blockchain blog.</div>
+            <div class="col-4 ${setting.cls.config}">Setting</div>
+        </div>`;
+    },
+    clickConfig:function(){
+        console.log('ready to show page');
+        $('.'+setting.cls.page).slideUp().show();      
+    },
+    clickBack:function(){
+        $('.'+setting.cls.page).slideDown().hide();
+    },
+    getPage:function(){
+        return `<div class="row ${setting.cls.page}">
+            <div class="col-4 ${setting.cls.back}"> < back </div>
+            <div class="col-7">Page title</div>
+            <div class="col-12 ${setting.cls.body}">Page content</div>
+        </div>`;
+    },
+    
     loadStyle: function(con) {
         var dom = `<style>
             .${setting.cls.row} small{color:#BBBBBB}
+            .${setting.cls.page} {display:none;width:100%;height:100%;z-index:999;position:fixed;left:0px;top:0px;background:#FFFFFF}
         </style>`;
         $(con).append(dom);
+    },
+    bindAction:function(con){
+        $(con).find('.' + setting.cls.row).off('click').on('click', self.clickRow);
+        $(con).find('.' + setting.cls.config).off('click').on('click', self.clickConfig);
+        $(con).find('.' + setting.cls.back).off('click').on('click', self.clickBack);
+        self.loadStyle(con);
     },
 };
 
@@ -98,11 +134,13 @@ anchorApp = function(agent, con, jquery) {
         if (!data) return false;
         const dt = JSON.parse(data);
         self.getBlogList(dt.list, function(res) {
-            const dom = self.formatList(res);
-            setTimeout(function() {
-                $(con).html(dom).find('.' + setting.cls.row).off('click').on('click', self.clickRow);
-                self.loadStyle(con);
-            }, setting.loadingDelay);
+            const bar = self.getBar();
+            const foot=self.getPage();
+            const dom = bar + self.formatList(res)+foot;
+            $(con).html(dom);
+            setTimeout(function(){
+                self.bindAction(con);
+            },setting.loadingDelay);
         });
     });
     $(con).html("<p>Loading...</p>");
