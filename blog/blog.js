@@ -4,15 +4,21 @@
 
 //Blog加载逻辑
 //1.获取入口的blog数据
+// let search = null; //搜索anchor的方法
+// let viewer = null; //查看anchor的方法
+// let writer = null; //写入anchor的方法
+// let signer = null; //用户验证的页面调用
+// let tools = null; //上部提供的解析工具
+// let subcribe = null; //监听的方法
+// let $ = null; //jquery的数据
+// let container='';       //上层的容器；
 
-let search = null; //搜索anchor的方法
-let viewer = null; //查看anchor的方法
-let writer = null; //写入anchor的方法
-let signer = null; //用户验证的页面调用
-let tools = null; //上部提供的解析工具
-let subcribe = null; //监听的方法
-let $ = null; //jquery的数据
-let container='';       //上层的容器；
+const search = agent.search;
+const viewer = agent.view;
+const writer = agent.write;
+const tools = agent.tools;
+const container = con;
+const $ = jquery;
 
 const hash = function(n) { return Math.random().toString(36).substr(n != undefined ? n : 6) };
 const setting = {
@@ -168,14 +174,4 @@ const self = {
         });
     },
 };
-
-anchorApp = function(agent, con, jquery) {
-    search = agent.search;
-    viewer = agent.view;
-    writer = agent.write;
-    tools = agent.tools;
-    container = con;
-    $ = jquery;
-
-    self.load(con);
-};
+self.load(con);
