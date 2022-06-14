@@ -1,19 +1,7 @@
 //Anchor App说明
-//1.执行逻辑，anchorApp已经在调用的时候创建了变量，使用eval执行这个问题。这样，anchorApp就作为程序启动的入口了
-//2. 传入3个参数 pok:polkadot网络读取的方法; con:dom容器的id ; jquery:jquery操作库
-
-//Blog加载逻辑
-//1.获取入口的blog数据
-// let search = null; //搜索anchor的方法
-// let viewer = null; //查看anchor的方法
-// let writer = null; //写入anchor的方法
-// let signer = null; //用户验证的页面调用
-// let tools = null; //上部提供的解析工具
-// let subcribe = null; //监听的方法
-// let $ = null; //jquery的数据
-// let container='';       //上层的容器；
-
-const search = agent.search;
+//1.使用new Function的方式加载cApp，const anchorApp=new Function("agent", "con", "jquery", str);
+//2.传入3个参数 agent:polkadot处理网络的各种方法; con:dom容器的id ; jquery:jquery操作库
+const search = agent.search; //搜索anchor的方法
 const viewer = agent.view;
 const writer = agent.write;
 const tools = agent.tools;
