@@ -1,14 +1,10 @@
 //Anchor App说明
-//1.使用new Function的方式加载cApp，const anchorApp=new Function("agent", "con", "jquery", str);
+//1.使用new Function的方式加载cApp，const anchorApp=new Function("agent", "con", str);
 //2.传入3个参数 agent:polkadot处理网络的各种方法; con:dom容器的id ; jquery:jquery操作库
-// const search = agent.search; //搜索anchor的方法
-// const viewer = agent.view;
-// const writer = agent.write;
-// const tools = agent.tools;
 
 const container = con;
 const tools = agent.tools;
-const $ = jquery;
+
 const hash = function(n) { return Math.random().toString(36).substr(n != undefined ? n : 6) };
 
 const last=[];     //放最近的10条新闻，用于丰富页面
@@ -17,13 +13,15 @@ const config={
     app:'news',     //设置筛选的data内容
     cacheMax:10,    //cache的最大长度
     cls:{
-        page:'nc_'+hash(),     //page容器的class
+        page:'nc_'+hash(),      //page容器的class
+        header:'nc_'+hash(),    //page的头部容器
         back:'nc_'+hash(),      //弹出页面返回按钮的class
-        title:'nc_'+hash(),      //弹出页面标题class
+        title:'nc_'+hash(),     //弹出页面标题class
+        sign:'nc_'+hash(),      //签名条class
         body:'nc_'+hash(),      //弹出页面容器class
     }
 }
-
+console.log($);
 const self={
     appendNews:function(row){
         console.log(row);
@@ -93,10 +91,13 @@ const self={
     },
     loadPage:function(con){
         $(con).append(`<div class="${config.cls.page}">
+            <div class="row ${config.cls.header}">
+                <div class="col-4 ${config.cls.back}"> < back </div>
+                <div class="col-8 ${config.cls.title}">Page title</div>
+            </div>
             <div class="container">
                 <div class="row">
-                    <div class="col-4 ${config.cls.back}"> < back </div>
-                    <div class="col-8 ${config.cls.title}"">Page title</div>
+                    <div class="col-12 ${config.cls.sign}"></div>
                     <div class="col-12 ${config.cls.body}">Content</div>
                 </div>
             </div>
@@ -105,6 +106,7 @@ const self={
     loadStyle: function(con){
         $(con).append(`<style>
             .${config.cls.page} {display:none;width:100%;height:100%;z-index:999;position:fixed;left:0px;top:0px;background:#FFFFFF}
+            .${config.cls.header} {height:58px;background:#EEEEEE}
         </style>`);
     },
     load:function(){
@@ -112,11 +114,10 @@ const self={
         self.loadPage(container);
         self.loadStyle(container);
         if(cache.length==0) return false;
+
+        //1.开始加载cache里的新闻
     },
 }
-
-$(container).html('Subscribe news, waiting...');
-
 
 self.load();        //加载已经有的新闻
 
