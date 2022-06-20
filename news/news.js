@@ -19,6 +19,9 @@ const config={
         title:'nc_'+hash(),     //弹出页面标题class
         sign:'nc_'+hash(),      //签名条class
         body:'nc_'+hash(),      //弹出页面容器class
+    },
+    thumb:{
+        back:'',
     }
 }
 console.log($);
@@ -36,7 +39,7 @@ const self={
             <div class="col-12 ${cls_page}">${!ctx.desc?"":ctx.desc}</div>
             <div class="col-4">${shorten(row.account,4)}</div>
             <div class="col-8 text-end">
-             Block : <strong>${row.block}</strong> , anchor : <strong class="${cls_anchor}" anchor="${row.anchor}">${row.anchor}</strong> 
+             Block : <strong>${row.block}</strong> , Anchor : <strong class="${cls_anchor}" anchor="${row.anchor}">${row.anchor}</strong> 
             </div>
             <div class="col-12"><hr /></div>
         </div>`;
@@ -56,6 +59,7 @@ const self={
         const dt=self.getCache(anchor,n);
 
         $('.'+config.cls.title).html(dt.title);
+        $('.'+config.cls.sign).html(`5G...3f publish on block 1234 , 2022-06-20 09:36 `);
         $('.'+config.cls.body).html(dt.content);
         self.clickBack();
         self.showPage();
@@ -92,11 +96,11 @@ const self={
     loadPage:function(con){
         $(con).append(`<div class="${config.cls.page}">
             <div class="row ${config.cls.header}">
-                <div class="col-4 ${config.cls.back}"> < back </div>
-                <div class="col-8 ${config.cls.title}">Page title</div>
+                <div class="col-12 ${config.cls.back}"> < </div>
             </div>
             <div class="container">
                 <div class="row">
+                    <div class="col-12"><h3 class="${config.cls.title}"></h3></div>
                     <div class="col-12 ${config.cls.sign}"></div>
                     <div class="col-12 ${config.cls.body}">Content</div>
                 </div>
@@ -106,7 +110,10 @@ const self={
     loadStyle: function(con){
         $(con).append(`<style>
             .${config.cls.page} {display:none;width:100%;height:100%;z-index:999;position:fixed;left:0px;top:0px;background:#FFFFFF}
-            .${config.cls.header} {height:58px;background:#EEEEEE}
+            .${config.cls.header} {height:58px;width:100%;background:#EEEEEE;position:fixed;left:0px;top:0px;}
+            .${config.cls.title} {margin-top:58px;}
+            .${config.cls.back} {padding-top:15px;}
+            .${config.cls.sign} {color:#BBBBBB}
         </style>`);
     },
     load:function(){
