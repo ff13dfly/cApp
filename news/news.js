@@ -13,12 +13,12 @@ const config={
     app:'news',     //设置筛选的data内容
     cacheMax:10,    //cache的最大长度
     cls:{
-        page:'nc_'+hash(),      //page容器的class
-        header:'nc_'+hash(),    //page的头部容器
-        back:'nc_'+hash(),      //弹出页面返回按钮的class
-        title:'nc_'+hash(),     //弹出页面标题class
-        sign:'nc_'+hash(),      //签名条class
-        body:'nc_'+hash(),      //弹出页面容器class
+        page:'a'+hash(),      //page容器的class
+        header:'a'+hash(),    //page的头部容器
+        back:'a'+hash(),      //弹出页面返回按钮的class
+        title:'a'+hash(),     //弹出页面标题class
+        sign:'a'+hash(),      //签名条class
+        body:'a'+hash(),      //弹出页面容器class
     },
     thumb:{
         back:'',
