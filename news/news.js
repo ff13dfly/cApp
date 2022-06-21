@@ -24,7 +24,9 @@ const config={
         back:'',
     }
 }
-//console.log($);
+
+if($===undefined) console.log('No jquery exsist, exit cApp news.');
+
 const self={
     appendNews:function(row){
         console.log(row);
@@ -123,7 +125,7 @@ const self={
         if(cache.length==0) return false;
 
         //1.开始加载cache里的新闻
-        agent.vertify('aaa','hello world',{type:"data"});
+        //agent.vertify('aaa','hello world',{type:"data"});
     },
 }
 

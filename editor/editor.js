@@ -16,8 +16,7 @@ const config={
     }
 }
 
-console.log(agent);
-agent.vertify('aaa','hello world',{type:"data"});
+if($===undefined) console.log('No jquery exsist, cEditor will not run properly.');
 
 const self={
     loadPage:function(con){
@@ -43,8 +42,40 @@ const self={
             .${config.cls.sign} {color:#BBBBBB}
         </style>`);
     },
+    
+    checkUTF8:function(text) {
+        var utf8Text = text;
+        try {
+            // Try to convert to utf-8
+            utf8Text = decodeURIComponent(escape(text));
+            // If the conversion succeeds, text is not utf-8
+        }catch(e) {
+            // console.log(e.message); // URI malformed
+            // This exception means text is utf-8
+        }   
+        return utf8Text; // returned text is always utf-8
+    },
+    toBinary:function(string) {
+        const codeUnits = new Uint16Array(string.length);
+        for (let i = 0; i < codeUnits.length; i++) {
+          codeUnits[i] = string.charCodeAt(i);
+        }
+        return btoa(String.fromCharCode(...new Uint8Array(codeUnits.buffer)));
+    },
+    fromBinary:function(encoded) {
+        const binary = atob(encoded);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < bytes.length; i++) {
+          bytes[i] = binary.charCodeAt(i);
+        }
+        return String.fromCharCode(...new Uint16Array(bytes.buffer));
+    },
     load:function(){
         console.log('Writer is ready.');
+        agent.vertify('abcd',self.toBinary("你好呀，world！"),JSON.stringify({type:"data",code:"utf8"}),function(res){
+            console.log('callback from cEditor');
+            console.log(res);
+        });
     },
 }
 

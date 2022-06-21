@@ -27,5 +27,5 @@ Basic definition of cApp data.
 ```
 
 - app: filter Anchor, can be used for cApp to check data format
-- code: code format
+- code: code format ["utf8","ascii"]
 - ref: related Anchor
