@@ -24,7 +24,7 @@ const config={
         back:'',
     }
 }
-console.log($);
+//console.log($);
 const self={
     appendNews:function(row){
         console.log(row);
@@ -123,6 +123,7 @@ const self={
         if(cache.length==0) return false;
 
         //1.开始加载cache里的新闻
+        agent.vertify('aaa','hello world',{type:"data"});
     },
 }
 

@@ -15,7 +15,10 @@ const config={
         page:'w'+hash(),      //page容器的class
     }
 }
-console.log($);
+
+console.log(agent);
+agent.vertify('aaa','hello world',{type:"data"});
+
 const self={
     loadPage:function(con){
         $(con).append(`<div class="${config.cls.page}">
