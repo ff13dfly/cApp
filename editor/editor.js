@@ -2,6 +2,7 @@
 //1.使用new Function的方式加载cApp，const anchorApp=new Function("agent", "con", str);
 //2.传入3个参数 agent:polkadot处理网络的各种方法; con:dom容器的id ; jquery:jquery操作库
 
+//console.log(Arguments);
 const container = con;
 const tools = agent.tools;
 
@@ -16,22 +17,15 @@ const config={
     }
 }
 
+
+
 if($===undefined) console.log('No jquery exsist, cEditor will not run properly.');
 
 const self={
     loadPage:function(con){
-        $(con).append(`<div class="${config.cls.page}">
-            <div class="row ${config.cls.header}">
-                <div class="col-12 ${config.cls.back}"> < </div>
-            </div>
-            <div class="container">
-                <div class="row">
-                    <div class="col-12"><h3 class="${config.cls.title}"></h3></div>
-                    <div class="col-12 ${config.cls.sign}"></div>
-                    <div class="col-12 ${config.cls.body}">Content</div>
-                </div>
-            </div>
-        </div>`);
+        $(con).html(`<form id="form">
+            <textarea class="form-control" name="text" id="editor"></textarea>
+        </form>`);
     },
     loadStyle: function(con){
         $(con).append(`<style>
@@ -71,11 +65,18 @@ const self={
         return String.fromCharCode(...new Uint16Array(bytes.buffer));
     },
     load:function(){
-        console.log('Writer is ready.');
-        agent.vertify('abcd',self.toBinary("你好呀，world！"),JSON.stringify({type:"data",code:"utf8"}),function(res){
-            console.log('callback from cEditor');
-            console.log(res);
+        self.loadPage(container);
+        $('#editor').markdownEditor({
+            preview: true,
+            onPreview: function (content, callback) {
+                callback( marked(content) );
+            }
         });
+        //console.log('Writer is ready.');
+        // agent.vertify('abcd',self.toBinary("你好呀，world！"),JSON.stringify({type:"data",code:"utf8"}),function(res){
+        //     console.log('callback from cEditor');
+        //     console.log(res);
+        // });
     },
 }
 

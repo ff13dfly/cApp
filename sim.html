@@ -5,6 +5,65 @@
     <script src="lib/jquery/jquery.min.js"></script>
     <script src="lib/bootstrap/bootstrap.min.js"></script>
     <link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css">
+
+    <script src="lib/bootstrap/bootstrap-markdown-editor.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="lib/bootstrap/bootstrap-markdown-editor.css">
+
+    <!-- <script src="lib/ace.1.1.3.js"></script> -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/ace.js"></script>
+    <script src="lib/marked.0.3.2.min.js"></script>
+    <script>
+        $(function() {
+            const apps = {
+                'news': 'news/news.js',
+                'editor': 'editor/editor.js',
+                'blog': 'blog/blog.js',
+            }
+
+            const self = {
+                load: function(source, ck) {
+                    $.ajax({
+                        url: source,
+                        timeout: 20000,
+                        dataType: 'text',
+                        success: function(res) {
+                            ck && ck(res)
+                        }
+                    });
+                },
+                structSelector: function(list, con) {
+                    let dom = '';
+                    for (let k in list) {
+                        const row = list[k];
+                        dom += `<option value="${k}">${row}<option>`
+                    }
+                    $(con).html(dom).off('change').on('change', self.appChange).trigger('change');
+                },
+                appChange: function() {
+                    const name = $(this).val();
+                    self.load(apps[name], function(res) {
+                        const cApp = new Function("agent", "con", res);
+                        if (!cApp) return false;
+                        cApp(simAgent, "#app_container");
+                    })
+                },
+                test: function() {
+                    const str = 'console.log(a)';
+                    const sApp = new Function("a", str);
+                    sApp('hello world');
+                },
+            }
+
+            const simAgent = {
+                view: function() {},
+                vertify: function() {},
+                subscribe: function() {},
+                tools: {},
+            };
+            self.structSelector(apps, '#app_select');
+        })
+    </script>
 </head>
 
 <body>
@@ -12,8 +71,9 @@
         <div class="row">
             <div class="col-lg-3"></div>
             <div class="col-lg-9">
-                <input type="text" class="form-control" value="">
+                <select class="form-control" id="app_select"></select>
             </div>
+            <div class="col-lg-12" id="app_container"></div>
         </div>
     </div>
 </body>
