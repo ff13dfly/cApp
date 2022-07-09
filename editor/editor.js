@@ -15,12 +15,10 @@ const config={
     cls:{
         page:'w'+hash(),      //page容器的class
     }
-}
-
-//const editor = new EditorJS('editorjscon');
-
+};
 
 if($===undefined) console.log('No jquery exsist, cEditor will not run properly.');
+let editor=null;
 
 const self={
     loadPage:function(con){
@@ -28,7 +26,12 @@ const self={
         //     <textarea class="form-control" name="text" id="editor"></textarea>
         // </form>`);
 
-        $(con).html(`<div id="editorjscon"></div>`);
+        $(con).html(`<div class="row">
+                <div class="col-12 text-end">
+                    <button class="btn btn-md btn-primary" id="save_me">Save</button>
+                </div>
+            </div><div id="editorjscon"></div>`).find('#save_me').off('click').on('click',self.save);
+
         const ecfg={
             holder: 'editorjscon', 
             tools: {
@@ -78,8 +81,19 @@ const self={
                     },
                 },
             },
+            onReady: () => {
+                console.log('Editor.js is ready to work!');
+            }
         };
-        const editor = new EditorJS(ecfg);
+        editor = new EditorJS(ecfg);
+    },
+    save:function(){
+        console.log('ready to save');
+        editor.save().then((outputData) => {
+            console.log('Article data: ', outputData)
+        }).catch((error) => {
+            console.log('Saving failed: ', error)
+        });
     },
     loadStyle: function(con){
         $(con).append(`<style>
@@ -122,18 +136,6 @@ const self={
     load:function(){
         self.loadPage(container);
         self.loadStyle(container);
-        // $('#editor').markdownEditor({
-        //     preview: true,
-        //     onPreview: function (content, callback) {
-        //         console.log(content);
-        //         callback( marked(content) );
-        //     }
-        // });
-        //console.log('Writer is ready.');
-        // agent.vertify('abcd',self.toBinary("你好呀，world！"),JSON.stringify({type:"data",code:"utf8"}),function(res){
-        //     console.log('callback from cEditor');
-        //     console.log(res);
-        // });
     },
 }
 
