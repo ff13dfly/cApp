@@ -17,18 +17,73 @@ const config={
     }
 }
 
+//const editor = new EditorJS('editorjscon');
 
 
 if($===undefined) console.log('No jquery exsist, cEditor will not run properly.');
 
 const self={
     loadPage:function(con){
-        $(con).html(`<form id="form">
-            <textarea class="form-control" name="text" id="editor"></textarea>
-        </form>`);
+        // $(con).html(`<form id="form">
+        //     <textarea class="form-control" name="text" id="editor"></textarea>
+        // </form>`);
+
+        $(con).html(`<div id="editorjscon"></div>`);
+        const ecfg={
+            holder: 'editorjscon', 
+            tools: {
+                header: Header,
+                image: SimpleImage,
+                image: {
+                    class: ImageTool,
+                    config: {
+                        endpoints: {
+                            byFile: 'http://localhost:8008/uploadFile', // Your backend file uploader endpoint
+                            byUrl: 'http://localhost:8008/fetchUrl', // Your endpoint that provides uploading by Url
+                        }
+                    }
+                },
+                embed: {
+                    class: Embed,
+                    config: {
+                        services: {
+                            youtube: true,
+                            coub: true
+                        }
+                    }
+                },
+                quote: Quote,
+                code: CodeTool,
+                linkTool: {
+                    class: LinkTool,
+                    config: {
+                        endpoint: 'http://localhost:8008/fetchUrl', // Your backend endpoint for url data fetching,
+                    }
+                },
+                list: {
+                    class: List,
+                    inlineToolbar: true,
+                    config: {
+                        defaultStyle: 'unordered'
+                    }
+                },
+                delimiter: Delimiter,
+                warning: Warning,
+                table: {
+                    class: Table,
+                    inlineToolbar: true,
+                    config: {
+                        rows: 2,
+                        cols: 3,
+                    },
+                },
+            },
+        };
+        const editor = new EditorJS(ecfg);
     },
     loadStyle: function(con){
         $(con).append(`<style>
+            #editorjscon{width:100%;height:60%;background:#EEEEEE;}
             .${config.cls.page} {display:none;width:100%;height:100%;z-index:999;position:fixed;left:0px;top:0px;background:#FFFFFF}
             .${config.cls.header} {height:58px;width:100%;background:#EEEEEE;position:fixed;left:0px;top:0px;}
             .${config.cls.title} {margin-top:58px;}
@@ -66,12 +121,14 @@ const self={
     },
     load:function(){
         self.loadPage(container);
-        $('#editor').markdownEditor({
-            preview: true,
-            onPreview: function (content, callback) {
-                callback( marked(content) );
-            }
-        });
+        self.loadStyle(container);
+        // $('#editor').markdownEditor({
+        //     preview: true,
+        //     onPreview: function (content, callback) {
+        //         console.log(content);
+        //         callback( marked(content) );
+        //     }
+        // });
         //console.log('Writer is ready.');
         // agent.vertify('abcd',self.toBinary("你好呀，world！"),JSON.stringify({type:"data",code:"utf8"}),function(res){
         //     console.log('callback from cEditor');
