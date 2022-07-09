@@ -80,9 +80,14 @@ const self={
                         cols: 3,
                     },
                 },
+                markdownParser: MDParser,
+                markdownImporter: MDImporter,
             },
             onReady: () => {
                 console.log('Editor.js is ready to work!');
+            },
+            onChange: (api, event) => {
+                console.log('Now I know that Editor\'s content changed!', event)
             }
         };
         editor = new EditorJS(ecfg);
