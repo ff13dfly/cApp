@@ -41,6 +41,14 @@ Basic definition of cApp data.
 }  
 ```
 
+```JSON
+{
+    "name":"testme",
+    "data":"console.log('testme library');",
+    "protocol":{"type":"data","format":"JS","code":"utf8","lib":["jquery","good_test","jrender"],"ext":["test_a","test_b","test_c"]}
+}  
+```
+
 - app: filter Anchor, can be used for cApp to check data format
 - code: code format ["utf8","ascii"]
 - ref: related Anchor

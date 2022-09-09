@@ -2,12 +2,16 @@
 //1.使用new Function的方式加载cApp，const anchorApp=new Function("agent", "con", str);
 //2.传入3个参数 agent:polkadot处理网络的各种方法; con:dom容器的id ; jquery:jquery操作库
 
-//console.log(agent);
+console.log(agent);
+console.log(con);
+console.log(error);
+console.log(SimpleMDE);
 const container = con;
 
 const hash = function(n) { return Math.random().toString(36).substr(n != undefined ? n : 6) };
 
 const config={
+    entry:'mds_con',
     app:'editor',     //设置筛选的data内容
     cacheMax:10,    //cache的最大长度
     cls:{
@@ -20,7 +24,8 @@ let editor=null;
 
 const self={
     loadPage:function(con){
-        $(con).html(`<textarea id="mds_con"></textarea>`);
+        $(con).html(`<textarea id="${config.entry}">Loading...</textarea>`);
+        if(!SimpleMDE) return $('#'+config.entry).val('Load SimpleMDE failed.');
         const mds = new SimpleMDE({
             autofocus: true,
             autosave: {
@@ -32,7 +37,7 @@ const self={
                 bold: "__",
                 italic: "_"
             },
-            element: document.getElementById("mds_con"),
+            element: document.getElementById(config.entry),
             forceSync: true,
             //hideIcons: ["guide", "heading"],
             indentWithTabs: false,
