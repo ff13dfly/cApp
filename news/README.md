@@ -2,12 +2,20 @@
 
 News cApp, you can read news by subscribe the block.
 
+```JSON
+{
+    "name":"news",
+    "raw":"code",
+    "protocol":{"type":"app","format":"JS","lib":["jquery"]}
+}
+```
+
 ## Definition
 
 - News format
   
 ```JSON
-{"type":"data","app":"news"}
+{"type":"data","app":"news","format":"JSON"}
 ```
 
 ## Sample

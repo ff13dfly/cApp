@@ -2,11 +2,14 @@
 //1.使用new Function的方式加载cApp，const anchorApp=new Function("agent", "con", str);
 //2.传入3个参数 agent:polkadot处理网络的各种方法; con:dom容器的id ; jquery:jquery操作库
 
+if(error!=null) console.log(error);
+if(!con) console.log('No container to run cApp.');
+if(!agent) console.log('No way to interact with anchor network.');
+if($===undefined) console.log('No jquery exsist, exit cApp news.');
+
 const container = con;
-const tools = agent.tools;
-
 const hash = function(n) { return Math.random().toString(36).substr(n != undefined ? n : 6) };
-
+const shorten=function(address,n){if (n === undefined) n = 10;return address.substr(0, n) + '...' + address.substr(address.length - n, n);};
 const last=[];     //放最近的10条新闻，用于丰富页面
 const cache={};
 const config={
@@ -23,16 +26,12 @@ const config={
     thumb:{
         back:'',
     }
-}
-
-if($===undefined) console.log('No jquery exsist, exit cApp news.');
+};
 
 const self={
     appendNews:function(row){
         console.log(row);
-        const toStr = tools.hex2str;
-        const shorten = tools.shortenAddress;
-        const ctx = JSON.parse(toStr(row.raw));
+        const ctx = row.raw;
         const cls_page='cc_'+hash();
         const cls_anchor='an_'+hash();
         const id="n_"+hash();
@@ -45,7 +44,7 @@ const self={
             </div>
             <div class="col-12"><hr /></div>
         </div>`;
-        $(container).prepend(dom);
+        $("#"+container).prepend(dom);
 
         //1.设置cache；
         ctx.account=row.account;
@@ -119,9 +118,9 @@ const self={
         </style>`);
     },
     load:function(){
-        $(container).html('');
-        self.loadPage(container);
-        self.loadStyle(container);
+        $("#"+container).html('');
+        self.loadPage("#"+container);
+        self.loadStyle("#"+container);
         if(cache.length==0) return false;
 
         //1.开始加载cache里的新闻
@@ -130,14 +129,13 @@ const self={
 }
 
 self.load();        //加载已经有的新闻
-
-agent.subscribe(function(list){
-    console.log('New block finalized.');
+console.log(agent);
+agent.common.subscribe(function(list){
+    //console.log('New block finalized.');
     if(list.length ==0) return false;
     for(let i=0;i<list.length;i++){
         const row=list[i];
         if(row.protocol && row.protocol.type==="data" && row.protocol.app===config.app){
-            //console.log('have anchor of news');
             self.appendNews(row);
         }
     }

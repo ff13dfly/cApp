@@ -9,6 +9,20 @@ Basic definition of cApp data.
     {"type":"app","lib":[]}
 ```
 
+## Protocol key words
+
+Definition highcase. 
+
+- type: ["DATA","APP"]
+- code: ["UTF8"]
+- format: ["JSON","JS","CSS"]
+- app:  
+- lib:  []
+- ext:  []
+- ref:  []
+- tag:  []
+- limit:   
+
 ### JS lib protocol
 
 ```JSON
