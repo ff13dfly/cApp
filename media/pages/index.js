@@ -1,20 +1,18 @@
-/*
-    {"type":"data","format":"JS"}
- */
-
-(function(app){
-    if(!app) return false;
+;(function(App){
+    if(!App) return false;
     var config={
-        name:'index',
+        name:"index",
     };
     var self={
-        listening:function(){
-            var info=app.info();
-            agent.common.subscribe(function(list){
-                //console.log('New block finalized.');
+        listening:function(input){
+            var info=App.info();
+            $("#cMedia_index").html("This is a cApp, fullscreen function.");
+
+            input.RPC.common.subscribe(function(list){
+                
                 if(list.length ==0) return false;
-                for(let i=0;i<list.length;i++){
-                    const row=list[i];
+                for(var i=0;i<list.length;i++){
+                    var row=list[i];
                     if(row.protocol && row.protocol.type==="data" && row.protocol.app===info.app){
                         console.log(row);
                     }
@@ -23,18 +21,25 @@
         },
     };
 
-    var obj={
-        "template":`<div>list of page</div>`,     //includindg dom and css, will add to body container,
-        "auto":function(input){
-            //console.log("Hello world");
-            console.log(app);
-            self.listening();
+    var page={
+        "data":{
+            "title":"cMedia App",     //default page title
+            "cache":null,
+            "template":'<div id="cMedia_index">list of page</div>',     //includindg dom and css, will add to body container,
+            "input":{page:0},
+        },      
+        "events":{
+            "before":function(ck){
+                console.log('before page loading...');
+                ck && ck();
+            },
+            "loading":self.listening,
+            "after":function(ck){
+                console.log('after page destoried...');
+                ck && ck();
+            },
         },
-        "callback":function(){
-            return {page:3};
-        },
-        "title":"",     //default page title
     };
 
-    app.page(config.name,obj);
+    App.page(config.name,page);
 })(cMedia);
