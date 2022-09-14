@@ -14,11 +14,10 @@
     var obj={
         "template":`<div>viewer of</div>`,     //includindg dom and css, will add to body container,
         "auto":function(input){
-            
             console.log("Hello world");
         },
         "title":"",     //default page title
     };
 
-    cNews.page(config.name,obj);
-})(cNews);
+    app.page(config.name,obj);
+})(cMedia);

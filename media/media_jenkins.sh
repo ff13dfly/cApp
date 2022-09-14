@@ -1,8 +1,8 @@
 #创建文件夹并把源码拷贝过来
-path="~/Desktop/autoPublish"
-folder="app"
-target="~/Desktop/www/cApp/news"
-config="~/Desktop/www/cApp/news/anchor_news.js"
+path="/Users/fuzhongqiang/Desktop/autoPublish"
+folder="cMedia"
+target="/Users/fuzhongqiang/Desktop/www/cApp/media"
+config="/Users/fuzhongqiang/Desktop/www/cApp/media/media_gulp.js"
 
 cd $path
 rm -rf $path/$folder
@@ -21,5 +21,5 @@ npm install gulp-concat
 
 #进入构建目录，执行gulpfile
 gulp
-cp anchorNews.min.js ../
+cp anchorMedia.min.js ../
 rm -rf $path/$folder

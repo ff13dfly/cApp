@@ -20,9 +20,11 @@ var concat = require('gulp-concat');
 
 //目标配置
 var target = './';
-var min = 'anchorNews.min.js';
+var min = 'anchorMedia.min.js';
 var source = [
-    'news.js'
+    'core.js',
+    'pages/index.js',
+    'pages/view.js',
 ];
 var opt = {
     mangle: {

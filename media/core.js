@@ -1,22 +1,18 @@
 //basic cApp framework, you can use it easily.
 //you can load lib on cApp protocol keyword "lib"
 
-/*
-    {"type":"app","format":"JS","lib":["jquery","bootstrap"],"ver":"0.0.1"}
- */
-
 (function(agent,con,error){
     if(error!=null) console.log(error);
     if(!con) console.log('No container to run cApp.');
     if(!agent) console.log('No way to interact with anchor network.');
 
     var config={
-        name:'cNews',           // name of cApp, will set to windows
+        app:'cMedia',          // name of cApp, will set to windows
         default:"index",        // default page
         cls:{
-            nav:"cnews_nav",
-            title:"cnews_title",
-            body:"cnews_body",
+            nav:"cmedia_nav",
+            title:"cmedia_title",
+            body:"cmedia_body",
         }
     };
 
@@ -38,9 +34,11 @@
             $("#"+con).html(framework);
         },
         load:function(name,input){
+            console.log('cMedia running..');
             if(!pages[name]) return false;
             var row=pages[name];
             //1.body add dom;
+            $("."+config.cls.body).html(row.template);
 
             //2.auto run js code on page
             if(input===undefined) input={};
@@ -53,6 +51,12 @@
     };
 
     var exports={
+        info:function(){
+            return {
+                app:config.app,
+                intro:"more information about app",
+            }
+        },
         to:function(name,input){
             if(!page[name]) return self.error();
 
@@ -76,13 +80,14 @@
 
         page:function(name,obj){
             pages[name]=obj;
+            console.log(name+',default:'+config.default);
             if(name===config.default) {
                 obj.auto({RPC:agent});
             }
         }, 
     };
 
-    window[config.name]=exports;
+    window[config.app]=exports;
     self.auto();
 
 })(agent,con,error);
