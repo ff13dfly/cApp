@@ -17,6 +17,7 @@ Definition highcase.
 - code: ["UTF8"]
 - format: ["JSON","JS","CSS"]
 - app:  
+- ver:  version of cApp
 - lib:  []
 - ext:  []
 - ref:  []
