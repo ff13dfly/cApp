@@ -10,9 +10,8 @@
         }
     };
     var cache=null;
-    
-    var self={
 
+    var self={
         listening:function(input){
             var info=App.info();
             //$("#cMedia_index").html("This is a cApp, fullscreen function.");
@@ -27,6 +26,7 @@
                 }
             });
         },
+        
         decode:function(row){
             var ctx = row.raw;
             var cls=config.cls;
@@ -50,7 +50,7 @@
         },
         struct:function(){
             self.clsAutoset(config.prefix);
-            console.log(`Config:${JSON.stringify(config)}`);
+            //console.log(`Config:${JSON.stringify(config)}`);
         },
         clsAutoset:function(pre){
             var hash=App.tools.hash;
@@ -61,6 +61,41 @@
         },
     };
 
+
+    var test={
+        auto:function(){
+            test.row();
+        },
+        row:function(){
+            var row={
+                anchor:"testMe",
+                block:999,
+                account:"5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy",
+                raw:{
+                    title:"Break news! Test cMedia",
+                    desc:"The city of Odesa, Ukraine, has come under further missile attacks Monday evening local time.   Around 10 p.m. local time (3 p.m. ET), witnesses in the center of the city said they heard several large explosions which shook buildings.",
+                    content:"A good news, this is the content.",
+                },
+            };
+            self.decode(row);
+
+            var row={
+                anchor:"testMe",
+                block:1239,
+                account:"5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy",
+                raw:{
+                    title:"Break news! Test cMedia again",
+                    desc:"Ukraine, has come under further missile attacks Monday evening local time.   Around 10 p.m. local time (3 p.m. ET), witnesses in the center of the city said they heard several large explosions which shook buildings.",
+                    content:"A good news, this is the content.",
+                },
+            };
+            self.decode(row);
+
+            App.fresh();
+        },
+    };
+
+
     var page={
         "data":{
             "title":"cMedia App",     //default page title
@@ -70,17 +105,18 @@
         },      
         "events":{
             "before":function(ck){
-                console.log('Before page loading...'+JSON.stringify(cache));
-                var dt={hello:"world"};
-                ck && ck(dt);
+                //console.log('Before page loading...'+JSON.stringify(cache));
+                //var dt={hello:"world"};
+                ck && ck();
             },
             "loading":function(input,data){
-                console.log('Page loading...'+JSON.stringify(data));
+                //console.log('Page loading...'+JSON.stringify(data));
                 cache=data;
+                test.auto();        //test data, need to remove
                 self.listening(input);
             },
             "after":function(ck){
-                console.log('after page destoried...');
+               // console.log('after page destoried...');
                 ck && ck();
             },
         },

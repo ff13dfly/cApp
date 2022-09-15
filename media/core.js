@@ -52,34 +52,36 @@
             }
             return true;
         },
-        goto:function(name,input){
-            console.log(`Opening page "${name}"`);
+        goto:function(name,input,skip){
+            //console.log(`Opening page "${name}"`);
             if(!pages[name]) return false;
             var row=pages[name];
+            //if(input.data) row.data=input.data;     //set input data as default
 
             //creat related data.will sent to page to use as cache
             //This will be pushed to the history queue, so when page reload as back, the data is ready.
             var cache=$.extend({},row.data);
+            cache.name=name;        //set history name
+
             var events=row.events;
-            console.log("[function Goto] cache:"+JSON.stringify(cache));
+            //console.log("[function Goto] cache:"+JSON.stringify(cache));
             if(events.before){
                 events.before(function(dt){
                     cache.raw=dt;           //load data to cache
-                    G.queue.push(cache);    //put page on history queue;
+                    if(!skip) G.queue.push(cache);    //put page on history queue;
                     self.initPage(cache,events,input);
                 });
             }else{
-                G.queue.push(cache);    //put page on history queue;
+                if(!skip) G.queue.push(cache);    //put page on history queue;
                 self.initPage(cache,events,input);
             }
         },
         initPage:function(data,events,input){
-            console.log("init page..."+JSON.stringify(data));
-            //console.log(row);
+            //console.log("init page..."+JSON.stringify(data));
             var cls=config.cls;
 
             //1.body add dom;
-            $("."+cls.body).html(data.template);
+            $("#"+cls.entry).find("."+cls.body).html(data.template);
 
             //1.1.set title
             $("#"+cls.entry).find('.'+cls.title).html(data.title);
@@ -101,25 +103,34 @@
         back:function(){
             $(this).attr("disabled","disabled");
             if(G.queue.length===0) return false;
+
+            console.log(JSON.stringify(G.queue));
+
             //1.run destoried page function;
-            var atom=G.queue.pop();
-            var evs=pages[atom.name].events;
+            var cur=G.queue.pop();
+            var atom=G.queue[G.queue.length-1];
+            //console.log(JSON.stringify(atom));
+
+            if(G.queue.length===1) self.hideBack();
+
+            var evs=pages[cur.name].events;
             //var input={};
             //if(atom.callback) input=atom.callback();
             evs.after(function(){
-                
                 $(this).removeAttr("disabled");
+                self.goto(atom.name,{RPC:agent},true);
             });
         },
         bind:function(){
             // <span class="" href="page" input=""></span>
-            //console.log('Auto open page');
             $("#"+con).find('span').off('click').on('click',function(){
                 var sel=$(this);
                 var page=sel.attr("page");
                 var data=JSON.parse(sel.attr("data"));
                 console.log(`preter[${page}]:${JSON.stringify(data)}`);
-                //console.log(sel.attr("data"));
+
+                self.showBack();
+                self.goto(page,{RPC:agent,data:data});
             });
         },  
         error:function(txt){
@@ -149,7 +160,6 @@
 
         },
         fresh:function(){
-            console.log('fresh binding..');
             self.bind();
         },
         back:self.back,
