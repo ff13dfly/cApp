@@ -9,14 +9,14 @@
     var config={
         app:'cMedia',          // name of cApp, will set to windows
         default:"index",        // default page
+        prefix:'cc_',
         cls:{
-            container:"cmedia_con",
-            nav:"cmedia_nav",
-            title:"cmedia_title",
-            back:"cmedia_back",
-            body:"cmedia_body",
-            href:"cmedia_href",         //auto page load class
-        }
+            entry:"",
+            nav:"",
+            title:"",
+            back:"",
+            body:"",
+        },
     };
 
     var G={
@@ -27,8 +27,9 @@
 
     var self={
         struct:function(){
+            if(!config.entry) self.clsAutoset(config.prefix);
             var cls=config.cls;
-            var framework=`<div class="row pt-2" id="${cls.container}">
+            var framework=`<div class="row pt-2" id="${cls.entry}">
                 <div class="col-12 ${cls.nav}">
                     <div class="row">
                         <div class="col-2"><span class="${cls.back}"> < </span></div>
@@ -44,58 +45,82 @@
             </style>`
             $("#"+con).html(framework+cmap);
         },
+        clsAutoset:function(pre){
+            var hash=exports.tools.hash;
+            for(var k in config.cls){
+                config.cls[k]=pre+hash();
+            }
+            return true;
+        },
         goto:function(name,input){
             console.log(`Opening page "${name}"`);
             if(!pages[name]) return false;
             var row=pages[name];
 
-            if(row.events.before){
-                row.events.before(function(){
-                    G.queue.push($.extend({},row.data));    //put page on history queue;
-                    self.initPage(row,input);
+            //creat related data.will sent to page to use as cache
+            //This will be pushed to the history queue, so when page reload as back, the data is ready.
+            var cache=$.extend({},row.data);
+            var events=row.events;
+            console.log("[function Goto] cache:"+JSON.stringify(cache));
+            if(events.before){
+                events.before(function(dt){
+                    cache.raw=dt;           //load data to cache
+                    G.queue.push(cache);    //put page on history queue;
+                    self.initPage(cache,events,input);
                 });
             }else{
-                G.queue.push($.extend({},row.data));    //put page on history queue;
-                self.initPage(row,input);
+                G.queue.push(cache);    //put page on history queue;
+                self.initPage(cache,events,input);
             }
         },
-        initPage:function(row,input){
-            console.log("init page.");
+        initPage:function(data,events,input){
+            console.log("init page..."+JSON.stringify(data));
             //console.log(row);
             var cls=config.cls;
 
             //1.body add dom;
-            $("."+cls.body).html(row.template);
+            $("."+cls.body).html(data.template);
 
             //1.1.set title
-            var data=row.data;
-            $("#"+cls.container).find('.'+cls.title).html(data.title);
-
-            $("#"+cls.container).find('.'+cls.back).off('click').on('click',self.back);
+            $("#"+cls.entry).find('.'+cls.title).html(data.title);
+            $("#"+cls.entry).find('.'+cls.back).off('click').on('click',self.back);
 
             //2.auto run js code on page
             if(input===undefined) input={};
             input.RPC=agent;
-            row.events.loading(input);      // page entry
+            events.loading(input,data);      // page entry
         },
         hideBack:function(){
             var cls=config.cls;
-            $("#"+cls.container).find('.'+cls.back).hide();
+            $("#"+cls.entry).find('.'+cls.back).hide();
         },
         showBack:function(){
             var cls=config.cls;
-            $("#"+cls.container).find('.'+cls.back).show();
+            $("#"+cls.entry).find('.'+cls.back).show();
         },
         back:function(){
+            $(this).attr("disabled","disabled");
             if(G.queue.length===0) return false;
-            //1.run destoried page callback;
+            //1.run destoried page function;
             var atom=G.queue.pop();
-            var input={};
-            if(atom.callback) input=atom.callback();
+            var evs=pages[atom.name].events;
+            //var input={};
+            //if(atom.callback) input=atom.callback();
+            evs.after(function(){
+                
+                $(this).removeAttr("disabled");
+            });
         },
         bind:function(){
             // <span class="" href="page" input=""></span>
-            console.log('Auto open page');
+            //console.log('Auto open page');
+            $("#"+con).find('span').off('click').on('click',function(){
+                var sel=$(this);
+                var page=sel.attr("page");
+                var data=JSON.parse(sel.attr("data"));
+                console.log(`preter[${page}]:${JSON.stringify(data)}`);
+                //console.log(sel.attr("data"));
+            });
         },  
         error:function(txt){
             console.log(txt);
@@ -124,7 +149,8 @@
 
         },
         fresh:function(){
-
+            console.log('fresh binding..');
+            self.bind();
         },
         back:self.back,
         page:function(name,pg){
@@ -138,7 +164,11 @@
                 self.hideBack();
                 self.goto(name,{RPC:agent});
             }
-        }, 
+        },
+        tools:{
+            hash:function(n) { return Math.random().toString(36).substr(n != undefined ? n : 6) },
+            shorten:function(address,n){if (n === undefined) n = 10;return address.substr(0, n) + '...' + address.substr(address.length - n, n);},
+        }
     };
 
     window[config.app]=exports;
