@@ -1,6 +1,6 @@
 /*
     {"type":"data","format":"JS"}
- */
+*/
 
 (function(App){
     if(!App) return false;

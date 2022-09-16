@@ -25,7 +25,7 @@
                 console.log(res);
                 var details=res.raw.raw;
                 
-                var ctx=self.autoLink(details.content);
+                var ctx=App.tools.convert(details.content,{page:"view"});
                 var dom=self.getDom(details.title,ctx,res.name,res.owner,res.blocknumber);
                 sel.html(dom);
                 App.fresh();
@@ -38,10 +38,6 @@
                 <div class="col-12">Auth: ${App.tools.shorten(owner,5)} on ${block} of ${anchor}</div>
                 <div class="col-12">${ctx}</div>
             </div>`;
-        },
-        autoLink:function(ctx){
-
-            return ctx;
         },
         //prepare the basic data when code loaded
         struct:function(){

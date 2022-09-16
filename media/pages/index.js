@@ -68,7 +68,7 @@
         row:function(){
             var row={
                 anchor:"testMe",
-                block:1912,
+                block:261,
                 account:"5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy",
                 raw:{
                     title:"Break news! Test cMedia",
@@ -79,8 +79,8 @@
             self.decode(row);
 
             var row={
-                anchor:"testMe",
-                block:1942,
+                anchor:"format",
+                block:2374,
                 account:"5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy",
                 raw:{
                     title:"Break news! Test cMedia again",

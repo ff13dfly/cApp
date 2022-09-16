@@ -10,6 +10,13 @@ block:  anchor on target block, not necessary
     {anchor://name/block}
 ```
 
+使用和MD一致的语法来处理关联
+
+```TEXT
+    This is a test txt [anchor testme](anchor://testme/309) to confirm the replace [anchor app](anchor://app/251) for anchor.
+```
+
+
 ## Definition
 
 ```JSON
@@ -48,6 +55,10 @@ block:  anchor on target block, not necessary
 
 ```JSON
     {"type":"data","format":"JSON","app":"cMedia"}
+```
+
+```JSON
+    {"title": "Test anchor format","desc": "It is a good way to test anchor format","content":"This is a test txt [anchor testme](anchor://testme/309) to confirm the replace [anchor app](anchor://app/251) for anchor."}
 ```
 
 ```JSON

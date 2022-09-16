@@ -197,6 +197,41 @@
             }
         },
         tools:{
+            convert:function(txt, ext){
+                var arr = txt.match(/\[.*?\)/g);
+                console.log(arr);
+                if(arr.length===0) return txt;
+                var map = {};
+                var format=exports.tools.format;
+                for (var i = 0; i < arr.length; i++) {
+                    var row = arr[i];
+                    map[row] = format(row, ext);
+                }
+    
+                for (var k in map) {
+                    var target = map[k];
+                    txt = txt.replaceAll(k, target);
+                }
+                return txt;
+            },
+            format:function(txt, ext) {
+                var arr = txt.split("](anchor://");
+                var last = arr.pop(),first = arr.pop();
+                var an = last.substr(0, last.length - 1).split("/");
+                var name = first.substr(1, first.length);
+                var details = {
+                    anchor: an[0],
+                    block: an[1] !== undefined ? parseInt(an[1]) : 0,
+                };
+    
+                var more = "";
+                if (ext != undefined) {
+                    for (var k in ext) {
+                        more += `${k}="${ext[k]}"`;
+                    }
+                }
+                return `<span ${more} data='${JSON.stringify(details)}'>${name}</span>`;
+            },
             hash:function(n) { return Math.random().toString(36).substr(n != undefined ? n : 6) },
             shorten:function(address,n){if (n === undefined) n = 10;return address.substr(0, n) + '...' + address.substr(address.length - n, n);},
         }
