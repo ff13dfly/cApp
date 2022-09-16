@@ -5,43 +5,23 @@
 (function(App){
     if(!App) return false;
     var config={
-        name:'view',
-        prefix:"cv_",
+        name:'history',
+        prefix:"hs_",
         cls:{
-            entry:'cv_index',
-            row:'',
-            anchor:'',
+            entry:'hs_index',
         },
     };
 
     var self={
-        show:function(params,data){
+        history:function(params,data){
             console.log(params);
             console.log(data);
 
             var RPC=App.cache.getG("RPC");
             var sel=$("#"+config.cls.entry);
-            RPC.common.view(params.block,params.anchor,params.owner,function(res){
-                console.log(res);
-                var details=res.raw.raw;
-                
-                var ctx=self.autoLink(details.content);
-                var dom=self.getDom(details.title,ctx,res.name,res.owner,res.blocknumber);
-                sel.html(dom);
-                App.fresh();
-            });
-            $("#"+config.cls.entry).html(`Loading anchor "${params.anchor}" data on ${params.block}`);
-        },
-        getDom:function(title,ctx,anchor,owner,block){
-            return `<div class="row">
-                <div class="col-12"><h3>${title}</h3></div>
-                <div class="col-12">Auth: ${App.tools.shorten(owner,5)} on ${block} of ${anchor}</div>
-                <div class="col-12">${ctx}</div>
-            </div>`;
-        },
-        autoLink:function(ctx){
-
-            return ctx;
+            var ha='<span page="view" data="{&quot;anchor&quot;:&quot;testMe&quot;,&quot;block&quot;:1942,&quot;owner&quot;:&quot;5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy&quot;}">anchor link</span>';
+            sel.html('Ready to show history<br>'+ha);
+            App.fresh();
         },
         //prepare the basic data when code loaded
         struct:function(){
@@ -51,7 +31,7 @@
         clsAutoset:function(pre){
             var hash=App.tools.hash;
             for(var k in config.cls){
-                if(!config.cls[k]) config.cls[k]=pre+hash();
+                if(!config.cls[k]) config.cls[k]=pre + hash();
             }
             return true;
         },
@@ -66,7 +46,7 @@
     var page={
         "data":{
             "name":config.name,
-            "title":"News details",     //default page title
+            "title":"Anchor history details",     //default page title
             "raw":null,
             "params":{},
             "template":`<div id="${config.cls.entry}"></div>`,     //includindg dom and css, will add to body container,
@@ -74,14 +54,13 @@
         "events":{
             "before":function(params,ck){
                 //console.log(`${config.name} event "before" param :${JSON.stringify(params)}`);
-                //var dt={view:"world"};
+                
                 ck && ck();
             },
             "loading":function(params,data){
-                //console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
-                //console.log(data);
+                console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
                 test.auto();        //test data, need to remove
-                self.show(params,data);
+                self.history(params,data);
             },
             "after":function(params,ck){
                 //console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);

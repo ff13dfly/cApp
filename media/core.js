@@ -54,7 +54,7 @@
             var framework=`<div class="row pt-2" id="${cls.entry}">
                 <div class="col-12 ${cls.nav}">
                     <div class="row">
-                        <div class="col-2"><span class="${cls.back}"> < </span></div>
+                        <div class="col-2"><p class="${cls.back}"> < </p></div>
                         <div class="col-8 text-center ${cls.title}"></div>
                         <div class="col-2"></div>
                     </div>
@@ -94,10 +94,10 @@
             //console.log("[function Goto] cache:"+JSON.stringify(cache));
             if(events.before){
                 events.before(params,function(dt){
-                    cache.raw=dt;           //load data to cache
-                    if(!skip) G.queue.push(cache);    //put page on history queue;
+                    if(dt!==undefined) cache.raw=dt;        //load data to cache
+                    if(!skip) G.queue.push(cache);          //put page on history queue;
                     self.initPage(cache);
-                    events.loading(params,cache);         // page entry
+                    events.loading(params,cache);           // page entry
                 });
             }else{
                 if(!skip) G.queue.push(cache);    //put page on history queue;
@@ -126,10 +126,11 @@
             $("#"+cls.entry).find('.'+cls.back).show();
         },
         back:function(){
+            console.log(`Before back :${JSON.stringify(G.queue)}`);
             $(this).attr("disabled","disabled");
             if(G.queue.length===0) return false;
 
-            console.log(JSON.stringify(G.queue));
+            
 
             //1.run destoried page function;
             var cur=G.queue.pop();
@@ -144,6 +145,7 @@
             evs.after(atom.params,function(){
                 $(this).removeAttr("disabled");
                 self.goto(atom.name,{},true);
+                console.log(`After back :${JSON.stringify(G.queue)}`);
             });
         },
         bind:function(){

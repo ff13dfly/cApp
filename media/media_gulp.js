@@ -25,6 +25,7 @@ var source = [
     'core.js',
     'pages/index.js',
     'pages/view.js',
+    'pages/history.js',
 ];
 var opt = {
     mangle: {

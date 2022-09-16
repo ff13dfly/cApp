@@ -26,9 +26,8 @@
         },
         
         decode:function(row){
-            var ctx = row.raw;
-            var cls=config.cls;
-            var dt={anchor:row.anchor,block:row.block};
+            var ctx = row.raw,cls=config.cls;
+            var dt={anchor:row.anchor,block:row.block,owner:row.account};
             var dom=`<div class="row">
                 <div class="col-12 pt-2 ${cls.row}" >
                     <span page="view" data='${JSON.stringify(dt)}'><h4>${ctx.title}</h4></span>
@@ -39,7 +38,7 @@
                 <div class="col-4">${App.tools.shorten(row.account,4)}</div>
                 <div class="col-8 text-end">
                  Block : <strong>${row.block}</strong> , 
-                 Anchor : <strong class="${cls.anchor}">${row.anchor}</strong> 
+                 Anchor : <strong class="${cls.anchor}"><span page="history" data='${JSON.stringify({anchor:row.anchor})}'>${row.anchor}</span></strong> 
                 </div>
                 <div class="col-12"><hr /></div>
             </div>`;
@@ -69,7 +68,7 @@
         row:function(){
             var row={
                 anchor:"testMe",
-                block:999,
+                block:1912,
                 account:"5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy",
                 raw:{
                     title:"Break news! Test cMedia",
@@ -81,7 +80,7 @@
 
             var row={
                 anchor:"testMe",
-                block:1239,
+                block:1942,
                 account:"5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy",
                 raw:{
                     title:"Break news! Test cMedia again",
@@ -107,19 +106,19 @@
         },      
         "events":{
             "before":function(params,ck){
-                console.log(`${config.name} event "before" param :${JSON.stringify(params)}`);
+                //console.log(`${config.name} event "before" param :${JSON.stringify(params)}`);
                 //console.log('Before page loading...'+JSON.stringify(cache));
                 var dt={hello:"world"};
                 ck && ck(dt);
             },
             "loading":function(params,data){
-                console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
-                console.log(data);
+                //console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
+                //console.log(data);
                 test.auto();        //test data, need to remove
                 self.listening();
             },
             "after":function(params,ck){
-                console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);
+                //console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);
                 ck && ck();
             },
         },
