@@ -4,7 +4,31 @@
 
 ```JSON
     {
-        "name":"cNews",
+        "name":"jquery",
+        "raw":"[code]",
+        "protocol":{"type":"data","format":"JS","ver":"3.8.0"}
+    }
+```
+
+```JSON
+    {
+        "name":"bootstrap",
+        "raw":"[code]",
+        "protocol":{"type":"data","format":"JS","lib":["bootstrap_css"],"ver":"5.1.3"}
+    }
+```
+
+```JSON
+    {
+        "name":"bootstrap_css",
+        "raw":"[code]",
+        "protocol":{"type":"data","format":"CSS","ver":"5.1.3"}
+    }
+```
+
+```JSON
+    {
+        "name":"cMedia",
         "raw":"[code]",
         "protocol":{"type":"app","format":"JS","lib":["jquery","bootstrap"],"ver":"0.0.1"}
     }

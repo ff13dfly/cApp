@@ -6,6 +6,7 @@
     if(!con) console.log('No container to run cApp.');
     if(!agent) console.log('No way to interact with anchor network.');
 
+    //cMedia basic config
     var config={
         app:'cMedia',          // name of cApp, will set to windows
         default:"index",        // default page
@@ -19,14 +20,35 @@
         },
     };
 
+    //galobal cache;
+    var pages={};
     var G={
-        queue:[],           // page stack
+        queue:[],       // page stack
+        RPC:null,       // RPC call function   
+        container:'',   // entry container id
+        name:'',        // App name, used to filter anchors.
+        funs:{
+            setG:function(k,v){
+                if(G[k]===undefined || k==='funs') return false;
+                G[k]=v;
+                return true;
+            },
+            getG:function(k){
+                return (G[k]===undefined || k==='funs')?null:G[k];
+            },
+            delG:function(k){
+                if(G[k]===undefined || k==='funs') return false;
+                delete G[k];
+                return true;
+            },
+        },
     };
 
-    var pages={};
+    
 
     var self={
         struct:function(){
+            //1.struct dom
             if(!config.entry) self.clsAutoset(config.prefix);
             var cls=config.cls;
             var framework=`<div class="row pt-2" id="${cls.entry}">
@@ -39,11 +61,16 @@
                 </div>
                 <div class="col-12 ${cls.body}"></div>
             </div>`;
-            var cmap=`<style>
+            var cmap = `<style>
                 .${cls.nav} {background:#EEEEEE;}
                 .${cls.body} {min-height:400px;width:100%;background:#FFFFFF;}
-            </style>`
+            </style>`;
             $("#"+con).html(framework+cmap);
+
+            //2.save RPC call object
+            G.funs.setG("RPC",agent);
+            G.funs.setG("container",con);
+            G.funs.setG("name",config.app);
         },
         clsAutoset:function(pre){
             var hash=exports.tools.hash;
@@ -52,7 +79,7 @@
             }
             return true;
         },
-        goto:function(name,input,skip){
+        goto:function(name,params,skip){
             //console.log(`Opening page "${name}"`);
             if(!pages[name]) return false;
             var row=pages[name];
@@ -61,36 +88,34 @@
             //creat related data.will sent to page to use as cache
             //This will be pushed to the history queue, so when page reload as back, the data is ready.
             var cache=$.extend({},row.data);
-            cache.name=name;        //set history name
+            cache.params=params;                //set params
 
             var events=row.events;
             //console.log("[function Goto] cache:"+JSON.stringify(cache));
             if(events.before){
-                events.before(function(dt){
+                events.before(params,function(dt){
                     cache.raw=dt;           //load data to cache
                     if(!skip) G.queue.push(cache);    //put page on history queue;
-                    self.initPage(cache,events,input);
+                    self.initPage(cache);
+                    events.loading(params,cache);         // page entry
                 });
             }else{
                 if(!skip) G.queue.push(cache);    //put page on history queue;
-                self.initPage(cache,events,input);
+                self.initPage(cache);
+                events.loading(params,cache);         // page entry
             }
         },
-        initPage:function(data,events,input){
+        initPage:function(data){
             //console.log("init page..."+JSON.stringify(data));
             var cls=config.cls;
 
             //1.body add dom;
-            $("#"+cls.entry).find("."+cls.body).html(data.template);
+            var sel=$("#"+cls.entry);
+            sel.find("."+cls.body).html(data.template);
 
             //1.1.set title
-            $("#"+cls.entry).find('.'+cls.title).html(data.title);
-            $("#"+cls.entry).find('.'+cls.back).off('click').on('click',self.back);
-
-            //2.auto run js code on page
-            if(input===undefined) input={};
-            input.RPC=agent;
-            events.loading(input,data);      // page entry
+            sel.find('.'+cls.title).html(data.title);
+            sel.find('.'+cls.back).off('click').on('click',self.back);
         },
         hideBack:function(){
             var cls=config.cls;
@@ -116,49 +141,47 @@
             var evs=pages[cur.name].events;
             //var input={};
             //if(atom.callback) input=atom.callback();
-            evs.after(function(){
+            evs.after(atom.params,function(){
                 $(this).removeAttr("disabled");
-                self.goto(atom.name,{RPC:agent},true);
+                self.goto(atom.name,{},true);
             });
         },
         bind:function(){
             // <span class="" href="page" input=""></span>
-            $("#"+con).find('span').off('click').on('click',function(){
+            $("#"+G.container).find('span').off('click').on('click',function(){
                 var sel=$(this);
                 var page=sel.attr("page");
-                var data=JSON.parse(sel.attr("data"));
-                console.log(`preter[${page}]:${JSON.stringify(data)}`);
+                var params=JSON.parse(sel.attr("data"));
 
                 self.showBack();
-                self.goto(page,{RPC:agent,data:data});
+                self.goto(page,params);
             });
         },  
         error:function(txt){
             console.log(txt);
         },
-        setG:function(k,v){
-            G[k]=v;
-            return true;
-        },
-        getG:function(k){
-            return G[k];
-        },
-        delG:function(k){
-            delete G[k];
-            return true;
-        },
     };
+
+    //程序加载逻辑
+    //1.页面载入时，对cls进行赋值；
+
+    //2.通过唯一入口goto进行页面访问时：
+    //2.1.执行events.before，获取数据后，克隆出1个page对象（仅仅data部分），将获取的数据存入；
+    //2.2.将整理好的数据，压入G.queue，作为历史记录进行访问；
+    //2.3.将page.template写入到主容器里，准备显示数据；
+
+    //3.执行events.loading，开始页面的操作和功能组织；
+
+    //4.调用back的时候，执行events.after，同时G.queue进行出栈操作
 
     var exports={
         info:function(){
             return {
                 app:config.app,
                 intro:"more information about app",
-            }
+            };
         },
-        to:function(name,input){
-
-        },
+        cache:G.funs,
         fresh:function(){
             self.bind();
         },
@@ -166,13 +189,9 @@
         page:function(name,pg){
             pages[name]=$.extend({},pg);     //need to clone.
 
-            if(pg.events!=undefined){
-                console.log('ready to run and set events');
-            }
-
             if(name===config.default) {
                 self.hideBack();
-                self.goto(name,{RPC:agent});
+                self.goto(name,{});
             }
         },
         tools:{

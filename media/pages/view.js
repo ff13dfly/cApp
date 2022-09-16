@@ -13,12 +13,16 @@
             anchor:'',
         },
     };
-    var cache=null;
 
     var self={
+        show:function(params){
+
+            $("#"+config.cls.entry).html("ready to render content....");
+        },
+        //prepare the basic data when code loaded
         struct:function(){
             self.clsAutoset(config.prefix);
-            console.log(`Config:${JSON.stringify(config)}`);
+            //console.log(`Config:${JSON.stringify(config)}`);
         },
         clsAutoset:function(pre){
             var hash=App.tools.hash;
@@ -37,26 +41,26 @@
 
     var page={
         "data":{
+            "name":config.name,
             "title":"cMedia App",     //default page title
             "raw":null,
+            "params":{},
             "template":`<div id="${config.cls.entry}"></div>`,     //includindg dom and css, will add to body container,
-            "input":{page:0},
         },      
         "events":{
-            "before":function(ck){
-                console.log('Before page loading...'+JSON.stringify(cache));
+            "before":function(params,ck){
+                console.log(`${config.name} event "before" param :${JSON.stringify(params)}`);
                 var dt={view:"world"};
                 ck && ck(dt);
             },
-            "loading":function(input,data){
-                console.log('Page loading...'+JSON.stringify(data));
-                cache=data;
+            "loading":function(params,data){
+                console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
+                console.log(data);
                 test.auto();        //test data, need to remove
-                console.log('ready to show page');
-                $("#"+config.cls.entry).html("ready to render content....");
+                self.show(params);
             },
-            "after":function(ck){
-                console.log('after page destoried...');
+            "after":function(params,ck){
+                console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);
                 ck && ck();
             },
         },

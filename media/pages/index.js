@@ -9,13 +9,11 @@
             anchor:'',
         }
     };
-    var cache=null;
-
     var self={
-        listening:function(input){
+        listening:function(){
             var info=App.info();
-            //$("#cMedia_index").html("This is a cApp, fullscreen function.");
-            input.RPC.common.subscribe(function(list){
+            var RPC=App.cache.getG("RPC");
+            RPC.common.subscribe(function(list){
                 if(list.length ==0) return false;
                 for(var i=0;i<list.length;i++){
                     var row=list[i];
@@ -48,6 +46,8 @@
             //console.log(`Config:${JSON.stringify(config)}`);
             $("#"+cls.entry).prepend(dom);
         },
+
+        //prepare the basic data when code loaded
         struct:function(){
             self.clsAutoset(config.prefix);
             //console.log(`Config:${JSON.stringify(config)}`);
@@ -97,26 +97,29 @@
 
 
     var page={
+        
         "data":{
+            "name":config.name,
             "title":"cMedia App",     //default page title
             "raw":null,
+            "params":{},
             "template":`<div id="${config.cls.entry}"></div>`,     //includindg dom and css, will add to body container,
-            "input":{page:0},
         },      
         "events":{
-            "before":function(ck){
+            "before":function(params,ck){
+                console.log(`${config.name} event "before" param :${JSON.stringify(params)}`);
                 //console.log('Before page loading...'+JSON.stringify(cache));
-                //var dt={hello:"world"};
-                ck && ck();
+                var dt={hello:"world"};
+                ck && ck(dt);
             },
-            "loading":function(input,data){
-                //console.log('Page loading...'+JSON.stringify(data));
-                cache=data;
+            "loading":function(params,data){
+                console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
+                console.log(data);
                 test.auto();        //test data, need to remove
-                self.listening(input);
+                self.listening();
             },
-            "after":function(ck){
-               // console.log('after page destoried...');
+            "after":function(params,ck){
+                console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);
                 ck && ck();
             },
         },
