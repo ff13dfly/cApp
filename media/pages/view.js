@@ -25,7 +25,7 @@
                 console.log(res);
                 var details=res.raw.raw;
                 
-                var ctx=App.tools.convert(details.content,{page:"view"});
+                var ctx=App.tools.convert(details.content,{"page":"view","class":"text-info"});
                 var dom=self.getDom(details.title,ctx,res.name,res.owner,res.blocknumber);
                 sel.html(dom);
                 App.fresh();

@@ -13,6 +13,7 @@
         prefix:'cc_',
         cls:{
             entry:"",
+            mask:"",
             nav:"",
             title:"",
             back:"",
@@ -44,11 +45,14 @@
         },
     };
 
-    
-
     var self={
         struct:function(){
-            //1.struct dom
+            //1.save RPC call object
+            G.funs.setG("RPC",agent);
+            G.funs.setG("container",con);
+            G.funs.setG("name",config.app);
+
+            //2.struct dom
             if(!config.entry) self.clsAutoset(config.prefix);
             var cls=config.cls;
             var framework=`<div class="row pt-2" id="${cls.entry}">
@@ -60,18 +64,20 @@
                     </div>
                 </div>
                 <div class="col-12 ${cls.body}"></div>
-            </div>`;
+            </div>
+            <div class="row pt-2" id="${cls.mask}"></div>`;
+
             var cmap = `<style>
                 .${cls.nav} {background:#EEEEEE;}
                 .${cls.body} {min-height:400px;width:100%;background:#FFFFFF;}
+                #${cls.mask} {display:none;position:fixed;z-index:99}
             </style>`;
             $("#"+con).html(framework+cmap);
 
-            //2.save RPC call object
-            G.funs.setG("RPC",agent);
-            G.funs.setG("container",con);
-            G.funs.setG("name",config.app);
+            //3.set mask dom
+            
         },
+
         clsAutoset:function(pre){
             var hash=exports.tools.hash;
             for(var k in config.cls){
@@ -116,21 +122,17 @@
             //1.1.set title
             sel.find('.'+cls.title).html(data.title);
             sel.find('.'+cls.back).off('click').on('click',self.back);
+
+            //2.loading animate here
+            self.animateLoad(function(){
+
+            });
         },
-        hideBack:function(){
-            var cls=config.cls;
-            $("#"+cls.entry).find('.'+cls.back).hide();
-        },
-        showBack:function(){
-            var cls=config.cls;
-            $("#"+cls.entry).find('.'+cls.back).show();
-        },
+
         back:function(){
             console.log(`Before back :${JSON.stringify(G.queue)}`);
             $(this).attr("disabled","disabled");
             if(G.queue.length===0) return false;
-
-            
 
             //1.run destoried page function;
             var cur=G.queue.pop();
@@ -143,9 +145,11 @@
             //var input={};
             //if(atom.callback) input=atom.callback();
             evs.after(atom.params,function(){
-                $(this).removeAttr("disabled");
-                self.goto(atom.name,{},true);
                 console.log(`After back :${JSON.stringify(G.queue)}`);
+                self.animateLoad(function(){
+                    $(this).removeAttr("disabled");
+                    self.goto(atom.name,{},true);
+                });
             });
         },
         bind:function(){
@@ -158,23 +162,51 @@
                 self.showBack();
                 self.goto(page,params);
             });
-        },  
+        },
+
+        animateBack:function(ck){
+
+        },
+        animateLoad:function(ck){
+            var cls=config.cls;
+            var con=G.funs.getG("container");
+            var dv=self.device(con);
+            var dom=$("#"+cls.entry).html();
+            var mmap={
+                width:dv.width+"px",
+                height:dv.height+"px",
+                top:dv.top+"px",
+                left:(dv.left+dv.screen)+"px",
+            };
+            $("#"+cls.mask).html(dom).css(mmap);
+
+            var sel=$("#"+cls.mask);
+            sel.show().animate({left:dv.left+'px'},3000,ck).hide();
+        },
+        device:function(con){
+            var sel=$("#"+con);
+            var w=sel.width(),h=sel.height();
+            var offset=sel.offset();
+           return {
+                width:w,
+                height:h,
+                top:offset.top,
+                left:offset.left,
+                screen:$(window).width(),
+           };
+        },
+        hideBack:function(){
+            var cls=config.cls;
+            $("#"+cls.entry).find('.'+cls.back).hide();
+        },
+        showBack:function(){
+            var cls=config.cls;
+            $("#"+cls.entry).find('.'+cls.back).show();
+        },
         error:function(txt){
             console.log(txt);
         },
     };
-
-    //程序加载逻辑
-    //1.页面载入时，对cls进行赋值；
-
-    //2.通过唯一入口goto进行页面访问时：
-    //2.1.执行events.before，获取数据后，克隆出1个page对象（仅仅data部分），将获取的数据存入；
-    //2.2.将整理好的数据，压入G.queue，作为历史记录进行访问；
-    //2.3.将page.template写入到主容器里，准备显示数据；
-
-    //3.执行events.loading，开始页面的操作和功能组织；
-
-    //4.调用back的时候，执行events.after，同时G.queue进行出栈操作
 
     var exports={
         info:function(){
@@ -227,7 +259,7 @@
                 var more = "";
                 if (ext != undefined) {
                     for (var k in ext) {
-                        more += `${k}="${ext[k]}"`;
+                        more += `${k}="${ext[k]}" `;
                     }
                 }
                 return `<span ${more} data='${JSON.stringify(details)}'>${name}</span>`;
