@@ -19,6 +19,9 @@
             back:"",
             body:"",
         },
+        animate:{
+            interval:500,
+        },
     };
 
     //galobal cache;
@@ -78,15 +81,16 @@
         clsAutoset:function(pre){
             var hash=exports.tools.hash;
             for(var k in config.cls){
-                config.cls[k]=pre+hash();
+                if(!config.cls[k])config.cls[k]=pre+hash();
             }
             return true;
         },
         goto:function(name,params,skip){
             //console.log(`Opening page "${name}"`);
             if(!pages[name]) return false;
+            var row=pages[name];
 
-            //1.cache current container dom for back function.
+            //1.cache current container dom as history snap. It can be use by back function
             if(G.queue.length>0 && !skip){
                 var curDom=self.getCurDom();
                 var last=G.queue[G.queue.length-1];
@@ -94,40 +98,40 @@
             }
             
             //2.prepare the target page data
-            var row=pages[name];
             //creat related data.will sent to page to use as cache
             //This will be pushed to the history queue, so when page reload as back, the data is ready.
             var cache=$.extend({},row.data);
-            cache.preload=self.preload(cache);      //prepare preload page dom
             cache.params=params;                    //set params
             if(!skip) G.queue.push(cache);          //put page on history queue;
             var act=!(G.queue.length===1 || skip);  //wether animation
-
-            var events=row.events;
+            
             //console.log("[function Goto] cache:"+JSON.stringify(cache));
-            if(events.before){
+            var events=row.events;
+            if(!events.before){
+                self.showPage(act,params,cache,events);               
+            }else{
                 events.before(params,function(dt){
-                    if(dt!==undefined) cache.raw=dt;        //load data to cache
-                    //2.loading animate here
+                    if(dt!==undefined){
+                        cache.raw=dt;        //load data to cache
+                    }
                     self.showPage(act,params,cache,events);
                 });
-            }else{
-                self.showPage(act,params,cache,events);
             }
         },
 
         showPage:function(act,params,cache,events){
-            if(act){
+            cache.preload=self.preload(cache);
+            if(!act){
+                self.initPage(cache);
+                events.loading(params,cache,function(){
+                        
+                });
+            }else{
                 self.animateLoad(cache.preload,function(){
                     self.initPage(cache);
                     events.loading(params,cache,function(){
 
                     });
-                });
-            }else{
-                self.initPage(cache);
-                events.loading(params,cache,function(){
-
                 });
             }
         },
@@ -151,8 +155,6 @@
             //1.body add dom;
             var sel=$("#"+cls.entry);
             sel.find("."+cls.body).html(data.template);
-
-            //1.1.set title
             sel.find('.'+cls.title).html(data.title);
             var dom=sel.html();
 
@@ -172,7 +174,6 @@
             //1.run destoried page function;
             var cur=G.queue.pop();
             var atom=G.queue[G.queue.length-1];
-            //console.log(JSON.stringify(atom));
 
             if(G.queue.length===1) self.hideBack();
 
@@ -181,7 +182,7 @@
             //if(atom.callback) input=atom.callback();
             evs.after(atom.params,function(){
                 //console.log(`After back :${JSON.stringify(G.queue)}`);
-                self.animateBack(function(){
+                self.animateBack(atom.snap,function(){
                     $(this).removeAttr("disabled");
                     self.goto(atom.name,{},true);
                 });
@@ -199,67 +200,58 @@
             });
         },
 
-        animateBack:function(ck){
-            console.log("ready to back");
+        animateBack:function(dom,ck){
+            //console.log("ready to back");
             var cls=config.cls;
-            var con=G.funs.getG("container");
-            var dv=self.device(con);
+            var dv=self.device(G.funs.getG("container"));
 
-            //1.get current container dom to mask 
-            //2.set mask position to container.
-            var dom=$("#"+cls.entry).html();
-            var sel=$("#"+cls.mask);
-            var mmap={
+            var cur=$("#"+cls.entry).html(); //1.get current container dom
+            $("#"+cls.entry).html(dom);  //2.set history snap to container.
+            if(G.queue.length===1){
+                self.hideBack();
+            }   
+            //3.set mask position and set current dom to it.
+            var cmap={
                 width:dv.width+"px",
                 height:dv.height+"px",
                 top:dv.top+"px",
                 left:dv.left+"px",
             };
-            sel.html(dom).css(mmap);
-            
-            //3.set history snap to container.
-            var last=G.queue[G.queue.length-1];
-            var snap=last.snap;
-            $("#"+cls.entry).html(snap);
-            self.bind();
-
-            //4.animate from left:0 to left:screen.width
-            ck && ck();
-            sel.show().animate({left:(dv.left+dv.screen)+'px'},1000,ck).hide();
+            var at=config.animate.interval;
+            var ani={left:(dv.left+dv.screen)+'px'};
+            $("#"+cls.mask).html(cur).css(cmap).show().animate(ani,at,function(){
+                $("#"+cls.mask).hide();
+                ck && ck();
+            });
         },
         animateLoad:function(dom,ck){
-            console.log("ready to load");
+            //console.log("ready to load");
             var cls=config.cls;
-            var con=G.funs.getG("container");
-            var dv=self.device(con);
+            var dv=self.device(G.funs.getG("container"));
+
             var cmap={
                 width:dv.width+"px",
                 height:dv.height+"px",
                 top:dv.top+"px",
                 left:(dv.left+dv.screen)+"px",
             };
-
-            console.log(cls.mask);
-            console.log(dv);
-            console.log(JSON.stringify(cmap));
-            $("#"+cls.mask).html(dom).css(cmap).show();
-            //need to reselect the target dom to do animation.
-            $("#"+cls.mask).animate({left:dv.left+'px'},1000,function(){
+            var at=config.animate.interval;
+            var ani={left:dv.left+'px'};
+            $("#"+cls.mask).html(dom).css(cmap).show().animate(ani,at,function(){
                 $("#"+cls.mask).hide();
                 ck && ck();
             });
         },
         device:function(con){
-            var sel=$("#"+con);
-            var w=sel.width(),h=sel.height();
+            var sel=$("#"+con),w=sel.width(),h=sel.height();
             var offset=sel.offset();
-           return {
+            return {
                 width:w,
                 height:h,
                 top:offset.top,
                 left:offset.left,
                 screen:$(window).width(),
-           };
+            };
         },
         hideBack:function(){
             var cls=config.cls;
@@ -282,14 +274,11 @@
             };
         },
         cache:G.funs,
-        fresh:function(){
-            self.bind();
-        },
+        fresh:self.bind,
         back:self.back,
         page:function(name,pg){
             pages[name]=$.extend({},pg);     //need to clone.
-
-            if(name===config.default) {
+            if(name===config.default){
                 self.hideBack();
                 self.goto(name,{});
             }
@@ -297,10 +286,8 @@
         tools:{
             convert:function(txt, ext){
                 var arr = txt.match(/\[.*?\)/g);
-                //console.log(arr);
                 if(arr.length===0) return txt;
-                var map = {};
-                var format=exports.tools.format;
+                var map = {},format=exports.tools.format;
                 for (var i = 0; i < arr.length; i++) {
                     var row = arr[i];
                     map[row] = format(row, ext);
@@ -324,9 +311,7 @@
     
                 var more = "";
                 if (ext != undefined) {
-                    for (var k in ext) {
-                        more += `${k}="${ext[k]}" `;
-                    }
+                    for (var k in ext)more += `${k}="${ext[k]}" `;
                 }
                 return `<span ${more} data='${JSON.stringify(details)}'>${name}</span>`;
             },
