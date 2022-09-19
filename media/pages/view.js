@@ -65,8 +65,9 @@
             "title":"News details",     //default page title
             "raw":null,
             "params":{},
+            "preload":"",
             "snap":"",
-            "template":`<div id="${config.cls.entry}"></div>`,     //includindg dom and css, will add to body container,
+            "template":`<div id="${config.cls.entry}">Loading...</div>`,     //includindg dom and css, will add to body container,
         },      
         "events":{
             "before":function(params,ck){

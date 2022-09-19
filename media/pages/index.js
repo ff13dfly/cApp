@@ -114,6 +114,7 @@
             "title":"cMedia App",     //default page title
             "raw":null,
             "params":{},
+            "preload":"Loading...",
             "snap":"",
             "template":`<div id="${config.cls.entry}"></div>`,     //includindg dom and css, will add to body container,
         },      

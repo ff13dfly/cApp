@@ -70,7 +70,7 @@
             var cmap = `<style>
                 .${cls.nav} {background:#EEEEEE;}
                 .${cls.body} {min-height:400px;width:100%;background:#FFFFFF;}
-                #${cls.mask} {display:none;position:fixed;z-index:99}
+                #${cls.mask} {display:none;position:fixed;z-index:99;background:#FFFFFF;}
             </style>`;
             $("#"+con).html(framework+cmap);    
         },
@@ -90,20 +90,18 @@
             if(G.queue.length>0 && !skip){
                 var curDom=self.getCurDom();
                 var last=G.queue[G.queue.length-1];
-                //console.log(last);
                 last.snap=curDom;
             }
-            
-            //G.queue[G.queue.length-1].snap=curDom;
             
             //2.prepare the target page data
             var row=pages[name];
             //creat related data.will sent to page to use as cache
             //This will be pushed to the history queue, so when page reload as back, the data is ready.
             var cache=$.extend({},row.data);
-            cache.params=params;                //set params
+            cache.preload=self.preload(cache);      //prepare preload page dom
+            cache.params=params;                    //set params
             if(!skip) G.queue.push(cache);          //put page on history queue;
-            var act=!(G.queue.length===1 || skip);
+            var act=!(G.queue.length===1 || skip);  //wether animation
 
             var events=row.events;
             //console.log("[function Goto] cache:"+JSON.stringify(cache));
@@ -117,15 +115,15 @@
                 self.showPage(act,params,cache,events);
             }
         },
+
         showPage:function(act,params,cache,events){
             if(act){
-                self.animateLoad(function(){
+                self.animateLoad(cache.preload,function(){
                     self.initPage(cache);
                     events.loading(params,cache,function(){
 
                     });
                 });
-                
             }else{
                 self.initPage(cache);
                 events.loading(params,cache,function(){
@@ -133,11 +131,7 @@
                 });
             }
         },
-        getCurDom:function(){
-            var cls=config.cls;
-            var con=G.funs.getG("container");
-            return $("#"+con).find("#"+cls.entry).html();
-        },
+        
         initPage:function(data){
             //console.log("init page..."+JSON.stringify(data));
             var cls=config.cls;
@@ -150,7 +144,26 @@
             sel.find('.'+cls.title).html(data.title);
             sel.find('.'+cls.back).off('click').on('click',self.back);
         },
+        preload:function(data){
+            var cls=config.cls;
+            var backup=self.getCurDom();
+            
+            //1.body add dom;
+            var sel=$("#"+cls.entry);
+            sel.find("."+cls.body).html(data.template);
 
+            //1.1.set title
+            sel.find('.'+cls.title).html(data.title);
+            var dom=sel.html();
+
+            $("#"+cls.entry).html(backup);
+            return dom;
+        },
+        getCurDom:function(){
+            var cls=config.cls;
+            var con=G.funs.getG("container");
+            return $("#"+con).find("#"+cls.entry).html();
+        },
         back:function(){
             //console.log(`Before back :${JSON.stringify(G.queue)}`);
             $(this).attr("disabled","disabled");
@@ -214,22 +227,27 @@
             ck && ck();
             sel.show().animate({left:(dv.left+dv.screen)+'px'},1000,ck).hide();
         },
-        animateLoad:function(ck){
+        animateLoad:function(dom,ck){
             console.log("ready to load");
             var cls=config.cls;
             var con=G.funs.getG("container");
             var dv=self.device(con);
-            var dom=$("#"+cls.entry).html();
-            var mmap={
+            var cmap={
                 width:dv.width+"px",
                 height:dv.height+"px",
                 top:dv.top+"px",
                 left:(dv.left+dv.screen)+"px",
             };
-            $("#"+cls.mask).html(dom).css(mmap);
 
-            var sel=$("#"+cls.mask);
-            sel.show().animate({left:dv.left+'px'},1000,ck).hide();
+            console.log(cls.mask);
+            console.log(dv);
+            console.log(JSON.stringify(cmap));
+            $("#"+cls.mask).html(dom).css(cmap).show();
+            //need to reselect the target dom to do animation.
+            $("#"+cls.mask).animate({left:dv.left+'px'},1000,function(){
+                $("#"+cls.mask).hide();
+                ck && ck();
+            });
         },
         device:function(con){
             var sel=$("#"+con);
