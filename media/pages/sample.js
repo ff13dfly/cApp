@@ -39,6 +39,7 @@
             "title":"Anchor history details",     //default page title
             "raw":null,
             "params":{},
+            "snap":"",
             "template":`<div id="${config.cls.entry}"></div>`,     //includindg dom and css, will add to body container,
         },      
         "events":{

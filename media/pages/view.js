@@ -16,13 +16,13 @@
 
     var self={
         show:function(params,data){
-            console.log(params);
-            console.log(data);
+            //console.log(params);
+            //console.log(data);
 
             var RPC=App.cache.getG("RPC");
             var sel=$("#"+config.cls.entry);
             RPC.common.view(params.block,params.anchor,params.owner,function(res){
-                console.log(res);
+                //console.log(res);
                 var details=res.raw.raw;
                 
                 var ctx=App.tools.convert(details.content,{"page":"view","class":"text-info"});
@@ -65,6 +65,7 @@
             "title":"News details",     //default page title
             "raw":null,
             "params":{},
+            "snap":"",
             "template":`<div id="${config.cls.entry}"></div>`,     //includindg dom and css, will add to body container,
         },      
         "events":{

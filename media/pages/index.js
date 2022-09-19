@@ -67,8 +67,8 @@
         },
         row:function(){
             var row={
-                anchor:"testMe",
-                block:261,
+                anchor:"fNews",
+                block:133,
                 account:"5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy",
                 raw:{
                     title:"Break news! Test cMedia",
@@ -79,8 +79,20 @@
             self.decode(row);
 
             var row={
+                anchor:"testMe",
+                block:127,
+                account:"5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy",
+                raw:{
+                    title:"Break news! Test cMedia again",
+                    desc:"Ukraine, has come under further missile attacks Monday evening local time.   Around 10 p.m. local time (3 p.m. ET), witnesses in the center of the city said they heard several large explosions which shook buildings.",
+                    content:"A good news, this is the content.",
+                },
+            };
+            self.decode(row);
+
+            var row={
                 anchor:"format",
-                block:2374,
+                block:97,
                 account:"5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy",
                 raw:{
                     title:"Break news! Test cMedia again",
@@ -102,6 +114,7 @@
             "title":"cMedia App",     //default page title
             "raw":null,
             "params":{},
+            "snap":"",
             "template":`<div id="${config.cls.entry}"></div>`,     //includindg dom and css, will add to body container,
         },      
         "events":{
@@ -111,11 +124,12 @@
                 var dt={hello:"world"};
                 ck && ck(dt);
             },
-            "loading":function(params,data){
+            "loading":function(params,data,ck){
                 //console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
                 //console.log(data);
                 test.auto();        //test data, need to remove
                 self.listening();
+                ck && ck();
             },
             "after":function(params,ck){
                 //console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);

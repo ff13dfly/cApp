@@ -72,10 +72,7 @@
                 .${cls.body} {min-height:400px;width:100%;background:#FFFFFF;}
                 #${cls.mask} {display:none;position:fixed;z-index:99}
             </style>`;
-            $("#"+con).html(framework+cmap);
-
-            //3.set mask dom
-            
+            $("#"+con).html(framework+cmap);    
         },
 
         clsAutoset:function(pre){
@@ -88,28 +85,58 @@
         goto:function(name,params,skip){
             //console.log(`Opening page "${name}"`);
             if(!pages[name]) return false;
-            var row=pages[name];
-            //if(input.data) row.data=input.data;     //set input data as default
 
+            //1.cache current container dom for back function.
+            if(G.queue.length>0 && !skip){
+                var curDom=self.getCurDom();
+                var last=G.queue[G.queue.length-1];
+                //console.log(last);
+                last.snap=curDom;
+            }
+            
+            //G.queue[G.queue.length-1].snap=curDom;
+            
+            //2.prepare the target page data
+            var row=pages[name];
             //creat related data.will sent to page to use as cache
             //This will be pushed to the history queue, so when page reload as back, the data is ready.
             var cache=$.extend({},row.data);
             cache.params=params;                //set params
+            if(!skip) G.queue.push(cache);          //put page on history queue;
+            var act=!(G.queue.length===1 || skip);
 
             var events=row.events;
             //console.log("[function Goto] cache:"+JSON.stringify(cache));
             if(events.before){
                 events.before(params,function(dt){
                     if(dt!==undefined) cache.raw=dt;        //load data to cache
-                    if(!skip) G.queue.push(cache);          //put page on history queue;
-                    self.initPage(cache);
-                    events.loading(params,cache);           // page entry
+                    //2.loading animate here
+                    self.showPage(act,params,cache,events);
                 });
             }else{
-                if(!skip) G.queue.push(cache);    //put page on history queue;
-                self.initPage(cache);
-                events.loading(params,cache);         // page entry
+                self.showPage(act,params,cache,events);
             }
+        },
+        showPage:function(act,params,cache,events){
+            if(act){
+                self.animateLoad(function(){
+                    self.initPage(cache);
+                    events.loading(params,cache,function(){
+
+                    });
+                });
+                
+            }else{
+                self.initPage(cache);
+                events.loading(params,cache,function(){
+
+                });
+            }
+        },
+        getCurDom:function(){
+            var cls=config.cls;
+            var con=G.funs.getG("container");
+            return $("#"+con).find("#"+cls.entry).html();
         },
         initPage:function(data){
             //console.log("init page..."+JSON.stringify(data));
@@ -122,15 +149,10 @@
             //1.1.set title
             sel.find('.'+cls.title).html(data.title);
             sel.find('.'+cls.back).off('click').on('click',self.back);
-
-            //2.loading animate here
-            self.animateLoad(function(){
-
-            });
         },
 
         back:function(){
-            console.log(`Before back :${JSON.stringify(G.queue)}`);
+            //console.log(`Before back :${JSON.stringify(G.queue)}`);
             $(this).attr("disabled","disabled");
             if(G.queue.length===0) return false;
 
@@ -145,8 +167,8 @@
             //var input={};
             //if(atom.callback) input=atom.callback();
             evs.after(atom.params,function(){
-                console.log(`After back :${JSON.stringify(G.queue)}`);
-                self.animateLoad(function(){
+                //console.log(`After back :${JSON.stringify(G.queue)}`);
+                self.animateBack(function(){
                     $(this).removeAttr("disabled");
                     self.goto(atom.name,{},true);
                 });
@@ -165,9 +187,35 @@
         },
 
         animateBack:function(ck){
+            console.log("ready to back");
+            var cls=config.cls;
+            var con=G.funs.getG("container");
+            var dv=self.device(con);
 
+            //1.get current container dom to mask 
+            //2.set mask position to container.
+            var dom=$("#"+cls.entry).html();
+            var sel=$("#"+cls.mask);
+            var mmap={
+                width:dv.width+"px",
+                height:dv.height+"px",
+                top:dv.top+"px",
+                left:dv.left+"px",
+            };
+            sel.html(dom).css(mmap);
+            
+            //3.set history snap to container.
+            var last=G.queue[G.queue.length-1];
+            var snap=last.snap;
+            $("#"+cls.entry).html(snap);
+            self.bind();
+
+            //4.animate from left:0 to left:screen.width
+            ck && ck();
+            sel.show().animate({left:(dv.left+dv.screen)+'px'},1000,ck).hide();
         },
         animateLoad:function(ck){
+            console.log("ready to load");
             var cls=config.cls;
             var con=G.funs.getG("container");
             var dv=self.device(con);
@@ -181,7 +229,7 @@
             $("#"+cls.mask).html(dom).css(mmap);
 
             var sel=$("#"+cls.mask);
-            sel.show().animate({left:dv.left+'px'},3000,ck).hide();
+            sel.show().animate({left:dv.left+'px'},1000,ck).hide();
         },
         device:function(con){
             var sel=$("#"+con);
@@ -231,7 +279,7 @@
         tools:{
             convert:function(txt, ext){
                 var arr = txt.match(/\[.*?\)/g);
-                console.log(arr);
+                //console.log(arr);
                 if(arr.length===0) return txt;
                 var map = {};
                 var format=exports.tools.format;

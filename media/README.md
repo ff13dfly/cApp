@@ -47,7 +47,7 @@ block:  anchor on target block, not necessary
     {
         "name":"cMedia",
         "raw":"[code]",
-        "protocol":{"type":"app","format":"JS","lib":["jquery","bootstrap"],"ver":"0.0.1"}
+        "protocol":{"type":"app","format":"JS","lib":["jquery","bootstrap"],"ver":"0.1.0"}
     }
 ```
 
@@ -84,7 +84,7 @@ block:  anchor on target block, not necessary
 
     -- 2.3.将page.template写入到主容器里，准备显示数据；
 
-- 3.执行events.loading，开始页面的操作和功能组织；
+- 3.执行events.loading，开始页面的操作和功能组织；渲染之后的数据，保存在cache里
 
 - 4.调用back的时候，执行events.after，同时G.queue进行出栈操作
 
@@ -94,10 +94,16 @@ block:  anchor on target block, not necessary
 
 - 2.将before渲染之后的数据，填充到mask层里；
 
-- 3.动画移动覆盖到container；
+- 3.动画[从右到左]移动覆盖到container；
 - 
 - 4.用新页面的内容，填充container；
 
 - 5.隐藏mask层，移动到屏幕右侧；
 
 ### 页面动画实现 (退出)
+
+1.获取当前主容器的dom
+
+2.在destory之后，把dom填充到mask里并覆盖在container之上；
+
+3.开始执行back里的
