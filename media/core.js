@@ -154,7 +154,7 @@
             if(!events.before){
                 self.showPage(act,params,cache,events);               
             }else{
-                events.before(params,function(dt){
+                events.before(params,cache,function(dt){
                     if(dt!==undefined){
                         cache.raw=dt;        //load data to cache
                     }
@@ -224,7 +224,7 @@
             var evs=pages[cur.name].events;
             //var input={};
             //if(atom.callback) input=atom.callback();
-            evs.after(atom.params,function(){
+            evs.after(atom.params,cur,function(){
                 //console.log(`After back :${JSON.stringify(G.queue)}`);
                 self.animateBack(atom.snap,function(){
                     $(this).removeAttr("disabled");
@@ -273,7 +273,7 @@
             //console.log("ready to load");
             var cls=config.cls;
             var dv=G.device;
-            console.log(`Container ${G.funs.getG("container")} : ${JSON.stringify(dv)}`);
+            //console.log(`Container ${G.funs.getG("container")} : ${JSON.stringify(dv)}`);
             var cmap={
                 width:dv.width+"px",
                 height:dv.height+"px",
@@ -282,7 +282,7 @@
             };
             var at=config.animate.interval;
             var ani={left:(dv.screen-dv.width)+'px'};
-            console.log(`Animation : ${JSON.stringify(ani)}`);
+            //console.log(`Animation : ${JSON.stringify(ani)}`);
             $("#"+cls.mask).html(dom).css(cmap).show().animate(ani,at,function(){
                 $("#"+cls.mask).hide();
                 ck && ck();

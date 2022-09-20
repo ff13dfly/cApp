@@ -54,7 +54,7 @@
             "template":`<div id="${config.cls.entry}"></div>`,     //includindg dom and css, will add to body container,
         },      
         "events":{
-            "before":function(params,ck){
+            "before":function(params,data,ck){
                 //console.log(`${config.name} event "before" param :${JSON.stringify(params)}`);
                 
                 ck && ck();
@@ -64,7 +64,7 @@
                 test.auto();        //test data, need to remove
                 self.history(params,data);
             },
-            "after":function(params,ck){
+            "after":function(params,data,ck){
                 //console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);
                 ck && ck();
             },

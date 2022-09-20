@@ -68,7 +68,7 @@
         row:function(){
             var row={
                 anchor:"fNews",
-                block:250,
+                block:87,
                 account:"5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy",
                 raw:{
                     title:"Break news! Test cMedia",
@@ -80,7 +80,7 @@
 
             var row={
                 anchor:"testMe",
-                block:244,
+                block:82,
                 account:"5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy",
                 raw:{
                     title:"Break news! Test cMedia again",
@@ -92,7 +92,7 @@
 
             var row={
                 anchor:"format",
-                block:227,
+                block:75,
                 account:"5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy",
                 raw:{
                     title:"Break news! Test cMedia again",
@@ -119,7 +119,7 @@
             "template":`<div id="${config.cls.entry}"></div>`,     //includindg dom and css, will add to body container,
         },      
         "events":{
-            "before":function(params,ck){
+            "before":function(params,data,ck){
                 //console.log(`${config.name} event "before" param :${JSON.stringify(params)}`);
                 //console.log('Before page loading...'+JSON.stringify(cache));
                 var dt={hello:"world"};
@@ -132,7 +132,7 @@
                 self.listening();
                 ck && ck();
             },
-            "after":function(params,ck){
+            "after":function(params,data,ck){
                 //console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);
                 ck && ck();
             },

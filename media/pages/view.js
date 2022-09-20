@@ -80,9 +80,10 @@
             "template":`<div id="${config.cls.entry}">Loading...</div>`,     //includindg dom and css, will add to body container,
         },      
         "events":{
-            "before":function(params,ck){
+            "before":function(params,data,ck){
                 //console.log(`${config.name} event "before" param :${JSON.stringify(params)}`);
                 //var dt={view:"world"};
+                //self.show(params,data);
                 ck && ck();
             },
             "loading":function(params,data){
@@ -91,8 +92,8 @@
                 test.auto();        //test data, need to remove
                 self.show(params,data);
             },
-            "after":function(params,ck){
-                console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);
+            "after":function(params,data,ck){
+                //console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);
                 ck && ck();
             },
         },
