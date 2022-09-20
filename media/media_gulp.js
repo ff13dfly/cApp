@@ -35,9 +35,7 @@ var opt = {
 
 gulp.task('default', function() {
     gulp.src(source) // 要压缩的js文件
-        //.pipe(jshint())						//代码检查
-        //.pipe(babel()) //使用uglify进行压缩,更多配置请参考：
-        .pipe(uglify(opt)) //使用uglify进行压缩,更多配置请参考：
+        //.pipe(uglify(opt)) //使用uglify进行压缩,更多配置请参考：
         .pipe(concat(min)) //压缩成一个js文件
         .pipe(gulp.dest(target)); //压缩后的路径'dist/js'
     return new Promise((resolve, reject) => {

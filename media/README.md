@@ -58,7 +58,7 @@ block:  anchor on target block, not necessary
 ```
 
 ```JSON
-    {"title": "Test anchor format","desc": "It is a good way to test anchor format","content":"This is a test txt [anchor testme](anchor://testme/309) to confirm the replace [anchor app](anchor://app/251) for anchor."}
+    {"title": "Test anchor format","desc": "It is a good way to test anchor format","content":"This is a test txt [anchor testme](anchor://testme/244) to confirm the replace [anchor app](anchor://fnews/250) for anchor."}
 ```
 
 ```JSON

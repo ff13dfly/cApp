@@ -31,6 +31,7 @@
         RPC:null,       // RPC call function   
         container:'',   // entry container id
         name:'',        // App name, used to filter anchors.
+        device:null,
         funs:{
             setG:function(k,v){
                 if(G[k]===undefined || k==='funs') return false;
@@ -48,6 +49,42 @@
         },
     };
 
+    var tools={
+        convert:function(txt, ext){
+            var arr = txt.match(/\[.*?\)/g);
+            if(arr===null || arr.length===0) return txt;
+            var map = {},format=tools.format;
+            for (var i = 0; i < arr.length; i++) {
+                var row = arr[i];
+                map[row] = format(row, ext);
+            }
+
+            for (var k in map) {
+                var target = map[k];
+                txt = txt.replaceAll(k, target);
+            }
+            return txt;
+        },
+        format:function(txt, ext) {
+            var arr = txt.split("](anchor://");
+            var last = arr.pop(),first = arr.pop();
+            var an = last.substr(0, last.length - 1).split("/");
+            var name = first.substr(1, first.length);
+            var details = {
+                anchor: an[0],
+                block: an[1] !== undefined ? parseInt(an[1]) : 0,
+            };
+
+            var more = "";
+            if (ext != undefined) {
+                for (var k in ext)more += `${k}="${ext[k]}" `;
+            }
+            return `<span ${more} data='${JSON.stringify(details)}'>${name}</span>`;
+        },
+        hash:function(n) { return Math.random().toString(36).substr(n != undefined ? n : 6) },
+        shorten:function(address,n){if (n === undefined) n = 10;return address.substr(0, n) + '...' + address.substr(address.length - n, n);},
+    };
+
     var self={
         struct:function(){
             //1.save RPC call object
@@ -60,7 +97,7 @@
             var cls=config.cls;
             var framework=`<div class="row pt-2" id="${cls.entry}">
                 <div class="col-12 ${cls.nav}">
-                    <div class="row">
+                    <div class="row pt-2">
                         <div class="col-2"><p class="${cls.back}"> < </p></div>
                         <div class="col-8 text-center ${cls.title}"></div>
                         <div class="col-2"></div>
@@ -71,15 +108,22 @@
             <div class="row pt-2" id="${cls.mask}"></div>`;
 
             var cmap = `<style>
-                .${cls.nav} {background:#EEEEEE;}
+                .${cls.nav} {background:#EEEEEE;height:45px;}
+                .${cls.nav} .row {background:#EEEEEE;height:45px;font-size:18px;}
                 .${cls.body} {min-height:400px;width:100%;background:#FFFFFF;}
                 #${cls.mask} {display:none;position:fixed;z-index:99;background:#FFFFFF;}
             </style>`;
-            $("#"+con).html(framework+cmap);    
+            $("#"+con).html(cmap+framework);   
+            
+            //3.check app container size and offset,listening scroll event
+            $(window).off("scroll").on("scroll",function(){
+                self.device(cls.entry);
+                //console.log(`Scrolling result:${JSON.stringify(G.device)}`);
+            }).trigger("scroll");
         },
 
         clsAutoset:function(pre){
-            var hash=exports.tools.hash;
+            var hash=tools.hash;
             for(var k in config.cls){
                 if(!config.cls[k])config.cls[k]=pre+hash();
             }
@@ -184,7 +228,8 @@
                 //console.log(`After back :${JSON.stringify(G.queue)}`);
                 self.animateBack(atom.snap,function(){
                     $(this).removeAttr("disabled");
-                    self.goto(atom.name,{},true);
+                    var skip=true;   //skip push history quueu
+                    self.goto(atom.name,atom.params,skip);
                 });
             });
         },
@@ -203,7 +248,7 @@
         animateBack:function(dom,ck){
             //console.log("ready to back");
             var cls=config.cls;
-            var dv=self.device(G.funs.getG("container"));
+            var dv=G.device;
 
             var cur=$("#"+cls.entry).html(); //1.get current container dom
             $("#"+cls.entry).html(dom);  //2.set history snap to container.
@@ -218,7 +263,7 @@
                 left:dv.left+"px",
             };
             var at=config.animate.interval;
-            var ani={left:(dv.left+dv.screen)+'px'};
+            var ani={left:dv.screen+'px'};
             $("#"+cls.mask).html(cur).css(cmap).show().animate(ani,at,function(){
                 $("#"+cls.mask).hide();
                 ck && ck();
@@ -227,31 +272,36 @@
         animateLoad:function(dom,ck){
             //console.log("ready to load");
             var cls=config.cls;
-            var dv=self.device(G.funs.getG("container"));
-
+            var dv=G.device;
+            console.log(`Container ${G.funs.getG("container")} : ${JSON.stringify(dv)}`);
             var cmap={
                 width:dv.width+"px",
                 height:dv.height+"px",
                 top:dv.top+"px",
-                left:(dv.left+dv.screen)+"px",
+                left:dv.screen+"px",
             };
             var at=config.animate.interval;
-            var ani={left:dv.left+'px'};
+            var ani={left:(dv.screen-dv.width)+'px'};
+            console.log(`Animation : ${JSON.stringify(ani)}`);
             $("#"+cls.mask).html(dom).css(cmap).show().animate(ani,at,function(){
                 $("#"+cls.mask).hide();
                 ck && ck();
             });
         },
         device:function(con){
+            //console.log("Check container:"+con);
+            //var cls=config.cls;
             var sel=$("#"+con),w=sel.width(),h=sel.height();
             var offset=sel.offset();
-            return {
+            var top=$(document).scrollTop();
+            G.device={
                 width:w,
                 height:h,
-                top:offset.top,
+                top:offset.top-top,
                 left:offset.left,
                 screen:$(window).width(),
             };
+            return true;
         },
         hideBack:function(){
             var cls=config.cls;
@@ -274,6 +324,7 @@
             };
         },
         cache:G.funs,
+        tools:tools,
         fresh:self.bind,
         back:self.back,
         page:function(name,pg){
@@ -282,41 +333,6 @@
                 self.hideBack();
                 self.goto(name,{});
             }
-        },
-        tools:{
-            convert:function(txt, ext){
-                var arr = txt.match(/\[.*?\)/g);
-                if(arr.length===0) return txt;
-                var map = {},format=exports.tools.format;
-                for (var i = 0; i < arr.length; i++) {
-                    var row = arr[i];
-                    map[row] = format(row, ext);
-                }
-    
-                for (var k in map) {
-                    var target = map[k];
-                    txt = txt.replaceAll(k, target);
-                }
-                return txt;
-            },
-            format:function(txt, ext) {
-                var arr = txt.split("](anchor://");
-                var last = arr.pop(),first = arr.pop();
-                var an = last.substr(0, last.length - 1).split("/");
-                var name = first.substr(1, first.length);
-                var details = {
-                    anchor: an[0],
-                    block: an[1] !== undefined ? parseInt(an[1]) : 0,
-                };
-    
-                var more = "";
-                if (ext != undefined) {
-                    for (var k in ext)more += `${k}="${ext[k]}" `;
-                }
-                return `<span ${more} data='${JSON.stringify(details)}'>${name}</span>`;
-            },
-            hash:function(n) { return Math.random().toString(36).substr(n != undefined ? n : 6) },
-            shorten:function(address,n){if (n === undefined) n = 10;return address.substr(0, n) + '...' + address.substr(address.length - n, n);},
         }
     };
 
