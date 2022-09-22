@@ -95,7 +95,7 @@
             //2.struct dom
             if(!config.entry) self.clsAutoset(config.prefix);
             var cls=config.cls;
-            var framework=`<div class="row pt-2" id="${cls.entry}">
+            var framework=`<div class="row" id="${cls.entry}">
                 <div class="col-12 ${cls.nav}">
                     <div class="row pt-2">
                         <div class="col-2"><p class="${cls.back}"> < </p></div>
@@ -106,12 +106,13 @@
                 <div class="col-12 ${cls.body}"></div>
             </div>
             <div class="row pt-2" id="${cls.mask}"></div>`;
-
+            var w=$(window).width();
             var cmap = `<style>
-                .${cls.nav} {background:#EEEEEE;height:45px;}
+                #${cls.entry}{width:${w}px;height:100%;background:#FFFFFF}
+                .${cls.nav} {background:#EEEEEE;height:45px;position:fixed;top:0px;left:0px;width:100%}
                 .${cls.nav} .row {background:#EEEEEE;height:45px;font-size:18px;}
-                .${cls.body} {min-height:400px;width:100%;background:#FFFFFF;}
-                #${cls.mask} {display:none;position:fixed;z-index:99;background:#FFFFFF;}
+                .${cls.body} {margin-top:45px;height:100%;width:100%;background:#FFFFFF;}
+                #${cls.mask} {display:none;position:fixed;z-index:99;background:#FFFFFF;width:100%;height:100%;top:0px;}
             </style>`;
             $("#"+con).html(cmap+framework);   
             
@@ -130,6 +131,9 @@
             return true;
         },
         goto:function(name,params,skip){
+            console.log(`--------------Loading page start--------------`);
+            console.log(`Function [goto] back status ${self.statusBack()},history lenght ${G.queue.length}`);
+            console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
             //console.log(`Opening page "${name}"`);
             if(!pages[name]) return false;
             var row=pages[name];
@@ -140,7 +144,9 @@
                 var last=G.queue[G.queue.length-1];
                 last.snap=curDom;
             }
-            
+            //if(G.queue.length===1)self.hideBack();
+            //else self.showBack();
+
             //2.prepare the target page data
             //creat related data.will sent to page to use as cache
             //This will be pushed to the history queue, so when page reload as back, the data is ready.
@@ -163,9 +169,12 @@
             }
         },
 
-        showPage:function(act,params,cache,events){
+        showPage:function(isAnimate,params,cache,events){
+            console.log(`Function [showPage] back status ${self.statusBack()},history lenght ${G.queue.length}`);
+            console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
+            if(G.queue.length>1) self.showBack();
             cache.preload=self.preload(cache);
-            if(!act){
+            if(!isAnimate){
                 self.initPage(cache);
                 events.loading(params,cache,function(){
                         
@@ -173,6 +182,8 @@
             }else{
                 self.animateLoad(cache.preload,function(){
                     self.initPage(cache);
+                    console.log('After initPage:')
+                    console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
                     events.loading(params,cache,function(){
 
                     });
@@ -181,6 +192,8 @@
         },
         
         initPage:function(data){
+            console.log(`Function [initPage] back status ${self.statusBack()},history lenght ${G.queue.length}`);
+            console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
             //console.log("init page..."+JSON.stringify(data));
             var cls=config.cls;
 
@@ -193,24 +206,26 @@
             sel.find('.'+cls.back).off('click').on('click',self.back);
         },
         preload:function(data){
+            console.log(`Function [preload] back status ${self.statusBack()},history lenght ${G.queue.length}`);
+            console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
             var cls=config.cls;
-            var backup=self.getCurDom();
-            
-            //1.body add dom;
-            var sel=$("#"+cls.entry);
+            var dom=$("#"+cls.entry).html();
+            var sel=$(dom).clone();
             sel.find("."+cls.body).html(data.template);
             sel.find('.'+cls.title).html(data.title);
-            var dom=sel.html();
-
-            $("#"+cls.entry).html(backup);
-            return dom;
+            if(G.queue.length>1) sel.find('.'+cls.back).show();
+            //console.log(sel.get(0));
+            return sel.prop("outerHTML");
         },
         getCurDom:function(){
+            // without nav and back button
             var cls=config.cls;
             var con=G.funs.getG("container");
             return $("#"+con).find("#"+cls.entry).html();
         },
         back:function(){
+            console.log(`--------------Back page start--------------`);
+            console.log(`Function [back] back status ${self.statusBack()},history lenght ${G.queue.length}`);
             //console.log(`Before back :${JSON.stringify(G.queue)}`);
             $(this).attr("disabled","disabled");
             if(G.queue.length===0) return false;
@@ -239,13 +254,13 @@
                 var sel=$(this);
                 var page=sel.attr("page");
                 var params=JSON.parse(sel.attr("data"));
-
-                self.showBack();
                 self.goto(page,params);
             });
         },
 
         animateBack:function(dom,ck){
+            console.log(`Function [animateBack] back status ${self.statusBack()},history lenght ${G.queue.length}`);
+            console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
             //console.log("ready to back");
             var cls=config.cls;
             var dv=G.device;
@@ -257,34 +272,33 @@
             }   
             //3.set mask position and set current dom to it.
             var cmap={
-                width:dv.width+"px",
-                height:dv.height+"px",
-                top:dv.top+"px",
                 left:dv.left+"px",
             };
             var at=config.animate.interval;
             var ani={left:dv.screen+'px'};
-            $("#"+cls.mask).html(cur).css(cmap).show().animate(ani,at,function(){
+            $("#"+cls.mask).html(cur).css(cmap).show().animate(ani,at,'',function(){
                 $("#"+cls.mask).hide();
+                console.log(`--------------Back page end--------------`);
                 ck && ck();
             });
         },
         animateLoad:function(dom,ck){
-            //console.log("ready to load");
+            console.log(`Function [animateLoad] back status ${self.statusBack()},history lenght ${G.queue.length}`);
+            console.log(dom);
+            // history queue have been saved
             var cls=config.cls;
             var dv=G.device;
             //console.log(`Container ${G.funs.getG("container")} : ${JSON.stringify(dv)}`);
             var cmap={
-                width:dv.width+"px",
-                height:dv.height+"px",
-                top:dv.top+"px",
                 left:dv.screen+"px",
             };
             var at=config.animate.interval;
             var ani={left:(dv.screen-dv.width)+'px'};
             //console.log(`Animation : ${JSON.stringify(ani)}`);
-            $("#"+cls.mask).html(dom).css(cmap).show().animate(ani,at,function(){
+            $("#"+cls.mask).html(dom).css(cmap).show().animate(ani,at,'',function(){
                 $("#"+cls.mask).hide();
+                
+                console.log(`--------------Loading page end--------------`);
                 ck && ck();
             });
         },
@@ -302,6 +316,10 @@
                 screen:$(window).width(),
             };
             return true;
+        },
+        statusBack:function(){
+            var cls=config.cls;
+            return $("#"+cls.entry).find('.'+cls.back).is(":hidden");
         },
         hideBack:function(){
             var cls=config.cls;

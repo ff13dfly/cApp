@@ -9,29 +9,51 @@
         prefix:"hs_",
         cls:{
             entry:'hs_index',
+            account:'',
+            info:'',
         },
     };
 
     var self={
-        history:function(params,data){
-            console.log(params);
-            console.log(data);
-
+        show:function(params,data){
+            var anchor=params.anchor;
             var RPC=App.cache.getG("RPC");
-            var sel=$("#"+config.cls.entry);
-            var ha='<span page="view" data="{&quot;anchor&quot;:&quot;testMe&quot;,&quot;block&quot;:1942,&quot;owner&quot;:&quot;5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy&quot;}">anchor link</span>';
-            sel.html('Ready to show history<br>'+ha);
-            App.fresh();
+            var cls=config.cls;
+            
+            var cmap = `<style>
+                .${cls.account}{font-size:10px;color:#EF2356;}
+                .${cls.info}{font-size:10px;}
+            </style>`;
+            $("#" + cls.entry).html(cmap);
+
+            if(RPC.common.history){
+                RPC.common.history(anchor,(list)=>{
+                    console.log(list);
+                    var dom='';
+                    for(var i=0;i<list.length;i++){
+                        dom+=self.decode(list[i]);
+                    }
+                    $("#"+cls.entry).append(dom);
+                    App.fresh();
+                });
+            }
+        },
+        decode:function(row){
+            var cls=config.cls;
+            return `<div class="row">
+                <div class="col-3 pt-2 ${cls.info}" >Block : ${row.block}</div>    
+                <div class="col-9 pt-2 ${cls.account}">${App.tools.shorten(row.owner,12)}</div>
+                <div class="col-12"><hr/></div>
+            </div>`;
         },
         //prepare the basic data when code loaded
-        struct:function(){
-            self.clsAutoset(config.prefix);
-            //console.log(`Config:${JSON.stringify(config)}`);
+        struct: function () {
+            self.clsAutoset(config.prefix);         
         },
-        clsAutoset:function(pre){
-            var hash=App.tools.hash;
-            for(var k in config.cls){
-                if(!config.cls[k]) config.cls[k]=pre + hash();
+        clsAutoset: function (pre) {
+            var hash = App.tools.hash;
+            for (var k in config.cls) {
+                if (!config.cls[k]) config.cls[k] = pre + hash();
             }
             return true;
         },
@@ -46,7 +68,7 @@
     var page={
         "data":{
             "name":config.name,
-            "title":"Anchor history details",     //default page title
+            "title":"History details",     //default page title
             "raw":null,
             "params":{},
             "preload":"Loading...",
@@ -55,17 +77,14 @@
         },      
         "events":{
             "before":function(params,data,ck){
-                //console.log(`${config.name} event "before" param :${JSON.stringify(params)}`);
-                
                 ck && ck();
             },
             "loading":function(params,data){
                 console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
                 test.auto();        //test data, need to remove
-                self.history(params,data);
+                self.show(params,data);
             },
             "after":function(params,data,ck){
-                //console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);
                 ck && ck();
             },
         },

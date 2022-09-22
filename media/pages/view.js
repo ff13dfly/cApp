@@ -1,8 +1,4 @@
-/*
-    {"type":"data","format":"JS"}
- */
-
-(function(App){
+;(function(App){
     if(!App) return false;
     var config={
         name:'view',
@@ -52,7 +48,6 @@
         //prepare the basic data when code loaded
         struct:function(){
             self.clsAutoset(config.prefix);
-
         },
         clsAutoset:function(pre){
             var hash=App.tools.hash;
@@ -81,19 +76,16 @@
         },      
         "events":{
             "before":function(params,data,ck){
-                //console.log(`${config.name} event "before" param :${JSON.stringify(params)}`);
-                //var dt={view:"world"};
-                //self.show(params,data);
+                console.log(`${config.name} event "before" param :${JSON.stringify(params)}`);
                 ck && ck();
             },
             "loading":function(params,data){
-                //console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
-                //console.log(data);
-                test.auto();        //test data, need to remove
+                console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
+                //test.auto();        //test data, need to remove
                 self.show(params,data);
             },
             "after":function(params,data,ck){
-                //console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);
+                console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);
                 ck && ck();
             },
         },
