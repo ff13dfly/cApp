@@ -13,11 +13,12 @@
 
     var self={
         show:function(params,data){
+            console.log(params);
             var RPC=App.cache.getG("RPC");
             var sel=$("#"+config.cls.entry);
             var css=self.getCSS();
-            RPC.common.view(params.block,params.anchor,params.owner,function(res){
-                //console.log(res);
+            RPC.common.view(params.block,params.anchor,params.owner?params.owner:'',function(res){
+                console.log(res);
                 if(res===false){
                     var dom=self.getDom('Error','No such anchor',params.anchor,'',0);
                 }else{

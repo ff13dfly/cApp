@@ -40,11 +40,14 @@
         },
         decode:function(row){
             var cls=config.cls;
-            return `<div class="row">
-                <div class="col-3 pt-2 ${cls.info}" >Block : ${row.block}</div>    
+            
+            console.log(row);
+            //var ctx=App.tools.convert(details.content,{"page":"view","class":"text-info"});
+            return App.tools.convert(`<div class="row">
+                <div class="col-3 pt-2 ${cls.info}" >Block :[${row.block}](anchor://${row.data.key}/${row.block}) </div>    
                 <div class="col-9 pt-2 ${cls.account}">${App.tools.shorten(row.owner,12)}</div>
                 <div class="col-12"><hr/></div>
-            </div>`;
+            </div>`,{"page":"view","class":"text-info"});
         },
         //prepare the basic data when code loaded
         struct: function () {
