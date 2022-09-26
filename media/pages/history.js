@@ -28,7 +28,7 @@
 
             if(RPC.common.history){
                 RPC.common.history(anchor,(list)=>{
-                    console.log(list);
+                    //console.log(list);
                     var dom='';
                     for(var i=0;i<list.length;i++){
                         dom+=self.decode(list[i]);
@@ -41,7 +41,7 @@
         decode:function(row){
             var cls=config.cls;
             
-            console.log(row);
+            //console.log(row);
             //var ctx=App.tools.convert(details.content,{"page":"view","class":"text-info"});
             return App.tools.convert(`<div class="row">
                 <div class="col-3 pt-2 ${cls.info}" >Block :[${row.block}](anchor://${row.data.key}/${row.block}) </div>    
@@ -83,7 +83,7 @@
                 ck && ck();
             },
             "loading":function(params,data){
-                console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
+                //console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
                 test.auto();        //test data, need to remove
                 self.show(params,data);
             },

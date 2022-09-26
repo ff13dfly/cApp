@@ -1,33 +1,40 @@
 # cApp
-Anchor cApp, pure on chain application.
 
+Anchor cApp, pure on chain application.
 
 ## cApp protocol
 
 Basic definition of cApp data.
+
 ```JSON
     {"type":"app","lib":[]}
 ```
 
 ## Protocol key words
 
-Definition highcase. 
+Definition reverse keywords.
+Basic keywords.
 
-- type: ["DATA","APP"]
-- code: ["UTF8"]
-- format: ["JSON","JS","CSS"]
-- app:  
-- ver:  version of cApp
-- lib:  []
-- ext:  []
-- ref:  []
-- tag:  []
-- limit:   
+- type: Enum in ["DATA","APP","CREATION"]
+- code: Enum in ["UTF8","ASCII"]
+- format: Enum in ["JSON","JS","CSS","MD"]
+- app:  Anchor
+- ver:  version like "0.0.1"
+- lib:  Array like [ Anchor, ... Anchor ]
+- ext:  Array like [ Anchor, ... Anchor ]
+- hem:  Anchor 
+
+Extend keywords.
+
+- ref:  Array like [ Anchor, ... Anchor ]
+- tag:  Array like [ Anchor, ... Anchor ]
+- limit: number
+- auth:  String as SS58 account
 
 ### JS lib protocol
 
 ```JSON
-    {"type":"data","fmt":"JS","limit":0}
+    {"type":"data","format":"JS","limit":0}
 ```
 
 - ref: related Anchor
@@ -67,21 +74,4 @@ Definition highcase.
 - app: filter Anchor, can be used for cApp to check data format
 - code: code format ["utf8","ascii"]
 - ref: related Anchor
-
--------------------Separator-------------------
-
-## 测试出现问题的插件,simple
-
-- simple image
-- embed
-
-
-- 以上是没发现起作用的
-
-- quota : 好像用处不大
-- code : 好像用处不大
-- link : 从指定的URL获取数据的，不是给text加URL的
-- raw : 嵌入HTML的，被废弃了
-- delimiter
-- warning
   

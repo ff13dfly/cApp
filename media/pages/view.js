@@ -13,12 +13,12 @@
 
     var self={
         show:function(params,data){
-            console.log(params);
+            //console.log(params);
             var RPC=App.cache.getG("RPC");
             var sel=$("#"+config.cls.entry);
             var css=self.getCSS();
             RPC.common.view(params.block,params.anchor,params.owner?params.owner:'',function(res){
-                console.log(res);
+                //console.log(res);
                 if(res===false){
                     var dom=self.getDom('Error','No such anchor',params.anchor,'',0);
                 }else{
@@ -77,16 +77,16 @@
         },      
         "events":{
             "before":function(params,data,ck){
-                console.log(`${config.name} event "before" param :${JSON.stringify(params)}`);
+                //console.log(`${config.name} event "before" param :${JSON.stringify(params)}`);
                 ck && ck();
             },
             "loading":function(params,data){
-                console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
+                //console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
                 //test.auto();        //test data, need to remove
                 self.show(params,data);
             },
             "after":function(params,data,ck){
-                console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);
+                //console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);
                 ck && ck();
             },
         },

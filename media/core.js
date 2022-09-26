@@ -105,21 +105,21 @@
                 </div>
                 <div class="col-12 ${cls.body}"></div>
             </div>
-            <div class="row pt-2" id="${cls.mask}"></div>`;
+            <div class="row" id="${cls.mask}"></div>`;
             var w=$(window).width();
             var cmap = `<style>
                 #${cls.entry}{width:${w}px;height:100%;background:#FFFFFF}
-                .${cls.nav} {background:#EEEEEE;height:45px;position:fixed;top:0px;left:0px;width:100%}
-                .${cls.nav} .row {background:#EEEEEE;height:45px;font-size:18px;}
-                .${cls.body} {margin-top:45px;height:100%;width:100%;background:#FFFFFF;}
+                #${cls.entry} .${cls.body} {margin-top:45px;height:100%;width:100%;background:#FFFFFF;}
+                #${cls.entry} .${cls.nav} {background:#EEEEEE;height:45px;position:fixed;top:0px;left:0px;width:100%}
+                .${cls.nav} .row {background:#EEEEEE;height:45px;font-size:18px;}  
                 #${cls.mask} {display:none;position:fixed;z-index:99;background:#FFFFFF;width:100%;height:100%;top:0px;}
+                #${cls.mask} .${cls.body} {margin-top:0px;height:100%;width:100%;background:#FFFFFF;}
             </style>`;
             $("#"+con).html(cmap+framework);   
             
             //3.check app container size and offset,listening scroll event
             $(window).off("scroll").on("scroll",function(){
                 self.device(cls.entry);
-                //console.log(`Scrolling result:${JSON.stringify(G.device)}`);
             }).trigger("scroll");
         },
 
@@ -131,9 +131,9 @@
             return true;
         },
         goto:function(name,params,skip){
-            console.log(`--------------Loading page start--------------`);
-            console.log(`Function [goto] back status ${self.statusBack()},history lenght ${G.queue.length}`);
-            console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
+            //console.log(`--------------Loading page start--------------`);
+            //console.log(`Function [goto] back status ${self.statusBack()},history lenght ${G.queue.length}`);
+            //console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
             //console.log(`Opening page "${name}"`);
             if(!pages[name]) return false;
             var row=pages[name];
@@ -170,9 +170,9 @@
         },
 
         showPage:function(isAnimate,params,cache,events,skip){
-            console.log(`Function [showPage] back status ${self.statusBack()},history lenght ${G.queue.length}`);
-            console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
-            if(G.queue.length>1) self.showBack();
+            //console.log(`Function [showPage] back status ${self.statusBack()},history lenght ${G.queue.length}`);
+            //console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
+            //if(G.queue.length>1) self.showBack();
             if(!skip){
                 cache.preload=self.preload(cache);
                 if(!isAnimate){
@@ -183,8 +183,8 @@
                 }else{
                     self.animateLoad(cache.preload,function(){
                         self.initPage(cache);
-                        console.log('After initPage:')
-                        console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
+                        //console.log('After initPage:')
+                        //console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
                         events.loading(params,cache,function(){
     
                         });
@@ -196,9 +196,10 @@
         },
         
         initPage:function(data){
-            console.log(`Function [initPage] back status ${self.statusBack()},history lenght ${G.queue.length}`);
-            console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
+            //console.log(`Function [initPage] back status ${self.statusBack()},history lenght ${G.queue.length}`);
+            //console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
             //console.log("init page..."+JSON.stringify(data));
+            if(G.queue.length>1) self.showBack();
             var cls=config.cls;
 
             //1.body add dom;
@@ -210,15 +211,18 @@
             sel.find('.'+cls.back).off('click').on('click',self.back);
         },
         preload:function(data){
-            console.log(`Function [preload] back status ${self.statusBack()},history lenght ${G.queue.length}`);
-            console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
+            //console.log(`Function [preload] back status ${self.statusBack()},history lenght ${G.queue.length}`);
+            //console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
             var cls=config.cls;
             var dom=$("#"+cls.entry).html();
             var sel=$(dom).clone();
             sel.find("."+cls.body).html(data.template);
             sel.find('.'+cls.title).html(data.title);
             if(G.queue.length>1) sel.find('.'+cls.back).show();
-            //console.log(sel.get(0));
+
+            //console.log('Here to render target page struct');
+
+            //console.log(`target title ${data.title},now title ${$("#"+cls.entry).find('.'+cls.title).html()}`);
             return sel.prop("outerHTML");
         },
         getCurDom:function(){
@@ -228,8 +232,8 @@
             return $("#"+con).find("#"+cls.entry).html();
         },
         back:function(){
-            console.log(`--------------Back page start--------------`);
-            console.log(`Function [back] back status ${self.statusBack()},history lenght ${G.queue.length}`);
+            //console.log(`--------------Back page start--------------`);
+            //console.log(`Function [back] back status ${self.statusBack()},history lenght ${G.queue.length}`);
             //console.log(`Before back :${JSON.stringify(G.queue)}`);
             $(this).attr("disabled","disabled");
             if(G.queue.length===0) return false;
@@ -237,15 +241,13 @@
             //1.run destoried page function;
             var cur=G.queue.pop();
             var atom=G.queue[G.queue.length-1];
-
-            if(G.queue.length===1) self.hideBack();
-
             var evs=pages[cur.name].events;
             //var input={};
             //if(atom.callback) input=atom.callback();
             evs.after(atom.params,cur,function(){
                 //console.log(`After back :${JSON.stringify(G.queue)}`);
                 self.animateBack(atom.snap,function(){
+                    if(G.queue.length===1) self.hideBack();
                     $(this).removeAttr("disabled");
                     var skip=true;   //skip push history quueu
                     self.goto(atom.name,atom.params,skip);
@@ -266,8 +268,8 @@
         },
 
         animateBack:function(dom,ck){
-            console.log(`Function [animateBack] back status ${self.statusBack()},history lenght ${G.queue.length}`);
-            console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
+            //console.log(`Function [animateBack] back status ${self.statusBack()},history lenght ${G.queue.length}`);
+            //console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
             //console.log("ready to back");
             var cls=config.cls;
             var dv=G.device;
@@ -279,49 +281,53 @@
             }   
             //3.set mask position and set current dom to it.
             var cmap={
-                left:dv.left+"px",
+                left:(dv.left+dv.back.left)+"px",
             };
             var at=config.animate.interval;
-            var ani={left:dv.screen+'px'};
+            var ani={left:(dv.screen+dv.back.left)+'px'};
+            //console.log(cur);
+            //console.log(`Animation Backing from ${JSON.stringify(cmap)} to ${JSON.stringify(ani)}`);
             $("#"+cls.mask).html(cur).css(cmap).show().animate(ani,at,'',function(){
                 $("#"+cls.mask).hide();
-                console.log(`--------------Back page end--------------`);
+                //console.log(`--------------Back page end--------------`);
                 ck && ck();
             });
         },
         animateLoad:function(dom,ck){
-            console.log(`Function [animateLoad] back status ${self.statusBack()},history lenght ${G.queue.length}`);
-            console.log(dom);
             // history queue have been saved
             var cls=config.cls;
+            //console.log(`Now title ${$("#"+cls.entry).find('.'+cls.title).html()}`);
             var dv=G.device;
             //console.log(`Container ${G.funs.getG("container")} : ${JSON.stringify(dv)}`);
             var cmap={
-                left:dv.screen+"px",
+                left:(dv.screen+dv.back.left)+"px",
             };
             var at=config.animate.interval;
-            var ani={left:(dv.screen-dv.width)+'px'};
-            //console.log(`Animation : ${JSON.stringify(ani)}`);
+            var ani={left:(dv.screen-dv.width+dv.back.left)+'px'};
+            //console.time('动画运行时间');
+            //console.log(`Animation Loading from ${JSON.stringify(cmap)} to ${JSON.stringify(ani)}`);
             $("#"+cls.mask).html(dom).css(cmap).show().animate(ani,at,'',function(){
                 $("#"+cls.mask).hide();
-                
-                console.log(`--------------Loading page end--------------`);
+                //console.log(`--------------Loading page end--------------`);
+                //console.timeEnd('动画运行时间');
                 ck && ck();
             });
         },
         device:function(con){
-            //console.log("Check container:"+con);
-            //var cls=config.cls;
+            var cls=config.cls;
             var sel=$("#"+con),w=sel.width(),h=sel.height();
             var offset=sel.offset();
             var top=$(document).scrollTop();
+            var back=sel.find('.'+cls.back).offset();
             G.device={
                 width:w,
                 height:h,
                 top:offset.top-top,
                 left:offset.left,
                 screen:$(window).width(),
+                back:back,
             };
+            //console.log(`Check container:${con},result: ${JSON.stringify(G.device)}`);
             return true;
         },
         statusBack:function(){
@@ -329,10 +335,12 @@
             return $("#"+cls.entry).find('.'+cls.back).is(":hidden");
         },
         hideBack:function(){
+            //console.log('Hiding back arrow.');
             var cls=config.cls;
             $("#"+cls.entry).find('.'+cls.back).hide();
         },
         showBack:function(){
+            //console.log('Showing back arrow.');
             var cls=config.cls;
             $("#"+cls.entry).find('.'+cls.back).show();
         },
@@ -353,6 +361,7 @@
         fresh:self.bind,
         back:self.back,
         page:function(name,pg){
+            //console.log(`Structing page ${name}`);
             pages[name]=$.extend({},pg);     //need to clone.
             if(name===config.default){
                 self.hideBack();
@@ -363,5 +372,4 @@
 
     window[config.app]=exports;
     self.struct();
-
 })(agent,con,error);
