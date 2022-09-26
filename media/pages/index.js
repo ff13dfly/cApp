@@ -10,6 +10,7 @@
             anchor: '',
             account:'',
             block:'',
+            add:'',             //add button class
         }
     };
     var his=[];
@@ -50,6 +51,20 @@
             }
             App.fresh();
         },
+        addButton:function(){
+            var cls=config.cls;
+            var dom=`<style>
+                #${cls.entry} .${cls.add}{
+                    width:100px;height:48px;background:#EFCCE9;opacity: 0.9;
+                    position:fixed;right:20px;bottom:25%;border-radius:24px;border:1px solid #EEFFFF;
+                    line-height:48px;text-align: center;
+                }
+            </style>
+            <div class="${cls.add}">
+                <span page="write" data="{}">Write</span>
+            </div>`;
+            $("#" + cls.entry).append(dom);
+        },
         decode: function (row) {
             var ctx = row.raw, cls = config.cls;
             var dt = { anchor: row.anchor, block: row.block, owner: row.account };
@@ -69,6 +84,11 @@
             </div>`;
             
             $("#" + cls.entry).prepend(dom);
+        },
+
+        cleanContainer:function(){
+            var cls=config.cls;
+            $("#"+cls.entry).html('');
         },
 
         //prepare the basic data when code loaded
@@ -92,7 +112,7 @@
         row: function () {
             var row = {
                 anchor: "fNews",
-                block: 138,
+                block: 127,
                 account: "5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy",
                 raw: {
                     title: "Break news! Test cMedia",
@@ -104,7 +124,7 @@
 
             var row = {
                 anchor: "testMe",
-                block: 131,
+                block: 122,
                 account: "5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy",
                 raw: {
                     title: "Break news! Test cMedia again",
@@ -116,7 +136,7 @@
 
             var row = {
                 anchor: "format",
-                block: 119,
+                block: 117,
                 account: "5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy",
                 raw: {
                     title: "Break news! Test cMedia again",
@@ -152,8 +172,10 @@
                 //console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
                 //console.log(data);
                 test.auto();        //test data, need to remove
+                self.addButton();
                 self.showHistory();
                 self.listening();
+                App.fresh();
                 ck && ck();
             },
             "after": function (params, data, ck) {

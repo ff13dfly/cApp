@@ -33,7 +33,13 @@
 
     <script src="lib/simpleMDE/simplemde.min.js"></script>
     <link rel="stylesheet" href="lib/simpleMDE/simplemde.min.css">
-
+    <style>
+        #demo {
+            border-radius: 3px;
+            text-align: center;
+            opacity: 0.9;
+        }
+    </style>
     <script>
         $(function() {
             const apps = {
@@ -96,6 +102,7 @@
             <div class="col-lg-3"></div>
             <div class="col-lg-9">
                 <select class="form-control" id="app_select"></select>
+
             </div>
             <div class="col-lg-12" id="app_container"></div>
         </div>
