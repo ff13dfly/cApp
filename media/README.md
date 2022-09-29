@@ -66,6 +66,10 @@ block:  anchor on target block, not necessary
 ```
 
 ```JSON
+    {"title": "10月新规来了！事关身份证、车子、电子烟","desc": "10月将至，伴随假期来临，一批新规也将落地。水果味电子烟将全面下架，验车也将发生重大变化，一起看看吧。","content":"10月1日起，全国多个省市将逐步启动首次申领居民身份证“跨省通办”试点工作，年底前，在试点地区实现群众首次申领居民身份证可在现居住地就近办理。2021年以来，公安部部署在京津冀、长三角、闽赣、粤湘、川渝黔等区域内开展这项试点工作。京津冀三地医保部门联合印发通知，进一步扩大京津冀异地就医定点医疗机构互认范围。自2022年10月1日起，将京津冀区域内三级和二级定点医疗机构纳入互认范围。"}
+```
+
+```JSON
     {"title": "News here!","desc": "The city of Odesa, Ukraine, has come under further missile attacks Monday evening local time.   Around 10 p.m. local time (3 p.m. ET), witnesses in the center of the city said they heard several large explosions which shook buildings.","content":"The city of Odesa, Ukraine, has come under further missile attacks Monday evening local time.   Around 10 p.m. local time (3 p.m. ET), witnesses in the center of the city said they heard several large explosions which shook buildings.  Social media showed at least one large fire burning. and a witness said a large shopping center was on fire. The resident of a city more than 40 kilometers (25 miles) from Odesa reported hearing the blasts.   A few hours earlier, Odesa city council reported three cruise missiles were fired from a Tu-22 bomber. Five buildings were destroyed and two people injured.  The targets were unknown but some images from Odesa suggested a mixed residential-industrial area had been hit.  Video released by the city council showed widespread devastation across a wide area.   On Monday morning authorities four sea-launched Onyx cruise missiles were fired towards Odesa.   The earlier attacks came as European Council President Charles Michel visited Odesa.  On Sunday, ten cruise missiles were fired at the Odesa area. Russia has used submarines, surface ships and aircraft to launch missiles at Odesa in recent days.","images":["base64 image","base64 image"]}
 ```
 

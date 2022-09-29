@@ -22,7 +22,6 @@
                 .${cls.block}{font-size:10px;}
             </style>`;
             $("#" + config.cls.entry).prepend(cmap);
-
             var info = App.info();
             var RPC = App.cache.getG("RPC");
             RPC.common.subscribe(function (list) {
@@ -123,13 +122,13 @@
             self.decode(row);
 
             var row = {
-                anchor: "testMe",
+                anchor: "测试中文",
                 block: 122,
                 account: "5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy",
                 raw: {
-                    title: "Break news! Test cMedia again",
-                    desc: "Ukraine, has come under further missile attacks Monday evening local time.   Around 10 p.m. local time (3 p.m. ET), witnesses in the center of the city said they heard several large explosions which shook buildings.",
-                    content: "A good news, this is the content.",
+                    title: "标题里有中文Test cMedia again",
+                    desc: "描述里有中文Ukraine, has come under further missile attacks Monday evening local time.   Around 10 p.m. local time (3 p.m. ET), witnesses in the center of the city said they heard several large explosions which shook buildings.",
+                    content: "正文里有中文A good news, this is the content.",
                 },
             };
             self.decode(row);

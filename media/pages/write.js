@@ -58,8 +58,13 @@
                 };
                 var proto={"type":"data","format":"JSON","app":info.app};
                 RPC.extra.verify(function(pair){
-                    RPC.common.write(pair,anchor,raw,proto,function(res){
-                        App.back();
+                    var link=RPC.common.write(pair,anchor,raw,proto,function(res){
+                        if(res.status.isInBlock){
+                            link.then((unsub)=>{
+                                unsub();
+                                App.back();
+                            });
+                        }
                     });
                 });
             });

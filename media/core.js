@@ -242,9 +242,7 @@
             var cur=G.queue.pop();
             var atom=G.queue[G.queue.length-1];
             var evs=pages[cur.name].events;
-            //var input={};
-            //if(atom.callback) input=atom.callback();
-            evs.after(atom.params,cur,function(){
+            evs.after((!atom || !atom.params)?{}:atom.params,cur,function(){
                 //console.log(`After back :${JSON.stringify(G.queue)}`);
                 self.animateBack(atom.snap,function(){
                     if(G.queue.length===1) self.hideBack();
