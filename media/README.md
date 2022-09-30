@@ -47,7 +47,17 @@ block:  anchor on target block, not necessary
     {
         "name":"cMedia",
         "raw":"[code]",
-        "protocol":{"type":"app","format":"JS","lib":["jquery","bootstrap"],"ver":"0.1.0"}
+        "protocol":{"type":"app","format":"JS","lib":["jquery","bootstrap"],"ver":"1.1.0"}
+    }
+```
+
+## Latest News
+
+```JSON
+    {
+        "name":"cMediaNews",
+        "raw":["testme",["fNews",23345],"format"],
+        "protocol":{"type":"data","format":"JSON"}
     }
 ```
 

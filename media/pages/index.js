@@ -2,8 +2,9 @@
     if (!App) return false;
     var config = {
         name: "index",
+        cache:"cMediaNews",      //cache anchor
         prefix: "ii_",
-        max:10,             //history max length
+        max:10,                     //history max length
         cls: {
             entry: 'ii_index',
             row: '',
@@ -14,6 +15,7 @@
         }
     };
     var his=[];
+    var RPC = App.cache.getG("RPC");
     var self = {
         listening: function () {
             var cls=config.cls;
@@ -23,7 +25,7 @@
             </style>`;
             $("#" + config.cls.entry).prepend(cmap);
             var info = App.info();
-            var RPC = App.cache.getG("RPC");
+            
             RPC.common.subscribe(function (list) {
                 if (list.length == 0) return false;
                 for (var i = 0; i < list.length; i++) {
@@ -36,6 +38,7 @@
                 }
             });
         },
+        
         pushHistory:function(row){
             if(his.length>=config.max){
                 his.shift();
@@ -43,12 +46,24 @@
             }
             his.push(row);
         },
+        
         showHistory:function(){
             var decode=self.decode;
+            if(his.length===0){
+                self.getLatest(config.cache,function(list){
+                    console.log(list);
+                });
+            }
+            
             for(var i=0;i<his.length;i++){
                 decode(his[i]);
             }
             App.fresh();
+        },
+        getLatest:function(anchor,ck){
+            console.log(anchor);
+            var list=[];
+            ck && ck(list);
         },
         addButton:function(){
             var cls=config.cls;
@@ -144,7 +159,6 @@
                 },
             };
             self.decode(row);
-
             App.fresh();
         },
     };
@@ -158,7 +172,7 @@
             "params": {},
             "preload": "Loading...",
             "snap": "",
-            "template": `<div id="${config.cls.entry}"></div>`,     //includindg dom and css, will add to body container,
+            "template":`<div id="${config.cls.entry}"></div>`,     //includindg dom and css, will add to body container,
         },
         "events": {
             "before": function (params, data, ck) {
@@ -170,7 +184,7 @@
             "loading": function (params, data, ck) {
                 //console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
                 //console.log(data);
-                test.auto();        //test data, need to remove
+                //test.auto();        //test data, need to remove
                 self.addButton();
                 self.showHistory();
                 self.listening();
