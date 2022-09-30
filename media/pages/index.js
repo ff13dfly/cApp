@@ -111,6 +111,7 @@
         decode: function (row) {
             var ctx = row.data.raw, cls = config.cls;
             var dt = { anchor: row.name, block: row.block, owner: row.owner };
+            var cmt= { anchor: row.name, block: row.block, owner: row.owner,title:ctx.title };
             var dom = `<div class="row">
                 <div class="col-12 pt-2 ${cls.row}" >
                     <span page="view" data='${JSON.stringify(dt)}'><h4>${ctx.title}</h4></span>
@@ -125,7 +126,7 @@
                 </div>
                 
                 <div class="col-3 gy-2 ${cls.operation}"><span page="share" data='${JSON.stringify(dt)}'>Share</span></div>
-                <div class="col-3 gy-2 ${cls.operation}"><span page="comment" data='${JSON.stringify(dt)}'>Comment</span></div>
+                <div class="col-3 gy-2 ${cls.operation}"><span page="comment" data='${JSON.stringify(cmt)}'>Comment</span></div>
                 <div class="col-3 gy-2 ${cls.operation}">Good</div>
                 <div class="col-3 gy-2 ${cls.operation}">Fav</div>
                 <div class="col-12"><hr /></div>

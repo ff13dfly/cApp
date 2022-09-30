@@ -16,21 +16,34 @@ Definition reverse keywords.
 Basic keywords.
 
 - type: Enum in ["DATA","APP","CREATION"]
+
 - code: Enum in ["UTF8","ASCII"]
+  
 - format: Enum in ["JSON","JS","CSS","MD"]
+  
 - app:  Anchor
+  cApp name, identify data by this.
+
 - ver:  version like "0.0.1"
+  cApp version
+
 - lib:  Array like [ Anchor, ... Anchor ]
+  JS/CSS library which cApp need
+
 - ext:  Array like [ Anchor, ... Anchor ]
-- hem:  Anchor 
+  cApp extend function file. JS file normally.
+
+- params: Object
+  cApp params, when type is "DATA" and "app" is not empty
 
 Extend keywords.
 
 - ref:  Array like [ Anchor, ... Anchor ]
+  
 - tag:  Array like [ Anchor, ... Anchor ]
-- follow: Anchor
-- salt: String
+  
 - limit: number
+  
 - auth:  String as SS58 account
 
 ### JS lib protocol

@@ -61,6 +61,18 @@ block:  anchor on target block, not necessary
     }
 ```
 
+## Comment
+
+use cApp name as params key on anchor's raw.
+
+```JSON
+    {
+        "name":"md5(Random) or anchor",
+        "raw":{"content":"","title":"#Title","desc":"comment on","cMedia":{"follow":"anchor","block":345}},
+        "protocol":{"type":"data","format":"JSON","app":"cMedia"}
+    }
+```
+
 ## Sample
 
 ```JSON
