@@ -29,8 +29,10 @@
             RPC.common.subscribe(function (list) {
                 if (list.length == 0) return false;
                 for (var i = 0; i < list.length; i++) {
-                    var row = list[i];   
-                    if (row.protocol && row.protocol.type === "data" && row.protocol.app === info.app) {
+                    var row = list[i];
+                    if(!row.data) continue;
+                    var data=row.data;
+                    if (data.protocol && data.protocol.type === "data" && data.protocol.app === info.app) {
                         self.pushHistory(row);
                         self.decode(row);
                         App.fresh();
@@ -51,19 +53,27 @@
             var decode=self.decode;
             if(his.length===0){
                 self.getLatest(config.cache,function(list){
-                    console.log(list);
+                    for(var i=0;i<list.length;i++){
+                        if(list[i].empty) continue;
+                        his.push(list[i]);
+                    }
+                    for(var i=0;i<his.length;i++) decode(his[i]);
+                    App.fresh();
                 });
+            }else{
+                for(var i=0;i<his.length;i++)decode(his[i]);
+                App.fresh();
             }
-            
-            for(var i=0;i<his.length;i++){
-                decode(his[i]);
-            }
-            App.fresh();
         },
         getLatest:function(anchor,ck){
-            console.log(anchor);
-            var list=[];
-            ck && ck(list);
+            RPC.common.search(anchor,function(res){
+                if(res.owner===null) return ck && ck([]);
+                if(!res.data || !res.data.raw || !res.data.raw.recommend)return ck && ck([]);
+                var ans=res.data.raw.recommend;
+                RPC.common.multi(ans,function(list){
+                    ck && ck(list);
+                });
+            });
         },
         addButton:function(){
             var cls=config.cls;
@@ -80,8 +90,8 @@
             $("#" + cls.entry).append(dom);
         },
         decode: function (row) {
-            var ctx = row.raw, cls = config.cls;
-            var dt = { anchor: row.anchor, block: row.block, owner: row.account };
+            var ctx = row.data.raw, cls = config.cls;
+            var dt = { anchor: row.name, block: row.block, owner: row.owner };
             var dom = `<div class="row">
                 <div class="col-12 pt-2 ${cls.row}" >
                     <span page="view" data='${JSON.stringify(dt)}'><h4>${ctx.title}</h4></span>
@@ -89,10 +99,10 @@
                 <div class="col-12 ${cls.row}">
                     <span page="view" data='${JSON.stringify(dt)}'>${!ctx.desc ? "" : ctx.desc}</span>
                 </div>
-                <div class="col-4 ${cls.account}">${App.tools.shorten(row.account, 4)}</div>
+                <div class="col-4 ${cls.account}">${App.tools.shorten(row.owner, 6)}</div>
                 <div class="col-8 ${cls.block} text-end">
                  Block : <strong>${row.block}</strong> , 
-                 Anchor : <strong class="${cls.anchor}"><span page="history" data='${JSON.stringify({ anchor: row.anchor })}'>${row.anchor}</span></strong> 
+                 Anchor : <strong class="${cls.anchor}"><span page="history" data='${JSON.stringify({ anchor: row.name })}'>${row.name}</span></strong> 
                 </div>
                 <div class="col-12"><hr /></div>
             </div>`;

@@ -17,12 +17,12 @@
             var RPC=App.cache.getG("RPC");
             var sel=$("#"+config.cls.entry);
             var css=self.getCSS();
-            RPC.common.view(params.block,params.anchor,params.owner?params.owner:'',function(res){
+            RPC.common.view(params.anchor,params.block,params.owner?params.owner:'',function(res){
                 //console.log(res);
                 if(res===false){
                     var dom=self.getDom('Error','No such anchor',params.anchor,'',0);
                 }else{
-                    var details=res.raw.raw;
+                    var details=res.data.raw;
                     var ctx=App.tools.convert(details.content,{"page":"view","class":"text-info"});
                     var dom=self.getDom(details.title,ctx,res.name,res.owner,res.blocknumber);
                 }
