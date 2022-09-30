@@ -11,6 +11,7 @@
             entry:'ww_index',
             title:'',
             content:'',
+            desc:'',
             anchor:'',
             add:'',
         },
@@ -33,6 +34,9 @@
                 <div class="col-12 gy-2">
                     <textarea class="form-control ${cls.content}" placeholder="Adding new content to anchor network..." rows="10"></textarea>   
                 </div>
+                <div class="col-12 gy-2">
+                    <textarea class="form-control ${cls.desc}" placeholder="Description..." rows="3"></textarea>   
+                </div>
                 <div class="col-6 gy-2">
                     <input type="text" class="form-control ${cls.anchor}" placeholder="Anchor name..." value="" >
                 </div>
@@ -50,10 +54,11 @@
             $("#"+cls.add).off('click').on('click',function(){
                 var title=$("#" + cls.entry).find('.'+cls.title).val().trim();
                 var ctx=$("#" + cls.entry).find('.'+cls.content).val().trim();
+                var desc=$("#" + cls.entry).find('.'+cls.desc).val().trim();
                 var anchor=$("#" + cls.entry).find('.'+cls.anchor).val().trim();
                 var raw={
                     "title":title,
-                    "desc": ctx,
+                    "desc": desc,
                     "content":ctx,
                 };
                 var proto={"type":"data","format":"JSON","app":info.app};

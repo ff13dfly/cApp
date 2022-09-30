@@ -56,7 +56,7 @@ block:  anchor on target block, not necessary
 ```JSON
     {
         "name":"cMediaNews",
-        "raw":{"recommend":["testme",["fNews",113],"format"]},
+        "raw":{"recommend":["testme",["cNews",958],"BBC"]},
         "protocol":{"type":"data","format":"JSON"}
     }
 ```

@@ -28,6 +28,8 @@ Extend keywords.
 
 - ref:  Array like [ Anchor, ... Anchor ]
 - tag:  Array like [ Anchor, ... Anchor ]
+- follow: Anchor
+- salt: String
 - limit: number
 - auth:  String as SS58 account
 

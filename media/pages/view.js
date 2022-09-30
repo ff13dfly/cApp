@@ -24,7 +24,7 @@
                 }else{
                     var details=res.data.raw;
                     var ctx=App.tools.convert(details.content,{"page":"view","class":"text-info"});
-                    var dom=self.getDom(details.title,ctx,res.name,res.owner,res.blocknumber);
+                    var dom=self.getDom(details.title,ctx,res.name,res.owner,res.block);
                 }
                 sel.html(css+dom);
                 App.fresh();
