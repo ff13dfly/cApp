@@ -9,13 +9,22 @@
         prefix:"ss_",
         cls:{
             entry:'ss_index',
+            qr:'',
         },
     };
 
     var self={
         show:function(params,data){
-            console.log(params);
-            console.log(data);
+            var cls=config.cls;
+            var dom=`<style>
+                #${cls.entry} .${cls.qr}{width:360px;height:360px;background:#BBBBBB;margin:0 auto;}
+            </style>
+            <div class="row">
+                <div class="col-12 gy-2 text-center">
+                    <p class="${cls.qr}"></p>
+                </div>
+            </div>`;
+            $("#" + cls.entry).html(dom);
         },
         struct:function(){
             var pre=config.prefix;

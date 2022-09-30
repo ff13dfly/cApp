@@ -20,7 +20,7 @@
 
     var self={
         show:function(params,data){
-            console.log(params);
+            //console.log(params);
             var cls=config.cls;
             var dom=`<style>
             </style>
