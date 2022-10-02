@@ -61,6 +61,14 @@ block:  anchor on target block, not necessary
     }
 ```
 
+```JSON
+    {
+        "name":"cMediaNews",
+        "raw":{"recommend":["fNews","BBC","testme","hello","NToday"]},
+        "protocol":{"type":"data","format":"JSON"}
+    }
+```
+
 ## Comment
 
 use cApp name as params key on anchor's raw.

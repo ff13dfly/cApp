@@ -20,26 +20,9 @@
 
     var self={
         show:function(params,data){
-            //console.log(params);
-            var cls=config.cls;
-            var dom=`<style>
-            </style>
-            <div class="row">
-                <div class="col-12 gy-2">
-                    <textarea class="form-control ${cls.content}" placeholder="Adding comment..." rows="10"></textarea>   
-                </div>
-                <div class="col-6 gy-2">
-                    <input type="text" class="form-control ${cls.anchor}" disabled="disabled" value="${params.anchor}" >
-                </div>
-                <div class="col-6 gy-2 text-end">
-                    <input type="hidden" class="form-control ${cls.title}" disabled="disabled" value="${params.title}" >
-                    <input type="hidden" class="form-control ${cls.block}" disabled="disabled" value="${params.block}" >
-                    <button class="btn btn-md btn-primary" id="${cls.add}">Comment</button>
-                </div>
-            </div>`;
-            $("#" + cls.entry).html(dom);
             self.bind();
         },
+        
         bind:function(){
             var cls=config.cls;
             var RPC = App.cache.getG("RPC");
@@ -68,14 +51,42 @@
                 });
             });
         },
-        struct:function(){
-            var pre=config.prefix;
-            var hash=App.tools.hash;
-            for(var k in config.cls){
-                if(!config.cls[k]) config.cls[k]=pre + hash();
+        struct: function () {
+            var pre = config.prefix;
+            var hash = App.tools.hash;
+            for (var k in config.cls) {
+                if (!config.cls[k]) config.cls[k] = pre + hash();
             }
+
+            page.data.preload = self.template();
             return true;
-        }
+        },
+        template: function () {
+            var css = self.getCSS();
+            var dom = self.getDom();
+            return `${css}<div id="${config.cls.entry}">${dom}</div>`;
+        },
+        getCSS:function(){
+            var cls=config.cls;
+            return `<style>
+            </style>`;
+        },
+        getDom:function(){
+            var cls=config.cls;
+            return `<div class="row">
+                <div class="col-12 gy-2">
+                    <textarea class="form-control ${cls.content}" placeholder="Adding comment..." rows="10"></textarea>   
+                </div>
+                <div class="col-6 gy-2">
+                    <input type="text" class="form-control ${cls.anchor}" disabled="disabled" value="" >
+                </div>
+                <div class="col-6 gy-2 text-end">
+                    <input type="hidden" class="form-control ${cls.title}" disabled="disabled" value="" >
+                    <input type="hidden" class="form-control ${cls.block}" disabled="disabled" value="" >
+                    <button class="btn btn-md btn-primary" id="${cls.add}">Comment</button>
+                </div>
+            </div>`;
+        },
     };
 
     var test={
@@ -88,11 +99,9 @@
         "data":{
             "name":config.name,
             "title":"Anchor comment",     //default page title
-            "raw":null,
             "params":{},
-            "preload":"Loading...",
+            "preload":"",
             "snap":"",
-            "template":`<div id="${config.cls.entry}"></div>`,     //includindg dom and css, will add to body container,
         },      
         "events":{
             "before":function(params,data,ck){

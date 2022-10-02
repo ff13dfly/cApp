@@ -19,34 +19,9 @@
 
     var self={
         show:function(params,data){
-            var cls=config.cls;
-            var dom=`<style>
-                #${cls.entry} .${cls.add}{
-                    width:100px;height:48px;background:#EFCCE9;opacity: 0.9;
-                    position:fixed;right:20px;bottom:25%;border-radius:24px;border:1px solid #EEFFFF;
-                    line-height:48px;text-align: center;
-                }
-            </style>
-            <div class="row">
-                <div class="col-12 gy-2">
-                    <input type="text" class="form-control ${cls.title}" placeholder="Title..." value="" >  
-                </div>
-                <div class="col-12 gy-2">
-                    <textarea class="form-control ${cls.content}" placeholder="Adding new content to anchor network..." rows="10"></textarea>   
-                </div>
-                <div class="col-12 gy-2">
-                    <textarea class="form-control ${cls.desc}" placeholder="Description..." rows="3"></textarea>   
-                </div>
-                <div class="col-6 gy-2">
-                    <input type="text" class="form-control ${cls.anchor}" placeholder="Anchor name..." value="" >
-                </div>
-                <div class="col-6 gy-2 text-end">
-                    <button class="btn btn-md btn-primary" id="${cls.add}">Add</button>
-                </div>
-            </div>`;
-            $("#" + cls.entry).html(dom);
             self.bind();
         },
+        
         bind:function(){
             var cls=config.cls;
             var RPC = App.cache.getG("RPC");
@@ -74,14 +49,51 @@
                 });
             });
         },
-        struct:function(){
-            var pre=config.prefix;
-            var hash=App.tools.hash;
-            for(var k in config.cls){
-                if(!config.cls[k]) config.cls[k]=pre + hash();
+        struct: function () {
+            var pre = config.prefix;
+            var hash = App.tools.hash;
+            for (var k in config.cls) {
+                if (!config.cls[k]) config.cls[k] = pre + hash();
             }
+
+            page.data.preload = self.template();
             return true;
-        }
+        },
+        template: function () {
+            var css = self.getCSS();
+            var dom = self.getDom();
+            return `${css}<div id="${config.cls.entry}">${dom}</div>`;
+        },
+        getCSS:function(){
+            var cls=config.cls;
+            return `<style>
+                #${cls.entry} .${cls.add}{
+                    width:100px;height:48px;background:#EFCCE9;opacity: 0.9;
+                    position:fixed;right:20px;bottom:25%;border-radius:24px;border:1px solid #EEFFFF;
+                    line-height:48px;text-align: center;
+                }
+            </style>`;
+        },
+        getDom:function(){
+            var cls=config.cls;
+            return `<div class="row">
+                <div class="col-12 gy-2">
+                    <input type="text" class="form-control ${cls.title}" placeholder="Title..." value="" >  
+                </div>
+                <div class="col-12 gy-2">
+                    <textarea class="form-control ${cls.content}" placeholder="Adding new content to anchor network..." rows="10"></textarea>   
+                </div>
+                <div class="col-12 gy-2">
+                    <textarea class="form-control ${cls.desc}" placeholder="Description..." rows="3"></textarea>   
+                </div>
+                <div class="col-6 gy-2">
+                    <input type="text" class="form-control ${cls.anchor}" placeholder="Anchor name..." value="" >
+                </div>
+                <div class="col-6 gy-2 text-end">
+                    <button class="btn btn-md btn-primary" id="${cls.add}">Add</button>
+                </div>
+            </div>`;
+        },
     };
 
     var test={
@@ -94,15 +106,14 @@
         "data":{
             "name":config.name,
             "title":"Add your content",     //default page title
-            "raw":null,
             "params":{},
             "preload":"Loading...",
             "snap":"",
-            "template":`<div id="${config.cls.entry}"></div>`,     //includindg dom and css, will add to body container,
         },      
         "events":{
             "before":function(params,data,ck){
-                ck && ck();
+                var fmt={code:1,message:"successful"};
+                ck && ck(fmt);
             },
             "loading":function(params,data){
                 test.auto();   

@@ -18,47 +18,53 @@
         show:function(params,data){
             var anchor=params.anchor;
             var RPC=App.cache.getG("RPC");
-            var cls=config.cls;
-            
-            var cmap = `<style>
-                .${cls.account}{font-size:10px;color:#EF2356;}
-                .${cls.info}{font-size:10px;}
-            </style>`;
-            $("#" + cls.entry).html(cmap);
-
             if(RPC.common.history){
                 RPC.common.history(anchor,(list)=>{
-                    //console.log(list);
                     var dom='';
                     for(var i=0;i<list.length;i++){
                         dom+=self.decode(list[i]);
                     }
-                    $("#"+cls.entry).append(dom);
+                    $("#"+config.cls.entry).append(dom);
                     App.fresh();
                 });
             }
         },
+        
         decode:function(row){
             var cls=config.cls;
-            
-            //console.log(row);
-            //var ctx=App.tools.convert(details.content,{"page":"view","class":"text-info"});
             return App.tools.convert(`<div class="row">
                 <div class="col-3 pt-2 ${cls.info}" >Block :[${row.block}](anchor://${row.data.key}/${row.block}) </div>    
                 <div class="col-9 pt-2 ${cls.account}">${App.tools.shorten(row.owner,12)}</div>
                 <div class="col-12"><hr/></div>
             </div>`,{"page":"view","class":"text-info"});
         },
+        
         //prepare the basic data when code loaded
         struct: function () {
-            self.clsAutoset(config.prefix);         
-        },
-        clsAutoset: function (pre) {
-            var hash = App.tools.hash;
-            for (var k in config.cls) {
-                if (!config.cls[k]) config.cls[k] = pre + hash();
+            var pre=config.prefix;
+            var hash=App.tools.hash;
+            for(var k in config.cls){
+                if(!config.cls[k]) config.cls[k]=pre+hash();
             }
-            return true;
+
+            page.data.preload=self.template();
+            return true;         
+        },
+        template:function(){
+            var css=self.getCSS();
+            var dom=self.getDom();
+            return `${css}<div id="${config.cls.entry}"></div>`;
+        },
+        getCSS:function(){
+            var cls=config.cls;
+            return `<style>
+                .${cls.account}{font-size:10px;color:#EF2356;}
+                .${cls.info}{font-size:10px;}
+            </style>`;
+        },
+        getDom:function(){
+            var cls=config.cls;
+            return ``;
         },
     };
 
@@ -72,11 +78,9 @@
         "data":{
             "name":config.name,
             "title":"History details",     //default page title
-            "raw":null,
             "params":{},
-            "preload":"Loading...",
+            "preload":"",
             "snap":"",
-            "template":`<div id="${config.cls.entry}"></div>`,     //includindg dom and css, will add to body container,
         },      
         "events":{
             "before":function(params,data,ck){

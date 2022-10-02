@@ -20,7 +20,7 @@
             body:"",
         },
         animate:{
-            interval:500,
+            interval:300,
         },
     };
 
@@ -162,69 +162,48 @@
                 self.showPage(act,params,cache,events,skip);               
             }else{
                 events.before(params,cache,function(dt){
-                    if(dt!==undefined){
-                        cache.raw=dt;        //load data to cache
-                    }
+                    //load data to cache
+                    if(dt!==undefined)self.decodeBefore(dt);
+                    //show target page
+                    //console.log(`Ready to show page: ${cache.name}`);
                     self.showPage(act,params,cache,events,skip);
                 });
             }
         },
-
+        decodeBefore:function(fmt){
+            //depend on fmt, can stop loading page
+        },
         showPage:function(isAnimate,params,cache,events,skip){
             //console.log(`Function [showPage] back status ${self.statusBack()},history lenght ${G.queue.length}`);
             //console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
             //if(G.queue.length>1) self.showBack();
             if(!skip){
                 cache.preload=self.preload(cache);
-                if(!isAnimate){
-                    self.initPage(cache);
+                self.animateLoad(cache,function(){
+                    //console.log('After initPage:')
+                    //console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
                     events.loading(params,cache,function(){
-                            
+
                     });
-                }else{
-                    self.animateLoad(cache.preload,function(){
-                        self.initPage(cache);
-                        //console.log('After initPage:')
-                        //console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
-                        events.loading(params,cache,function(){
-    
-                        });
-                    });
-                }
+                },isAnimate);
             }else{
                 self.bind();
             }
         },
-        
-        initPage:function(data){
-            //console.log(`Function [initPage] back status ${self.statusBack()},history lenght ${G.queue.length}`);
-            //console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
-            //console.log("init page..."+JSON.stringify(data));
-            if(G.queue.length>1) self.showBack();
-            var cls=config.cls;
-
-            //1.body add dom;
-            var sel=$("#"+cls.entry);
-            sel.find("."+cls.body).html(data.template);
-
-            //1.1.set title
-            sel.find('.'+cls.title).html(data.title);
-            sel.find('.'+cls.back).off('click').on('click',self.back);
-        },
         preload:function(data){
+            //console.log(data);
             //console.log(`Function [preload] back status ${self.statusBack()},history lenght ${G.queue.length}`);
             //console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
-            var cls=config.cls;
+            var res={head:'',body:''},cls=config.cls;
+
             var dom=$("#"+cls.entry).html();
             var sel=$(dom).clone();
-            sel.find("."+cls.body).html(data.template);
             sel.find('.'+cls.title).html(data.title);
             if(G.queue.length>1) sel.find('.'+cls.back).show();
 
-            //console.log('Here to render target page struct');
-
-            //console.log(`target title ${data.title},now title ${$("#"+cls.entry).find('.'+cls.title).html()}`);
-            return sel.prop("outerHTML");
+            res.head=sel.prop("outerHTML");
+            res.body=data.preload;
+            return res;
         },
         getCurDom:function(){
             // without nav and back button
@@ -259,6 +238,7 @@
             $("#"+G.container).find('span').off('click').on('click',function(){
                 var sel=$(this);
                 var page=sel.attr("page");
+                if(!page) return false;     //skip normal span
                 var params=JSON.parse(sel.attr("data"));
                 self.goto(page,params);
             });
@@ -292,25 +272,42 @@
                 ck && ck();
             });
         },
-        animateLoad:function(dom,ck){
-            // history queue have been saved
-            var cls=config.cls;
-            //console.log(`Now title ${$("#"+cls.entry).find('.'+cls.title).html()}`);
-            var dv=G.device;
-            //console.log(`Container ${G.funs.getG("container")} : ${JSON.stringify(dv)}`);
-            var cmap={
-                left:(dv.screen+dv.back.left)+"px",
-            };
-            var at=config.animate.interval;
-            var ani={left:(dv.screen-dv.width+dv.back.left)+'px'};
+        animateLoad:function(cache,ck,isAnimate){
+            //console.log(`Now title ${$("#"+cls.entry).find('.'+cls.title).html()}`);    
+            //console.log(`Container ${G.funs.getG("container")} : ${JSON.stringify(dv)}`);   
             //console.time('动画运行时间');
             //console.log(`Animation Loading from ${JSON.stringify(cmap)} to ${JSON.stringify(ani)}`);
-            $("#"+cls.mask).html(dom).css(cmap).show().animate(ani,at,'',function(){
-                $("#"+cls.mask).hide();
-                //console.log(`--------------Loading page end--------------`);
-                //console.timeEnd('动画运行时间');
+            var cls=config.cls;
+            var dom=cache.preload;
+            var cls=config.cls;
+            var sel=$("#"+cls.entry);
+            
+
+            if(!isAnimate){
+                if(G.queue.length>1) self.showBack();
+                sel.find('.'+cls.title).html(cache.title);
+                sel.find('.'+cls.back).off('click').on('click',self.back);
+                $("#"+cls.entry).find('.'+cls.body).html(dom.body);
                 ck && ck();
-            });
+            }else{
+                
+                var dv=G.device;
+                var cmap={
+                    left:(dv.screen+dv.back.left)+"px",
+                };
+                var at=config.animate.interval;
+                var ani={left:(dv.screen-dv.width+dv.back.left)+'px'};
+                $("#"+cls.mask).html(dom.head+dom.body).css(cmap).show().animate(ani,at,'',function(){
+                    $("#"+cls.mask).hide();
+                    if(G.queue.length>1) self.showBack();
+                    sel.find('.'+cls.title).html(cache.title);
+                    sel.find('.'+cls.back).off('click').on('click',self.back);
+                    sel.find('.'+cls.body).html(dom.body);
+                    //console.log(`--------------Loading page end--------------`);
+                    //console.timeEnd('动画运行时间');
+                    ck && ck();
+                });
+            }
         },
         device:function(con){
             var cls=config.cls;
