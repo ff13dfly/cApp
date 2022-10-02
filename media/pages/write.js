@@ -67,11 +67,7 @@
         getCSS:function(){
             var cls=config.cls;
             return `<style>
-                #${cls.entry} .${cls.add}{
-                    width:100px;height:48px;background:#EFCCE9;opacity: 0.9;
-                    position:fixed;right:20px;bottom:25%;border-radius:24px;border:1px solid #EEFFFF;
-                    line-height:48px;text-align: center;
-                }
+                #${cls.entry} .${cls.add}{width:100px;height:48px;background:#EFCCE9;opacity: 0.9;position:fixed;right:20px;bottom:25%;border-radius:24px;border:1px solid #EEFFFF;line-height:48px;text-align: center;}
             </style>`;
         },
         getDom:function(){

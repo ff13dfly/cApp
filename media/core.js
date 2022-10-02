@@ -20,7 +20,7 @@
             body:"",
         },
         animate:{
-            interval:300,
+            interval:500,
         },
     };
 
@@ -158,34 +158,35 @@
             
             //console.log("[function Goto] cache:"+JSON.stringify(cache));
             var events=row.events;
+            var cfg={
+                skip:skip,         //no preload and animate
+                animate:act,       //wether animate
+                overwrite:true,     //overwrite template after animate
+            }
             if(!events.before){
-                self.showPage(act,params,cache,events,skip);               
+                self.showPage(params,cache,events,cfg);               
             }else{
                 events.before(params,cache,function(dt){
                     //load data to cache
-                    if(dt!==undefined)self.decodeBefore(dt);
+                    if(dt!==undefined){
+                        if(dt.overwrite!==undefined) cfg.overwrite=dt.overwrite;
+                        self.decodeBefore(dt);
+                    }
                     //show target page
                     //console.log(`Ready to show page: ${cache.name}`);
-                    self.showPage(act,params,cache,events,skip);
+                    self.showPage(params,cache,events,cfg);
                 });
             }
         },
         decodeBefore:function(fmt){
             //depend on fmt, can stop loading page
         },
-        showPage:function(isAnimate,params,cache,events,skip){
-            //console.log(`Function [showPage] back status ${self.statusBack()},history lenght ${G.queue.length}`);
-            //console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
-            //if(G.queue.length>1) self.showBack();
-            if(!skip){
+        showPage:function(params,cache,events,cfg){
+            if(!cfg.skip){
                 cache.preload=self.preload(cache);
                 self.animateLoad(cache,function(){
-                    //console.log('After initPage:')
-                    //console.log(`Title:${$("#"+config.cls.entry).find('.'+config.cls.title).html()}`);
-                    events.loading(params,cache,function(){
-
-                    });
-                },isAnimate);
+                    events.loading(params,cache);
+                },cfg);
             }else{
                 self.bind();
             }
@@ -272,42 +273,58 @@
                 ck && ck();
             });
         },
-        animateLoad:function(cache,ck,isAnimate){
+        animateLoad:function(cache,ck,cfg){
             //console.log(`Now title ${$("#"+cls.entry).find('.'+cls.title).html()}`);    
             //console.log(`Container ${G.funs.getG("container")} : ${JSON.stringify(dv)}`);   
             //console.time('动画运行时间');
             //console.log(`Animation Loading from ${JSON.stringify(cmap)} to ${JSON.stringify(ani)}`);
             var cls=config.cls;
-            var dom=cache.preload;
-            var cls=config.cls;
-            var sel=$("#"+cls.entry);
-            
-
-            if(!isAnimate){
-                if(G.queue.length>1) self.showBack();
-                sel.find('.'+cls.title).html(cache.title);
-                sel.find('.'+cls.back).off('click').on('click',self.back);
-                $("#"+cls.entry).find('.'+cls.body).html(dom.body);
+            //var dom=cache.preload;
+            if(!cfg.animate){
+                self.pageAuto(cache,cfg);
                 ck && ck();
             }else{
-                
                 var dv=G.device;
                 var cmap={
                     left:(dv.screen+dv.back.left)+"px",
                 };
                 var at=config.animate.interval;
                 var ani={left:(dv.screen-dv.width+dv.back.left)+'px'};
-                $("#"+cls.mask).html(dom.head+dom.body).css(cmap).show().animate(ani,at,'',function(){
-                    $("#"+cls.mask).hide();
-                    if(G.queue.length>1) self.showBack();
-                    sel.find('.'+cls.title).html(cache.title);
-                    sel.find('.'+cls.back).off('click').on('click',self.back);
-                    sel.find('.'+cls.body).html(dom.body);
-                    //console.log(`--------------Loading page end--------------`);
-                    //console.timeEnd('动画运行时间');
+                var dom=`${cache.preload.head}<div class="${cls.body}">${cache.preload.body}</div>`;
+                $("#"+cls.mask).html(dom).css(cmap).show().animate(ani,at,'',function(){
+                    self.pageAuto(cache,cfg);
                     ck && ck();
                 });
             }
+        },
+        pageAuto:function(cache,cfg){
+            var cls=config.cls;
+            var sel=$("#"+cls.entry);
+            if(G.queue.length>1) self.showBack();
+            sel.find('.'+cls.title).html(cache.title);
+            sel.find('.'+cls.back).off('click').on('click',self.back);
+            //var body=cfg.overwrite===true?cache.preload.body:$("#"+cls.mask).find('.'+cls.body).html();
+            //console.log(body);
+            sel.find('.'+cls.body).html(cache.preload.body);
+            if(cfg.animate) $("#"+cls.mask).hide();
+        },
+        
+        statusBack:function(){
+            var cls=config.cls;
+            return $("#"+cls.entry).find('.'+cls.back).is(":hidden");
+        },
+        hideBack:function(){
+            //console.log('Hiding back arrow.');
+            var cls=config.cls;
+            $("#"+cls.entry).find('.'+cls.back).hide();
+        },
+        showBack:function(){
+            //console.log('Showing back arrow.');
+            var cls=config.cls;
+            $("#"+cls.entry).find('.'+cls.back).show();
+        },
+        error:function(txt){
+            console.log(txt);
         },
         device:function(con){
             var cls=config.cls;
@@ -325,23 +342,6 @@
             };
             //console.log(`Check container:${con},result: ${JSON.stringify(G.device)}`);
             return true;
-        },
-        statusBack:function(){
-            var cls=config.cls;
-            return $("#"+cls.entry).find('.'+cls.back).is(":hidden");
-        },
-        hideBack:function(){
-            //console.log('Hiding back arrow.');
-            var cls=config.cls;
-            $("#"+cls.entry).find('.'+cls.back).hide();
-        },
-        showBack:function(){
-            //console.log('Showing back arrow.');
-            var cls=config.cls;
-            $("#"+cls.entry).find('.'+cls.back).show();
-        },
-        error:function(txt){
-            console.log(txt);
         },
     };
 

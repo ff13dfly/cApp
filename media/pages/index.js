@@ -139,12 +139,7 @@
                 .${cls.account}{font-size:10px;color:#EF8889;}
                 .${cls.block}{font-size:10px;}
                 .${cls.operation}{font-size:10px;}
-
-                #${cls.entry} .${cls.add}{
-                    width:100px;height:48px;background:#F4F4F4;opacity: 0.9;
-                    position:fixed;right:20px;bottom:25%;border-radius:24px;border:1px solid #AAAAAA;
-                    line-height:48px;text-align: center;box-shadow: 3px 3px 3px #BBBBBB;
-                }
+                #${cls.entry} .${cls.add}{width:100px;height:48px;background:#F4F4F4;opacity: 0.9;position:fixed;right:20px;bottom:25%;border-radius:24px;border:1px solid #AAAAAA;line-height:48px;text-align: center;box-shadow: 3px 3px 3px #BBBBBB;}
                 #${cls.entry} .${cls.add} img{opacity: 0.8;}   
             </style>`;
             return cmap;

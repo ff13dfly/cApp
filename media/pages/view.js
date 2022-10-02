@@ -4,7 +4,7 @@
         name:'view',
         prefix:"cv_",
         cls:{
-            entry:'cv_index',
+            entry:'',
             row:'',
             anchor:'',
             intro:'',
@@ -22,7 +22,7 @@
         show:function(params,data){
             var RPC=App.cache.getG("RPC");
             RPC.common.view(params.anchor,params.block,params.owner?params.owner:'',function(res){
-                console.log(res);
+                //console.log(res);
                 if(res.empty){
                     self.render("Error",'No such anchor','null',params.anchor,params.block);
                 }else{
@@ -32,10 +32,9 @@
                     var owner=App.tools.shorten(res.owner,8);
                     self.render(details.title,ctx,owner,res.name,res.block);
                 }
-                self.bind();
-                App.fresh();    //enable page link
+                //self.bind();
+                App.fresh();
             });
-            //$("#"+config.cls.entry).html(`Loading anchor "${params.anchor}" data on ${params.block}`);
         },
         render:function(title,content,owner,anchor,block){
             var cls=config.cls;
@@ -48,7 +47,7 @@
         },
 
         bind:function(){
-            console.log("binding comment action");
+            //console.log("binding comment action");
         },
 
         struct:function(){
@@ -123,15 +122,14 @@
             "before":function(params,data,ck){
                 //console.log(`${config.name} event "before" param :${JSON.stringify(params)}`);
                 //1.set before rending dom
-
+                
                 //2.set before function result;
-                var fmt={code:1,message:"successful"};
+                var fmt={code:1,message:"successful",overwrite:true};
                 ck && ck(fmt);
             },
             "loading":function(params,data){
-                //console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
-                //test.auto();        //test data, need to remove
                 self.show(params,data);
+                
             },
             "after":function(params,data,ck){
                 //console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);
