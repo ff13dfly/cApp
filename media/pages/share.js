@@ -6,7 +6,7 @@
     if(!App) return false;
     var config={
         name:'share',
-        prefix:"ss_",
+        prefix:"s",
         cls:{
             entry:'ss_index',
             qr:'',

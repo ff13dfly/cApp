@@ -6,9 +6,9 @@
     if(!App) return false;
     var config={
         name:'comment',
-        prefix:"ct_",
+        prefix:"c",
         cls:{
-            entry:'ct_index',
+            entry:'',
             anchor:'',
             block:'',
             title:'',

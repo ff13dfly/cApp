@@ -6,9 +6,9 @@
     if(!App) return false;
     var config={
         name:'history',
-        prefix:"hs_",
+        prefix:"h",
         cls:{
-            entry:'hs_index',
+            entry:'',
             account:'',
             info:'',
         },

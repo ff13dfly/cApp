@@ -2,7 +2,7 @@
     if(!App) return false;
     var config={
         name:'view',
-        prefix:"cv_",
+        prefix:"v",
         cls:{
             entry:'',
             row:'',

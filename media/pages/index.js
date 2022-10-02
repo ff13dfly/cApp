@@ -3,10 +3,10 @@
     var config = {
         name: "index",
         cache:"cMediaNews",      //cache anchor
-        prefix: "ii_",
+        prefix: "i",
         max:10,                     //history max length
         cls: {
-            entry: 'ii_index',
+            entry: '',
             row: '',
             anchor: '',
             account:'',

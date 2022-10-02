@@ -10,7 +10,7 @@
     var config={
         app:'cMedia',          // name of cApp, will set to windows
         default:"index",        // default page
-        prefix:'cc_',
+        prefix:'i',
         cls:{
             entry:"",
             mask:"",

@@ -6,9 +6,9 @@
     if(!App) return false;
     var config={
         name:'write',
-        prefix:"ww_",
+        prefix:"w",
         cls:{
-            entry:'ww_index',
+            entry:'',
             title:'',
             content:'',
             desc:'',
