@@ -22,7 +22,6 @@
         show:function(params,data){
             var RPC=App.cache.getG("RPC");
             RPC.common.view(params.anchor,params.block,params.owner?params.owner:'',function(res){
-                //console.log(res);
                 if(res.empty){
                     self.render("Error",'No such anchor','null',params.anchor,params.block);
                 }else{
@@ -32,7 +31,7 @@
                     var owner=App.tools.shorten(res.owner,8);
                     self.render(details.title,ctx,owner,res.name,res.block);
                 }
-                //self.bind();
+                self.bind();
                 App.fresh();
             });
         },
@@ -56,18 +55,11 @@
             for(var k in config.cls){
                 if(!config.cls[k]) config.cls[k]=pre+hash();
             }
-            //console.log('view page struct:');
-            //console.log(page.data.preload);              //only body
+
             page.data.preload=self.template();
             return true;
         },
         template:function(){
-            // var title="Loading";
-            // var ctx="Loading target content";
-            // var anchor="anchor";
-            // var owner="Checking";
-            // var block=0;
-            // return self.getDom(title,ctx,anchor,owner,block);
             var css = self.getCSS();
             var dom = self.getDom();
             var cmt=self.getComment();
@@ -104,12 +96,6 @@
         },
     };
 
-    var test={
-        auto:function(){
-
-        },
-    };
-
     var page={
         "data":{
             "name":config.name,         //page name
@@ -120,19 +106,13 @@
         },      
         "events":{
             "before":function(params,data,ck){
-                //console.log(`${config.name} event "before" param :${JSON.stringify(params)}`);
-                //1.set before rending dom
-                
-                //2.set before function result;
-                var fmt={code:1,message:"successful",overwrite:true};
-                ck && ck(fmt);
+                var result={code:1,message:"successful",overwrite:true};
+                ck && ck(result);
             },
             "loading":function(params,data){
                 self.show(params,data);
-                
             },
             "after":function(params,data,ck){
-                //console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);
                 ck && ck();
             },
         },

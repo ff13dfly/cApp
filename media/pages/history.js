@@ -1,8 +1,4 @@
-/*
-    {"type":"data","format":"JS"}
-*/
-
-(function(App){
+;(function(App){
     if(!App) return false;
     var config={
         name:'history',
@@ -68,12 +64,6 @@
         },
     };
 
-    var test={
-        auto:function(){
-
-        },
-    };
-
     var page={
         "data":{
             "name":config.name,
@@ -87,8 +77,6 @@
                 ck && ck();
             },
             "loading":function(params,data){
-                //console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
-                test.auto();        //test data, need to remove
                 self.show(params,data);
             },
             "after":function(params,data,ck){

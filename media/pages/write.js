@@ -1,8 +1,4 @@
-/*
-    {"type":"data","format":"JS"}
- */
-
-(function(App){
+;(function(App){
     if(!App) return false;
     var config={
         name:'write',
@@ -25,7 +21,7 @@
         bind:function(){
             var cls=config.cls;
             var RPC = App.cache.getG("RPC");
-            var info = App.info();
+            var app_name = App.cache.getG("name");
             $("#"+cls.add).off('click').on('click',function(){
                 var title=$("#" + cls.entry).find('.'+cls.title).val().trim();
                 var ctx=$("#" + cls.entry).find('.'+cls.content).val().trim();
@@ -36,7 +32,7 @@
                     "desc": desc,
                     "content":ctx,
                 };
-                var proto={"type":"data","format":"JSON","app":info.app};
+                var proto={"type":"data","format":"JSON","app":app_name};
                 RPC.extra.verify(function(pair){
                     var link=RPC.common.write(pair,anchor,raw,proto,function(res){
                         if(res.status.isInBlock){
@@ -92,12 +88,6 @@
         },
     };
 
-    var test={
-        auto:function(){
-
-        },
-    };
-
     var page={
         "data":{
             "name":config.name,
@@ -108,11 +98,10 @@
         },      
         "events":{
             "before":function(params,data,ck){
-                var fmt={code:1,message:"successful"};
-                ck && ck(fmt);
+                var result={code:1,message:"successful"};
+                ck && ck(result);
             },
             "loading":function(params,data){
-                test.auto();   
                 self.show(params,data);
             },
             "after":function(params,data,ck){

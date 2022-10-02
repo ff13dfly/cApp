@@ -21,16 +21,14 @@
     var RPC = App.cache.getG("RPC");
     var self = {
         listening: function () {
-            
-            //$("#" + config.cls.entry).prepend(cmap);
-            var info = App.info();
+            var name = App.cache.getG("name");
             RPC.common.subscribe(function (list) {
                 if (list.length == 0) return false;
                 for (var i = 0; i < list.length; i++) {
                     var row = list[i];
                     if(!row.data) continue;
                     var data=row.data;
-                    if (data.protocol && data.protocol.type === "data" && data.protocol.app === info.app) {
+                    if (data.protocol && data.protocol.type === "data" && data.protocol.app === name) {
                         self.pushHistory(row);
                         self.decode(row);
                         self.bind();
@@ -39,15 +37,6 @@
                 }
             });
         },
-        
-        pushHistory:function(row){
-            if(his.length>=config.max){
-                his.shift();
-                return this.pushHistory(row);
-            }
-            his.push(row);
-        },
-        
         showHistory:function(){
             var decode=self.decode;
             if(his.length===0){
@@ -66,6 +55,7 @@
                 App.fresh();
             }
         },
+        
         getLatest:function(anchor,ck){
             RPC.common.search(anchor,function(res){
                 if(res.owner===null) return ck && ck([]);
@@ -76,8 +66,13 @@
                 });
             });
         },
-        
-        
+        pushHistory:function(row){
+            if(his.length>=config.max){
+                his.shift();
+                return this.pushHistory(row);
+            }
+            his.push(row);
+        },
         decode: function (row) {
             var ctx = row.data.raw, cls = config.cls;
             var dt = { anchor: row.name, block: row.block, owner: row.owner };
@@ -153,38 +148,25 @@
         },
     };
 
-
-    var test = {
-        auto: function () {
-            //test.row();
-        }
-    };
-
-
     var page = {
         "data": {
             "name": config.name,
-            "title": "cMedia App",     //default page title
+            "title": "cMedia App",
             "params": {},
             "preload": "",
             "snap": "",
         },
         "events": {
             "before": function (params, data, ck) {
-                //console.log(`${config.name} event "before" param :${JSON.stringify(params)}`);
-                //console.log('Before page loading...'+JSON.stringify(cache));
-                var dt = { hello: "world" };
-                ck && ck(dt);
+                var result={code:1,message:"successful"};
+                ck && ck(result);
             },
             "loading": function (params, data, ck) {
-                //console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
                 self.showHistory();
                 self.listening();
-                App.fresh();
                 ck && ck();
             },
             "after": function (params, data, ck) {
-                //console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);
                 ck && ck();
             },
         },

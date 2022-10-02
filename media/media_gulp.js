@@ -34,14 +34,14 @@ var opt = {
     mangle: {
         toplevel: true,
     },
-    output:{
-        beautify: false,
-        comments: false,
-        preamble: "/* cMedia Anchor cApp */"
-    },
-    compress: {
-        drop_console: true
-    },
+    // output:{
+    //     beautify: false,
+    //     comments: false,
+    //     preamble: "/* cMedia Anchor cApp */"
+    // },
+    // compress: {
+    //     drop_console: true
+    // },
 };
 
 gulp.task('default', function() {

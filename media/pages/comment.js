@@ -1,8 +1,4 @@
-/*
-    {"type":"data","format":"JS"}
- */
-
-(function(App){
+;(function(App){
     if(!App) return false;
     var config={
         name:'comment',
@@ -26,7 +22,7 @@
         bind:function(){
             var cls=config.cls;
             var RPC = App.cache.getG("RPC");
-            var info = App.info();
+            var app_name = App.cache.getG("name");
             $("#"+cls.add).off('click').on('click',function(){
                 var anchor=$("#" + cls.entry).find('.'+cls.anchor).val().trim();
                 var title=$("#" + cls.entry).find('.'+cls.title).val().trim();
@@ -37,7 +33,7 @@
                     "title":`#${title}#`,
                     "desc":`Comment anchor [${anchor}] on ${block}`,
                 };
-                raw[info.app]={follow:anchor,block:block};
+                raw[app_name]={follow:anchor,block:block};
                 var proto={"type":"data","format":"JSON","app":info.app};
                 RPC.extra.verify(function(pair){
                     var link=RPC.common.write(pair,('cmt_'+anchor),raw,proto,function(res){
@@ -88,13 +84,7 @@
             </div>`;
         },
     };
-
-    var test={
-        auto:function(){
-
-        },
-    };
-
+    
     var page={
         "data":{
             "name":config.name,
@@ -105,15 +95,13 @@
         },      
         "events":{
             "before":function(params,data,ck){
-                ck && ck();
+                var result={code:1,message:"successful",overwrite:true};
+                ck && ck(result);
             },
             "loading":function(params,data){
-                //console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
-                test.auto();        //test data, need to remove
                 self.show(params,data);
             },
             "after":function(params,data,ck){
-                //console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);
                 ck && ck();
             },
         },

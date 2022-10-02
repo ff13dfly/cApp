@@ -1,8 +1,4 @@
-/*
-    {"type":"data","format":"JS"}
- */
-
-(function(App){
+;(function(App){
     if(!App) return false;
     var config={
         name:'share',
@@ -50,12 +46,6 @@
         },
     };
 
-    var test={
-        auto:function(){
-
-        },
-    };
-
     var page={
         "data":{
             "name":config.name,
@@ -69,7 +59,6 @@
                 ck && ck();
             },
             "loading":function(params,data){
-                test.auto();
                 self.show(params,data);
             },
             "after":function(params,data,ck){

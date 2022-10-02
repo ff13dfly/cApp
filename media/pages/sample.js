@@ -2,9 +2,9 @@
     if (!App) return false;
     var config = {
         name: 'share',
-        prefix: "ss_",
+        prefix: "s",
         cls: {
-            entry: 'ss_index',
+            entry: '',
             qr: '',
         },
     };
@@ -17,6 +17,8 @@
         bind:function(){
             var cls = config.cls;
         },
+
+        //autorun methon when page app loaded
         struct: function () {
             var pre = config.prefix;
             var hash = App.tools.hash;
@@ -27,11 +29,13 @@
             page.data.preload = self.template();
             return true;
         },
+        //group dom and css function
         template: function () {
             var css = self.getCSS();
             var dom = self.getDom();
             return `${css}<div id="${config.cls.entry}">${dom}</div>`;
         },
+        //css collection
         getCSS: function () {
             var cls = config.cls;
             var cmap = `<style>
@@ -39,6 +43,7 @@
                 </style>`;
             return cmap;
         },
+        //dom structure
         getDom: function () {
             var cls = config.cls;
             return `<div class="row">
@@ -65,14 +70,20 @@
         },
         "events": {
             "before": function (params, data, ck) {
-                var fmt={code:1,message:"successful"};
-                ck && ck(fmt);
+                //console.log(`${config.name} event "before" param :${JSON.stringify(params)}`);
+                //console.log('Before page loading...'+JSON.stringify(cache));
+                var dt = { hello: "world" };
+                ck && ck(dt);
             },
-            "loading": function (params, data) {
-                test.auto();
-                self.show(params, data);
+            "loading": function (params, data, ck) {
+                //console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
+                self.showHistory();
+                self.listening();
+                App.fresh();
+                ck && ck();
             },
             "after": function (params, data, ck) {
+                //console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);
                 ck && ck();
             },
         },
