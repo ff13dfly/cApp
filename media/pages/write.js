@@ -14,7 +14,7 @@
     };
 
     var self={
-        show:function(params,data){
+        show:function(params){
             self.bind();
         },
         
@@ -97,14 +97,14 @@
             "snap":"",
         },      
         "events":{
-            "before":function(params,data,ck){
+            "before":function(params,ck){
                 var result={code:1,message:"successful"};
                 ck && ck(result);
             },
-            "loading":function(params,data){
-                self.show(params,data);
+            "loading":function(params){
+                self.show(params);
             },
-            "after":function(params,data,ck){
+            "after":function(params,ck){
                 ck && ck();
             },
         },

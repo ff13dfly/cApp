@@ -11,7 +11,7 @@
     };
 
     var self={
-        show:function(params,data){
+        show:function(params){
             var anchor=params.anchor;
             var RPC=App.cache.getG("RPC");
             if(RPC.common.history){
@@ -73,13 +73,13 @@
             "snap":"",
         },      
         "events":{
-            "before":function(params,data,ck){
+            "before":function(params,ck){
                 ck && ck();
             },
-            "loading":function(params,data){
-                self.show(params,data);
+            "loading":function(params){
+                self.show(params);
             },
-            "after":function(params,data,ck){
+            "after":function(params,ck){
                 ck && ck();
             },
         },

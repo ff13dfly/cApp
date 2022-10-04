@@ -72,16 +72,27 @@ block:  anchor on target block, not necessary
 ## Comment
 
 use cApp name as params key on anchor's raw.
+Simple way to identify the target anchor to comment, and the content collected on your own anchor.
 
 ```JSON
     {
-        "name":"md5(Random) or anchor",
-        "raw":{"content":"","title":"#Title","desc":"comment on","cMedia":{"follow":"anchor","block":345}},
+        "name":"normal anchor",
+        "raw":{"content":"comment content","title":"[title](anchor://name/block)"},
         "protocol":{"type":"data","format":"JSON","app":"cMedia"}
     }
 ```
 
-## Sample
+## Fav
+
+```JSON
+    {
+        "name":"normal anchor",
+        "raw":{"fav":["[title](anchor://name/block)"]},
+        "protocol":{"type":"data","format":"JSON","app":"cMedia"}
+    }
+```
+
+## Sample of news
 
 ```JSON
     {"type":"data","format":"JSON","app":"cMedia"}

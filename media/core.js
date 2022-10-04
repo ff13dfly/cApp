@@ -34,7 +34,7 @@
         name:'',        // App name, used to filter anchors.
         device:null,    // device 
         funs:{
-            setG:function(k,v){
+            setG:function(k,v,check){
                 if(G[k]===undefined || k==='funs') return false;
                 G[k]=v;
                 return true;
@@ -143,7 +143,7 @@
             };
             if(!events.before) return self.showPage(params,cache,events,cfg);
 
-            events.before(params,cache,function(dt){
+            events.before(params,function(dt){
                 if(dt!==undefined){
                     if(dt.overwrite!==undefined) cfg.overwrite=dt.overwrite;
                     self.decodeBefore(dt);
@@ -157,7 +157,7 @@
 
             cache.preload=self.preload(cache);
             self.animateLoad(cache,function(){
-                events.loading(params,cache);
+                events.loading(params);
             },cfg);
         },
         preload:function(data){
@@ -181,7 +181,7 @@
 
             var cur=G.queue.pop(),atom=G.queue[G.queue.length-1];
             var evs=pages[cur.name].events;
-            evs.after((!atom || !atom.params)?{}:atom.params,cur,function(){
+            evs.after((!atom || !atom.params)?{}:atom.params,function(){
                 self.animateBack(atom.snap,function(){
                     if(G.queue.length===1) self.hideBack();
                     $(this).removeAttr("disabled");

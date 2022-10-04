@@ -10,7 +10,7 @@
     };
 
     var self = {
-        show: function (params, data) {
+        show: function (params) {
             self.bind();
         },
         
@@ -69,20 +69,20 @@
             "snap": "",
         },
         "events": {
-            "before": function (params, data, ck) {
+            "before": function (params, ck) {
                 //console.log(`${config.name} event "before" param :${JSON.stringify(params)}`);
                 //console.log('Before page loading...'+JSON.stringify(cache));
                 var dt = { hello: "world" };
                 ck && ck(dt);
             },
-            "loading": function (params, data, ck) {
+            "loading": function (params) {
                 //console.log(`${config.name} event "loading" param :${JSON.stringify(params)}`);
                 self.showHistory();
                 self.listening();
                 App.fresh();
                 ck && ck();
             },
-            "after": function (params, data, ck) {
+            "after": function (params, ck) {
                 //console.log(`${config.name} event "after" param :${JSON.stringify(params)}`);
                 ck && ck();
             },

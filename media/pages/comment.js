@@ -7,36 +7,52 @@
             entry:'',
             anchor:'',
             block:'',
+            relate:'',
+            location:'',
             title:'',
             content:'',
             comment:'',
+            mine:'',
             add:'',
         },
     };
 
     var self={
-        show:function(params,data){
+        show:function(params){
+            console.log(params);
+            var relate="#"+params.title+"#";
+            self.render(params.title,params.anchor,params.block,params.owner);
             self.bind();
         },
-        
+        render:function(title,anchor,block,owner){
+            var cls=config.cls;
+            var sel=$("#"+cls.entry);
+            sel.find('.'+cls.relate).html('#'+title+'#');
+            sel.find('.'+cls.location).html(`${anchor} on block ${block},owned by ${App.tools.shorten(owner,8)}`);
+            sel.find('.'+cls.title).val(title);
+            sel.find('.'+cls.block).val(block);
+            sel.find('.'+cls.anchor).val(anchor);
+        },
         bind:function(){
             var cls=config.cls;
             var RPC = App.cache.getG("RPC");
             var app_name = App.cache.getG("name");
+
             $("#"+cls.add).off('click').on('click',function(){
                 var anchor=$("#" + cls.entry).find('.'+cls.anchor).val().trim();
+                var block=parseInt($("#" + cls.entry).find('.'+cls.block).val().trim());
                 var title=$("#" + cls.entry).find('.'+cls.title).val().trim();
                 var ctx=$("#" + cls.entry).find('.'+cls.content).val().trim();
-                var block=parseInt($("#" + cls.entry).find('.'+cls.block).val().trim());
+
+                var mine=$("#" + cls.entry).find('.'+cls.mine).val().trim();
+                if(!mine) return console.log("no anchor to record comment");
                 var raw={
+                    "title":`#[${title}](anchor://${anchor}/${block})#`,
                     "content":ctx,
-                    "title":`#${title}#`,
-                    "desc":`Comment anchor [${anchor}] on ${block}`,
                 };
-                raw[app_name]={follow:anchor,block:block};
-                var proto={"type":"data","format":"JSON","app":info.app};
+                var proto={"type":"data","format":"JSON","app":app_name};
                 RPC.extra.verify(function(pair){
-                    var link=RPC.common.write(pair,('cmt_'+anchor),raw,proto,function(res){
+                    var link=RPC.common.write(pair,mine,raw,proto,function(res){
                         if(res.status.isInBlock){
                             link.then((unsub)=>{
                                 unsub();
@@ -70,15 +86,18 @@
         getDom:function(){
             var cls=config.cls;
             return `<div class="row">
+                <div class="col-12 gy-2"><h5 class="${cls.relate}">#Title#<h5></div>
+                <div class="col-12 gy-2 ${cls.location}">Anchor on block 0</div>
                 <div class="col-12 gy-2">
                     <textarea class="form-control ${cls.content}" placeholder="Adding comment..." rows="10"></textarea>   
                 </div>
                 <div class="col-6 gy-2">
-                    <input type="text" class="form-control ${cls.anchor}" disabled="disabled" value="" >
+                    <input type="text" class="form-control ${cls.mine}" value="" >
                 </div>
                 <div class="col-6 gy-2 text-end">
                     <input type="hidden" class="form-control ${cls.title}" disabled="disabled" value="" >
                     <input type="hidden" class="form-control ${cls.block}" disabled="disabled" value="" >
+                    <input type="hidden" class="form-control ${cls.anchor}" disabled="disabled" value="" >
                     <button class="btn btn-md btn-primary" id="${cls.add}">Comment</button>
                 </div>
             </div>`;
@@ -94,14 +113,14 @@
             "snap":"",
         },      
         "events":{
-            "before":function(params,data,ck){
+            "before":function(params,ck){
                 var result={code:1,message:"successful",overwrite:true};
                 ck && ck(result);
             },
-            "loading":function(params,data){
-                self.show(params,data);
+            "loading":function(params){
+                self.show(params);
             },
-            "after":function(params,data,ck){
+            "after":function(params,ck){
                 ck && ck();
             },
         },

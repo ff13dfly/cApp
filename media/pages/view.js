@@ -19,7 +19,7 @@
     };
 
     var self={
-        show:function(params,data){
+        show:function(params){
             var RPC=App.cache.getG("RPC");
             RPC.common.view(params.anchor,params.block,params.owner?params.owner:'',function(res){
                 if(res.empty){
@@ -105,14 +105,14 @@
             "snap":"",                  //loaded page dom struct
         },      
         "events":{
-            "before":function(params,data,ck){
+            "before":function(params,ck){
                 var result={code:1,message:"successful",overwrite:true};
                 ck && ck(result);
             },
-            "loading":function(params,data){
-                self.show(params,data);
+            "loading":function(params){
+                self.show(params);
             },
-            "after":function(params,data,ck){
+            "after":function(params,ck){
                 ck && ck();
             },
         },

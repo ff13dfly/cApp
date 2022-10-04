@@ -11,7 +11,7 @@
             anchor: '',
             account:'',
             operation:'',
-            good:'',
+            thumbs:'',
             fav:'',
             block:'',
             add:'',             //add button class
@@ -74,39 +74,47 @@
             his.push(row);
         },
         decode: function (row) {
-            var ctx = row.data.raw, cls = config.cls;
-            var dt = { anchor: row.name, block: row.block, owner: row.owner };
-            var cmt= { anchor: row.name, block: row.block, owner: row.owner,title:ctx.title };
+            var viewer=self.getRow(row);
+            var opt=self.getOperation(row);
             var dom = `<div class="row">
-                <div class="col-12 pt-2 ${cls.row}" >
-                    <span page="view" data='${JSON.stringify(dt)}'><h4>${ctx.title}</h4></span>
-                </div>
-                <div class="col-4 ${cls.account}">${App.tools.shorten(row.owner, 8)}</div>
-                <div class="col-8 ${cls.block} text-end">
-                 Block : <strong>${row.block}</strong> , 
-                 Anchor : <strong class="${cls.anchor}"><span page="history" data='${JSON.stringify({ anchor: row.name })}'>${row.name}</span></strong> 
-                </div>
-                <div class="col-12 gy-2 ${cls.row}">
-                    <span page="view" data='${JSON.stringify(dt)}'>${!ctx.desc ? "" : ctx.desc}</span>
-                </div>
-                
-                <div class="col-3 gy-2 ${cls.operation}"><span page="share" data='${JSON.stringify(dt)}'>Share</span></div>
-                <div class="col-3 gy-2 ${cls.operation}"><span page="comment" data='${JSON.stringify(cmt)}'>Comment</span></div>
-                <div class="col-3 gy-2 ${cls.operation} ${cls.good}"><p data='${JSON.stringify(dt)}'>Good</p></div>
-                <div class="col-3 gy-2 ${cls.operation} ${cls.fav}"><p data='${JSON.stringify(dt)}'>Fav</p></div>
+                ${viewer}${opt}
                 <div class="col-12"><hr /></div>
             </div>`;
             
-            $("#" + cls.entry).prepend(dom);
+            $("#" + config.cls.entry).prepend(dom);
+        },
+        getRow:function(row){
+            var ctx = row.data.raw, cls = config.cls;
+            var dt = { anchor: row.name, block: row.block, owner: row.owner };
+            return `<div class="col-12 pt-2 ${cls.row}" >
+                <span page="view" data='${JSON.stringify(dt)}'><h4>${ctx.title}</h4></span>
+            </div>
+            <div class="col-4 ${cls.account}">${App.tools.shorten(row.owner, 8)}</div>
+            <div class="col-8 ${cls.block} text-end">
+            Block : <strong>${row.block}</strong> , 
+            Anchor : <strong class="${cls.anchor}"><span page="history" data='${JSON.stringify({ anchor: row.name })}'>${row.name}</span></strong> 
+            </div>
+            <div class="col-12 gy-2 ${cls.row}">
+                <span page="view" data='${JSON.stringify(dt)}'>${!ctx.desc ? "" : ctx.desc}</span>
+            </div>`;
+        },
+        getOperation:function(row){
+            var ctx = row.data.raw, cls = config.cls;
+            var cmt= { anchor: row.name, block: row.block, owner: row.owner,title:ctx.title };
+            var dt=JSON.stringify(cmt);
+            return `<div class="col-3 gy-2 ${cls.operation}"><span page="share" data='${dt}'>Share</span></div>
+            <div class="col-3 gy-2 ${cls.operation}"><span page="comment" data='${dt}'>Comment</span></div>
+            <div class="col-3 gy-2 ${cls.operation} ${cls.thumbs}"><p data='${dt}'>Good</p></div>
+            <div class="col-3 gy-2 ${cls.operation} ${cls.fav}"><p data='${dt}'>Fav</p></div>`;
         },
         bind:function(){
             var cls=config.cls;
-            $("#"+cls.entry).find('.'+cls.good).off('click').on('click',function(){
-                console.log('点赞 done');
+            $("#"+cls.entry).find('.'+cls.thumbs).off('click').on('click',function(){
+                console.log('thumbs up by ');       //实名点赞
             });
 
             $("#"+cls.entry).find('.'+cls.fav).off('click').on('click',function(){
-                console.log('收藏 done');
+                console.log('fav');
             });
         },
         //prepare the basic data when code loaded
@@ -157,16 +165,16 @@
             "snap": "",
         },
         "events": {
-            "before": function (params, data, ck) {
+            "before": function (params, ck) {
                 var result={code:1,message:"successful"};
                 ck && ck(result);
             },
-            "loading": function (params, data, ck) {
+            "loading": function (params, ck) {
                 self.showHistory();
                 self.listening();
                 ck && ck();
             },
-            "after": function (params, data, ck) {
+            "after": function (params, ck) {
                 ck && ck();
             },
         },
