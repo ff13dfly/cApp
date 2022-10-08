@@ -19,7 +19,7 @@
 			container:'',				//containerID , unique id for image uploader
 			title:'Image selector',		//uploader title
 			count:0,					//uploaded count
-			max:9,						//max upload amount
+			max:3,						//max upload amount
 			width:1500,					//image compress width
 			quality:0.7,				//image compress quality
 		},
@@ -123,7 +123,9 @@
 			//1.upload function bind
 			$("#"+con).find('.'+cls.file).off('change').on('change',function(){
 				var len=this.files.length;
-				if(len+me.setting.count > me.setting.max) return Q.showToast('Max upload'+me.setting.max);
+				var sum=len+me.setting.count;
+				if(sum > me.setting.max) return self.toast('Max upload'+me.setting.max);
+				if(sum === me.setting.max) self.hideAdd();
 				for(var k=0;k<len;k++){
 					cache.push(null);
 					self.load(this.files[k],k,function(bs64,order){
@@ -155,7 +157,9 @@
 				sel.remove();
 				me.setting.count--;
 				self.amountUpdate();
-				
+
+				if(me.setting.count<me.setting.max) self.showAdd();
+
 				if(!self.removeCache(index)) return false;
 				if(events.change) events.change(cache);
 				self.clearRow();
@@ -173,13 +177,23 @@
 			return true;
 		},
 		toast:function(txt){
-
+			var cls=me.cls,con=me.setting.container;
+			$("#"+con).find('.'+cls.title).html(`<span class="text-waring">${txt}</div>`);
+			setTimeout(function(){
+				$("#"+con).find('.'+cls.title).html(me.setting.title);
+			},1500);
 		},
 		setMax:function(n){
 			$("#"+me.setting.container).find('.'+me.cls.max).html(n);
 		},
 		setSum:function(n){
 			$("#"+me.setting.container).find('.'+me.cls.sum).html(n);
+		},
+		hideAdd:function(){
+			$("#"+me.setting.container).find('.'+me.cls.add).parent().hide();
+		},
+		showAdd:function(){
+			$("#"+me.setting.container).find('.'+me.cls.add).parent().show();
 		},
 		load:function(fa,index,ck){
 			var arr=fa.name.split('.');
