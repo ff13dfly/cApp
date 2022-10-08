@@ -20,21 +20,16 @@
 			title:'Image selector',		//uploader title
 			count:0,					//uploaded count
 			max:9,						//max upload amount
-			style:'inner',				//['inner','extend'] container style
-			exif:{},				//exif offset params
-			mkey:'',				//unkown key
+			width:1500,					//image compress width
+			quality:0.7,				//image compress quality
 		},
 	};
 
-	var cache={
+	var cache=[];		//image list cache
 
-	};
-
-	//调用的
 	var events={
 		thumb:null,
-		remove:null,
-		add:null,
+		change:null,
 	};
 	
 	var self={
@@ -64,25 +59,24 @@
 			$(con).html(self.getCSS()+self.getDom());
 			self.amountUpdate();
 			self.bind();
-
-			self.appendRow();
-			self.appendRow();
-			self.appendRow();
-			self.appendRow();
+		},
+		getResult:function(){
+			return cache;
 		},
 		getDom:function(){
 			var cls=me.cls;
 			return `<div class="row">
-				<div class="col-12 ${cls.title}">${me.setting.title}</div>
+				<div class="col-6 ${cls.title}">${me.setting.title}</div>
+				<div class="col-6 text-end">
+					<span class="${cls.sum}">0</span>/<span class="${cls.max}">0</span>
+				</div>
 				<div class="col-4">
 					<input style="display:none"  class="${cls.file}" type="file" accept="image/*" multiple/>
 					<p class="${cls.add}">
 						<span>+</span>
 					</p>
 				</div>
-				<div class="col-12">
-					<span class="${cls.sum}">0</span>/<span class="${cls.max}">0</span>
-				</div>
+				
 			</div>`;
 		},
 		getCSS:function(){
@@ -95,17 +89,28 @@
 				#${con} .${cls.remove}{background:#FFFFFF;color:#FFBE00;padding:5px 10px 5px 10px;border-radius:5px;}
 			</style>`;
 		},
-		appendRow:function(fa){
+		appendRow:function(bs64,index,skip){
 			var cls=me.cls,con=me.setting.container;
-			var bg=!fa?"":fa;
-			var dom=`<div class="col-4" >
-				<p class="${cls.thumb}" style="background-image:url(${bg})"></p>
+			var dom=`<div class="col-4" index="${index}">
+				<p class="${cls.thumb}" style="background-image:url(${bs64});background-size: cover;"></p>
 			</div>`;
 			$('#'+con).find('.'+cls.add).parent().before(dom);
 
-			me.setting.count++;
+			if(!skip) me.setting.count++;
 			self.amountUpdate();
 			self.bind();
+
+			if(events.change) events.change(cache);
+			return true;
+		},
+		clearRow:function(){
+			var cls=me.cls,con=me.setting.container;
+			$("#"+con).find('.'+cls.thumb).parent().remove();
+		},
+		domCache:function(){
+			for(var i=0;i<cache.length;i++){
+				self.appendRow(cache[i],i,true);
+			}
 			return true;
 		},
 		amountUpdate:function(){
@@ -114,13 +119,17 @@
 		},
 		bind:function(){
 			var cls=me.cls,con=me.setting.container;
+			var start=me.setting.count;
 			//1.upload function bind
 			$("#"+con).find('.'+cls.file).off('change').on('change',function(){
 				var len=this.files.length;
 				if(len+me.setting.count > me.setting.max) return Q.showToast('Max upload'+me.setting.max);
 				for(var k=0;k<len;k++){
-					self.compress(this.files[k],k,function(rs,rotate,index){
-						self.appendRow(rs);
+					cache.push(null);
+					self.load(this.files[k],k,function(bs64,order){
+						var index=start+order;
+						cache[index]=bs64;
+						self.appendRow(bs64,index);
 					});		
 				}
 			});
@@ -140,135 +149,92 @@
 
 			//3.remove function bind
 			$("#"+con).find('.'+cls.remove).off('click').on('click',function(){
-				console.log('ready to remove');
-
-				$(this).parent().parent().remove();
+				//console.log('ready to remove');
+				var sel=$(this).parent().parent();
+				var index=parseInt(sel.attr("index"));
+				sel.remove();
 				me.setting.count--;
 				self.amountUpdate();
+				
+				if(!self.removeCache(index)) return false;
+				if(events.change) events.change(cache);
+				self.clearRow();
+				self.domCache();
 				self.bind();
 			});
+		},
+		removeCache:function(index){
+			if(index>=cache.length-1) return false;
+			var arr=[];
+			for(var i=0;i<cache.length;i++){
+				if(i!=index) arr.push(cache[i]);
+			}
+			cache=arr;
+			return true;
 		},
 		toast:function(txt){
 
 		},
 		setMax:function(n){
 			$("#"+me.setting.container).find('.'+me.cls.max).html(n);
-			//$("#"+me.cls.max).html(n);		//3.1设置显示最大图像上传数
 		},
 		setSum:function(n){
 			$("#"+me.setting.container).find('.'+me.cls.sum).html(n);
-			//$("#"+me.cls.sum).html(n);
 		},
-		compress:function(fa,index,ck){
-			var ro=0;
-			if(fa.size < Math.pow(1024, 2) || fa.type!='image/jpeg') return ck && ck(fa,ro,index);		//小文件和非jpg文件不压缩
-			var name=fa.name,reader= new FileReader();
+		load:function(fa,index,ck){
+			var arr=fa.name.split('.');
+			if(arr[arr.length-1].toLowerCase()=='heic'){
+				if(!heic2any) return ck && ck(fa,index);	//抛出错误
+				heic2any({blob:fa,toType:'image/jpeg'}).then(function(bb){
+					var uu=URL.createObjectURL(bb);
+					self.compress(uu,function(dt){
+						ck && ck(dt,index);
+					});
+				});
+			}
+			
+			var reader= new FileReader();
 			reader.readAsDataURL(fa);
 			reader.onload=function(e){
-				var img=new Image();
-				img.src=e.target.result;
-				img.onload=function(ee){
-						//处理图像的旋转
-					if(ee.path[0] && ee.path[0].src){
-						var b64=ee.path[0].src;
-			           	var ro=self.getOrientation(self.base64ToArrayBuffer(b64));
-					}
-					var zwidth=1500;			//需要压缩到的图像尺寸
-					var ratio=zwidth/img.width,w=img.width*ratio,h=img.height*ratio,q=0.8;
-					var cvs=document.createElement('canvas'),ctx=cvs.getContext('2d');
-					var anw= document.createAttribute("width"),anh=document.createAttribute("height");
-					anw.nodeValue=w;
-					anh.nodeValue=h;
-					cvs.setAttributeNode(anw);
-		            cvs.setAttributeNode(anh);
-			            
-					ctx.fillStyle = "#fff";
-		            ctx.fillRect(0, 0, w, h);
-					ctx.drawImage(img, 0, 0, w, h);
-			            
-		            var base64 = cvs.toDataURL('image/jpeg', q),bytes = window.atob(base64.split(',')[1]);  // 去掉url的头，并转换为byte
-					var ab = new ArrayBuffer(bytes.length),ia = new Uint8Array(ab);
-					for (var i = 0; i < bytes.length; i++)ia[i] = bytes.charCodeAt(i);
-			            
-					fb = new Blob([ab],{type:'image/jpeg'});
-					fb.name = name;
-					ck && ck(fb,ro,index);
+				var bs64=e.target.result;
+				if(fa.size < Math.pow(1024, 2) || fa.type!='image/jpeg'){
+					return ck && ck(bs64,index);
 				}
-			}
+
+				self.compress(bs64,function(dt){
+					ck && ck(dt,index);
+				});
+			};
 		},
-		base64ToArrayBuffer:function(base64) {
-			base64 = base64.replace(/^data\:([^\;]+)\;base64,/gmi, '');
-			var binary = atob(base64);
-			var len = binary.length;
-			var buffer = new ArrayBuffer(len);
-			var view = new Uint8Array(buffer);
-			for (var i = 0; i < len; i++) {
-				view[i] = binary.charCodeAt(i);
-			}
-			return buffer;
-		},
-		getStringFromCharCode:function(dataView, start, length) {
-			var str = '';
-			var i;
-			for (i = start, length += start; i < length; i++) {
-				str += String.fromCharCode(dataView.getUint8(i));
-			}
-			return str;
-		},
-		getOrientation:function(arrayBuffer){
-			var dataView = new DataView(arrayBuffer);
-			var length = dataView.byteLength;
-			var orientation,exifIDCode,tiffOffset,firstIFDOffset,littleEndian,endianness,appStart,ifdStart,offset,i;
-			if (dataView.getUint8(0) === 0xFF && dataView.getUint8(1) === 0xD8) {
-				offset = 2;
-				while (offset < length){
-					if (dataView.getUint8(offset) === 0xFF && dataView.getUint8(offset + 1) === 0xE1) {
-						appStart = offset;
-						break;
-					}
-					offset++;
-				}
-			}
+		compress:function(url,ck){
+			var img=new Image();
+			img.src=url;
+			img.onload=function(){
+				var ratio=me.setting.width/img.width,w=img.width*ratio,h=img.height*ratio;
+				var cvs=document.createElement('canvas'),ctx=cvs.getContext('2d');
+				var anw= document.createAttribute("width"),anh=document.createAttribute("height");
+				anw.nodeValue=w;
+				anh.nodeValue=h;
+				cvs.setAttributeNode(anw);
+				cvs.setAttributeNode(anh);
+						
+				ctx.fillStyle = "#fff";
+				ctx.fillRect(0, 0, w, h);
+				ctx.drawImage(img, 0, 0, w, h);
 				
-			if (appStart) {
-				exifIDCode = appStart + 4;
-				tiffOffset = appStart + 10;
-				if (self.getStringFromCharCode(dataView, exifIDCode, 4) === 'Exif') {
-					endianness = dataView.getUint16(tiffOffset);
-					littleEndian = endianness === 0x4949;
-					if (littleEndian || endianness === 0x4D4D /* bigEndian */) {
-						if (dataView.getUint16(tiffOffset + 2, littleEndian) === 0x002A) {
-							firstIFDOffset = dataView.getUint32(tiffOffset + 4, littleEndian);
-							if (firstIFDOffset >= 0x00000008) {
-								ifdStart = tiffOffset + firstIFDOffset;
-							}
-						}
-					}
-				}
-			}
-				
-			if (ifdStart){
-				length = dataView.getUint16(ifdStart, littleEndian);
-				for (i = 0; i < length; i++) {
-					offset = ifdStart + i * 12 + 2;
-					//0x0112是旋转对应的位置
-					if (dataView.getUint16(offset, littleEndian) === 0x0112) {
-						offset += 8;
-						orientation = dataView.getUint16(offset, littleEndian);
-						// Override the orientation with its default value for Safari (#120)
-						/*if (IS_SAFARI_OR_UIWEBVIEW) {
-							dataView.setUint16(offset, 1, littleEndian);
-						}*/
-						break;
-					}
-				}
-			}
-			return orientation;
-		},
-		encode:function(arr,c){
-			var c=c||'-',s='';
-			for(var i=0,len=arr.length;i<len;i++)s+=arr[i]+(i==len-1?'':c);
-			return s;
+				var type='image/jpeg';
+				var base64 = cvs.toDataURL(type, me.setting.quality),bytes = window.atob(base64.split(',')[1]);  // 去掉url的头，并转换为byte
+				var ab = new ArrayBuffer(bytes.length),ia = new Uint8Array(ab);
+				for (var i = 0; i < bytes.length; i++)ia[i] = bytes.charCodeAt(i);
+				var fb = new Blob([ab], {type:type});
+
+				var reader = new FileReader();
+				reader.readAsDataURL(fb);
+				reader.onloadend = function() {
+					var bs64 = reader.result;
+					ck&& ck(bs64);
+				};
+			};
 		},
 	};
 

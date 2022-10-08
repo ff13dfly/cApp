@@ -23,7 +23,11 @@
             var cfg={
                 container:'upload_con',
             };
-            var agent={};
+            var agent={
+                change:function(cache){
+                    console.log(cache);
+                },
+            };
             cUpload.init(cfg,agent);
         },
         bind:function(){
