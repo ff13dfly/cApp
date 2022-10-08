@@ -15,9 +15,17 @@
 
     var self={
         show:function(params){
+            self.uploader();
             self.bind();
         },
-        
+        uploader:function(){
+            //var con='#upload_con';
+            var cfg={
+                container:'upload_con',
+            };
+            var agent={};
+            cUpload.init(cfg,agent);
+        },
         bind:function(){
             var cls=config.cls;
             var RPC = App.cache.getG("RPC");
@@ -76,7 +84,7 @@
                     <textarea class="form-control ${cls.content}" placeholder="Adding new content to anchor network..." rows="10"></textarea>   
                 </div>
                 <div class="col-12 gy-2">
-                    <textarea class="form-control ${cls.desc}" placeholder="Description..." rows="3"></textarea>   
+                     <textarea class="form-control ${cls.desc}" placeholder="Description..." rows="3"></textarea>   
                 </div>
                 <div class="col-6 gy-2">
                     <input type="text" class="form-control ${cls.anchor}" placeholder="Anchor name..." value="" >
@@ -84,6 +92,7 @@
                 <div class="col-6 gy-2 text-end">
                     <button class="btn btn-md btn-primary" id="${cls.add}">Add</button>
                 </div>
+                <div class="col-12" id="upload_con"></div>
             </div>`;
         },
     };

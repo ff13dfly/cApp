@@ -39,12 +39,12 @@
             var cls=config.cls;
             var sel=$("#"+cls.entry);
             sel.find('.'+cls.title).html(title);
-            sel.find('.'+cls.content).html(content);
+            sel.find('.'+cls.content).html(App.tools.wrap(content));
             sel.find('.'+cls.owner).html(owner);
             sel.find('.'+cls.name).html(anchor);
             sel.find('.'+cls.block).html(block);
         },
-
+        
         bind:function(){
             //console.log("binding comment action");
         },

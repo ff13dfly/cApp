@@ -22,6 +22,7 @@ var concat = require('gulp-concat');
 var target = './';
 var min = 'anchorMedia.min.js';
 var source = [
+    'uploader.js',
     'core.js',
     'pages/index.js',
     'pages/view.js',
