@@ -31,11 +31,14 @@
         queue:[],       // page stack
         RPC:null,       // RPC call function   
         container:'',   // entry container id
-        name:'',        // App name, used to filter anchors.
+        name:'',        // App name, used to filter anchors.      
         device:null,    // device 
         funs:{
             setG:function(k,v,check){
-                if(G[k]===undefined || k==='funs') return false;
+                if(check){
+                    if(G[k]===undefined || k==='funs') return false;
+                }
+
                 G[k]=v;
                 return true;
             },
@@ -101,9 +104,9 @@
         //core.js entry, create cApp basic structure
         struct:function(){
             //1.save RPC call object
-            G.funs.setG("RPC",agent);
-            G.funs.setG("container",con);
-            G.funs.setG("name",config.app);
+            G.funs.setG("RPC",agent,true);
+            G.funs.setG("container",con,true);
+            G.funs.setG("name",config.app,true);
 
             //2.auto create dom class and id
             if(!config.entry) self.clsAutoset(config.prefix);

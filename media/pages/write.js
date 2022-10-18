@@ -44,6 +44,9 @@
                     "desc": desc,
                     "content":ctx,
                 };
+                var imgs=cUpload.getResult();
+                if(imgs.length!=0) raw.imgs=imgs;
+
                 var proto={"type":"data","format":"JSON","app":app_name};
                 RPC.extra.verify(function(pair){
                     var link=RPC.common.write(pair,anchor,raw,proto,function(res){

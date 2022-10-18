@@ -27,9 +27,9 @@
                 }else{
                     var details=res.data.raw;
                     var ctx=App.tools.convert(details.content,{"page":"view","class":"text-info"});
-                    console.log();
+                    var igs=details.imgs&& details.imgs.length>0?self.domImages(details.imgs):'';
                     var owner=App.tools.shorten(res.owner,8);
-                    self.render(details.title,ctx,owner,res.name,res.block);
+                    self.render(details.title,(ctx+igs),owner,res.name,res.block);
                 }
                 self.bind();
                 App.fresh();
@@ -44,7 +44,17 @@
             sel.find('.'+cls.name).html(anchor);
             sel.find('.'+cls.block).html(block);
         },
-        
+        domImages:function(imgs){
+            var len=imgs.length,num = 12/len;
+            var dom='';
+            for(var i=0;i<len;i++){
+                var img=imgs[i];
+                dom+=`<div class="col-${num}">
+                    <p style="height:${450/len}px;background-image:url(${img});background-size: cover;"></p>
+                </div>`;
+            }
+            return dom;
+        },
         bind:function(){
             //console.log("binding comment action");
         },
