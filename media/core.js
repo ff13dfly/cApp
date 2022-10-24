@@ -9,7 +9,9 @@
 
     //cMedia basic config
     var config={
-        app:'cMedia',          // name of cApp, will set to windows
+        app:'cMedia',           // name of cApp, will set to windows
+        instance:"freeSaying",  // name of instance, filter target anchor data
+        setting:"freeConfig",   // instance setting, used to load data or config
         default:"index",        // default page
         prefix:'i',
         cls:{
@@ -31,7 +33,7 @@
         queue:[],       // page stack
         RPC:null,       // RPC call function   
         container:'',   // entry container id
-        name:'',        // App name, used to filter anchors.      
+        name:'',        // App name, used to filter anchors.    
         device:null,    // device 
         funs:{
             setG:function(k,v,check){
@@ -107,6 +109,7 @@
             G.funs.setG("RPC",agent,true);
             G.funs.setG("container",con,true);
             G.funs.setG("name",config.app,true);
+            G.funs.setG("setting",config.setting);
 
             //2.auto create dom class and id
             if(!config.entry) self.clsAutoset(config.prefix);

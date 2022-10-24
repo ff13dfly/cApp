@@ -19,10 +19,10 @@
 
     var self={
         show:function(params){
-            console.log(params);
+            //console.log(params);
             var relate="#"+params.title+"#";
-            self.render(params.title,params.anchor,params.block,params.owner);
             self.bind();
+            self.render(params.title,params.anchor,params.block,params.owner);   
         },
         render:function(title,anchor,block,owner){
             var cls=config.cls;
@@ -32,6 +32,7 @@
             sel.find('.'+cls.title).val(title);
             sel.find('.'+cls.block).val(block);
             sel.find('.'+cls.anchor).val(anchor);
+            sel.find('.'+cls.mine).val(anchor);
         },
         bind:function(){
             var cls=config.cls;
@@ -51,16 +52,23 @@
                     "content":ctx,
                 };
                 var proto={"type":"data","format":"JSON","app":app_name};
-                RPC.extra.verify(function(pair){
-                    var link=RPC.common.write(pair,mine,raw,proto,function(res){
-                        if(res.status.isInBlock){
-                            link.then((unsub)=>{
-                                unsub();
-                                App.back();
-                            });
-                        }
+
+                if(RPC.extra.comment){
+                    RPC.extra.comment(ctx,anchor,block,(res)=>{
+                        console.log(res);
                     });
-                });
+                }else{
+                    RPC.extra.verify(function(pair){
+                        var link=RPC.common.write(pair,mine,raw,proto,function(res){
+                            if(res.status.isInBlock){
+                                link.then((unsub)=>{
+                                    unsub();
+                                    App.back();
+                                });
+                            }
+                        });
+                    });
+                }
             });
         },
         struct: function () {
@@ -92,7 +100,7 @@
                     <textarea class="form-control ${cls.content}" placeholder="Adding comment..." rows="10"></textarea>   
                 </div>
                 <div class="col-6 gy-2">
-                    <input type="text" class="form-control ${cls.mine}" value="" >
+                    <input type="text" class="form-control ${cls.mine}" disabled="disabled" value="" >
                 </div>
                 <div class="col-6 gy-2 text-end">
                     <input type="hidden" class="form-control ${cls.title}" disabled="disabled" value="" >

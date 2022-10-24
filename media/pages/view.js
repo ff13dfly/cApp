@@ -47,13 +47,26 @@
         domImages:function(imgs){
             var len=imgs.length,num = 12/len;
             var dom='';
+            var count=0;
             for(var i=0;i<len;i++){
                 var img=imgs[i];
+                self.calcImages(img,i,function(){
+
+                });
                 dom+=`<div class="col-${num}">
-                    <p style="height:${450/len}px;background-image:url(${img});background-size: cover;"></p>
+                    <p style="height:${450/len}px;background:#FFFFFF url(${img}) no-repeat;background-size:contain;"></p>
                 </div>`;
             }
             return dom;
+        },
+        calcImages:function(img,index,ck){
+            var ig=new Image();
+            ig.src=img;
+            ig.onload=function(res){
+                console.log(res);
+                console.log(`Size:[${ig.width},${ig.height}]`);
+                ck && ck({index:index,size:[ig.width,ig.height]});
+            };
         },
         bind:function(){
             //console.log("binding comment action");
@@ -96,10 +109,13 @@
                 <div class="col-12 gy-2">
                     <textarea class="form-control ${cls.cmtContent}" placeholder="Comment..." rows="3"></textarea>
                 </div>
-                <div class="col-6 gy-2">
-                    <input type="text" class="form-control ${cls.cmtTarget}" placeholder="Anchor name..." value="" >
+                <div class="col-2 gy-2 text-end">
+                    Enable
                 </div>
-                <div class="col-6 gy-2 text-end">
+                <div class="col-6 gy-2">
+                    <input type="text" disabled="disabled" class="form-control ${cls.cmtTarget}" placeholder="Anchor name..." value="" >
+                </div>
+                <div class="col-4 gy-2 text-end">
                     <button class="btn btn-md btn-primary" id="${cls.cmtAdd}">Comment</button>
                 </div>
             </div>`;
@@ -109,7 +125,7 @@
     var page={
         "data":{
             "name":config.name,         //page name
-            "title":"News details",     //default page title
+            "title":"Details",          //default page title
             "params":{},                //page params from call 
             "preload":"",               //preload template
             "snap":"",                  //loaded page dom struct

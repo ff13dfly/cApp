@@ -2,7 +2,7 @@
     if (!App) return false;
     var config = {
         name: "index",
-        cache:"cMediaNews",      //cache anchor
+        cache:App.cache.getG("setting"),      //cache anchor
         prefix: "i",
         max:10,                     //history max length
         cls: {
@@ -31,7 +31,7 @@
     var RPC = App.cache.getG("RPC");
     var self = {
         listening: function () {
-            var name = App.cache.getG("name");
+            var name = App.cache.getG("instance");
             RPC.common.subscribe(function (list) {
                 if (list.length == 0) return false;
                 for (var i = 0; i < list.length; i++) {
@@ -50,6 +50,7 @@
         showHistory:function(){
             var decode=self.decode;
             if(his.length===0){
+                console.log(config.cache);
                 self.getLatest(config.cache,function(list){
                     for(var i=0;i<list.length;i++){
                         if(list[i].empty) continue;
@@ -101,7 +102,9 @@
             return `<div class="col-12 pt-2 ${cls.row}" >
                 <span page="view" data='${JSON.stringify(dt)}'><h5>${ctx.title}</h5></span>
             </div>
-            <div class="col-4 ${cls.account}">${App.tools.shorten(row.owner, 8)}</div>
+            <div class="col-4 ${cls.account}">
+                <span page="auth" data='${JSON.stringify({auth: row.owner})}'>${App.tools.shorten(row.owner, 8)}</span>
+            </div>
             <div class="col-8 ${cls.block} text-end">
             <img style="widht:10px;height:10px;margin:-2px 6px 0px 0px;${ss}" src="${icons.block}"><strong>${row.block}</strong> , 
             <img style="widht:12px;height:12px;margin:-2px 0px 0px 0px;${ss}" src="${icons.anchor}">
@@ -109,7 +112,8 @@
             </div>
             <div class="col-12 gy-2 ${cls.row}">
                 <span page="view" data='${JSON.stringify(dt)}'>${!ctx.desc ? "" : ctx.desc}</span>
-            </div>${igs}
+            </div>
+                <span page="view" data='${JSON.stringify(dt)}'>${igs}</span>
             `;
         },
         getImages:function(imgs){
@@ -118,7 +122,7 @@
             for(var i=0;i<len;i++){
                 var img=imgs[i];
                 dom+=`<div class="col-${num}">
-                    <p style="height:${300/len}px;background-image:url(${img});background-size: cover;"></p>
+                    <p style="height:${300/len}px;background:#FFFFFF url(${img}) no-repeat;background-size:contain;"></p>
                 </div>`;
             }
             return dom;
