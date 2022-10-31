@@ -55,7 +55,6 @@
             for(var k in config.cls){
                 if(!config.cls[k]) config.cls[k]=pre + hash();
             }
-
             page.data.preload=self.template();
             return true;
         },

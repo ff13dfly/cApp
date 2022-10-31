@@ -13,6 +13,7 @@
             operation:'',
             thumbs:'',
             fav:'',
+            cmtCount:'',
             block:'',
             add:'',             //add button class
         }
@@ -28,6 +29,7 @@
     App.cache.setG("icons",icons);
     
     var his=[];
+    var cmts={};
     var RPC = App.cache.getG("RPC");
     var self = {
         listening: function () {
@@ -42,7 +44,7 @@
                         self.pushHistory(row);
                         self.decode(row);
                         self.bind();
-                        App.fresh();
+                        App.fresh();        //fresh page to bind action 
                     }
                 }
             });
@@ -58,12 +60,12 @@
                     }
                     for(var i=0;i<his.length;i++) decode(his[i]);
                     self.bind();
-                    App.fresh();
+                    App.fresh();        //fresh page to bind action 
                 });
             }else{
-                for(var i=0;i<his.length;i++)decode(his[i]);
+                for(var i=0;i<his.length;i++) decode(his[i]);
                 self.bind();
-                App.fresh();
+                App.fresh();        //fresh page to bind action 
             }
         },
         
@@ -84,7 +86,13 @@
             }
             his.push(row);
         },
+        setCmtAmount:function(anchor,block,n){
+            if(!cmts[anchor]) cmts[anchor]={};
+            cmts[anchor][block]=!n?0:n;
+            return true;
+        },
         decode: function (row) {
+            self.setCmtAmount(row.name,row.block);
             var viewer=self.getRow(row);
             var opt=self.getOperation(row);
             var dom = `<div class="row">
@@ -131,17 +139,12 @@
             var ctx = row.data.raw, cls = config.cls;
             var cmt= { anchor: row.name, block: row.block, owner: row.owner,title:ctx.title };
             var dt=JSON.stringify(cmt);
-            var num=123;
             return `<div class="col-12 text-end gy-2 ${cls.operation}">
                 <span page="comment" data='${dt}'>
                     <img style="widht:21px;height:21px;" src="${icons.comment}">
                 </span>
-                <span>${num}</span>
+                <span class="${cls.cmtCount}" id="${row.name}_${row.block}">0</span>
             </div>`;
-            //return `<div class="col-3 gy-2 ${cls.operation}"><span page="share" data='${dt}'>Share</span></div>
-            //<div class="col-3 gy-2 ${cls.operation}"><span page="comment" data='${dt}'>Comment</span></div>
-            //<div class="col-3 gy-2 ${cls.operation} ${cls.thumbs}"><p data='${dt}'>Good</p></div>
-            //<div class="col-3 gy-2 ${cls.operation} ${cls.fav}"><p data='${dt}'>Fav</p></div>`;
         },
         bind:function(){
             var cls=config.cls;
@@ -152,6 +155,33 @@
             $("#"+cls.entry).find('.'+cls.fav).off('click').on('click',function(){
                 console.log('fav');
             });
+
+            self.getCount();
+        },
+        getCount:function(){
+            var show=self.showCount;
+            for(var anchor in cmts){
+                var bs=cmts[anchor];
+                for(var block in bs){
+                    show(anchor,block,bs[block]);
+                }
+            }
+        },
+        showCount:function(anchor,block,n){
+            var id='#'+anchor+'_'+block;
+            if(n!==0) return $(id).html(n);
+            const svc="vSaying",fun="count";
+            const params={
+                anchor:anchor,
+                block:block,
+            }
+            RPC.extra.auto(svc,fun,params,(res)=>{
+                console.log(res);
+                var count=res.count;
+                self.setCmtAmount(anchor,block,count);
+                //ck && ck(res);
+                $(id).html(count);
+            });
         },
         //prepare the basic data when code loaded
         struct: function () {
@@ -160,9 +190,7 @@
             for (var k in config.cls) {
                 if (!config.cls[k]) config.cls[k] = pre + hash();
             }
-
             page.data.preload=self.template();
-
             return true;       
         },
         template:function(){
