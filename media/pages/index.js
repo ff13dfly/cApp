@@ -31,7 +31,7 @@
     var RPC = App.cache.getG("RPC");
     var self = {
         listening: function () {
-            var name = App.cache.getG("instance");
+            var name = App.cache.getG("name");
             RPC.common.subscribe(function (list) {
                 if (list.length == 0) return false;
                 for (var i = 0; i < list.length; i++) {

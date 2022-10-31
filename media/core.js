@@ -17,11 +17,13 @@
         cls:{
             entry:"",
             mask:"",
+            toast:"",
             nav:"",
             title:"",
             back:"",
             body:"",
         },
+        toast:1000,
         animate:{
             interval:500,
         },
@@ -108,7 +110,7 @@
             //1.save RPC call object
             G.funs.setG("RPC",agent,true);
             G.funs.setG("container",con,true);
-            G.funs.setG("name",config.app,true);
+            G.funs.setG("name",config.instance,true);
             G.funs.setG("setting",config.setting);
 
             //2.auto create dom class and id
@@ -258,8 +260,23 @@
             sel.find('.'+cls.body).html(cache.preload.body);
             if(cfg.animate) $("#"+cls.mask).hide();
         },
+        toast:function(txt,type){
+            var cls=config.cls;
+            var dom='';
+            switch (type) {
+                case 'info':
+                    dom=`<div class="col-12 text-center">${txt}</div>`;
+                    break;
+            
+                default:
 
-
+                    break;
+            }
+            $("#"+cls.toast).html(dom).show();
+            setTimeout(() => {
+                $("#"+cls.toast).hide();
+            }, config.toast);
+        },
         getCurDom:function(){
             var cls=config.cls;
             var con=G.funs.getG("container");
@@ -312,6 +329,7 @@
                 .${cls.back}{color:#222222;}  
                 #${cls.mask} {display:none;position:fixed;z-index:99;background:#FFFFFF;width:100%;height:100%;top:0px;}
                 #${cls.mask} .${cls.body} {margin-top:0px;height:100%;width:100%;background:#FFFFFF;}
+                #${cls.toast}{display:none;width:40%;height:25%;background:#EEEEEE;z-index:199}
             </style>`;
         },
         getDom:function(){
@@ -326,6 +344,7 @@
                 </div>
                 <div class="col-12 ${cls.body}"></div>
             </div>
+            <div class="row" id="${cls.toast}"></div>
             <div class="row" id="${cls.mask}"></div>`;
         },
     };
@@ -335,6 +354,7 @@
         tools:tools,                        //Global untils
         fresh:self.bind,                    //auto decode anchor link
         back:self.back,                     //history back function
+        toast:self.toast,                   //show toast function
         page:function(name,pg){
             pages[name]=$.extend({},pg);    //need to clone.
 

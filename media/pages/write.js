@@ -34,6 +34,7 @@
             var cls=config.cls;
             var RPC = App.cache.getG("RPC");
             var app_name = App.cache.getG("name");
+            console.log(app_name);
             $("#"+cls.add).off('click').on('click',function(){
                 var title=$("#" + cls.entry).find('.'+cls.title).val().trim();
                 var ctx=$("#" + cls.entry).find('.'+cls.content).val().trim();

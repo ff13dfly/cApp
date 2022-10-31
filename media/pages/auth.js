@@ -1,16 +1,52 @@
 ;(function(App){
     if(!App) return false;
+    var RPC = App.cache.getG("RPC");
     var config={
         name:'auth',
         prefix:"s",
         cls:{
             entry:'',
         },
+        page:{
+            count:1,
+            step:15,
+            max:1,
+        }
     };
-
+    
     var self={
         show:function(params){
-            console.log(params);
+            //console.log(RPC);
+            if(!RPC.extra.auto){
+                App.toast('No vServer to get data.');
+                return App.back();
+            }
+            App.toast('Ready to get data.');
+            self.list(params.auth,self.fill);
+            
+        },
+        fill:function(list){
+            var cls=config.cls;
+            var dom='';
+            for(var i=0;i<list.length;i++){
+                var row=list[i];
+                console.log(row);
+                dom+=`<div class="col-12">${row.anchor} @ ${row.block}</div>
+                <div class="col-12">概要内容在这</div>
+                `;
+            }
+            $('#'+cls.entry).html(dom);
+        },
+        list:function(auth,ck){
+            var svc="vAuth",fun="list";
+            var params={
+                account:auth,
+                page:config.page.count,
+                step:config.page.step,
+            }
+            RPC.extra.auto(svc,fun,params,(res)=>{
+                ck && ck(res);
+            });
         },
         
         struct:function(){

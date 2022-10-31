@@ -33,6 +33,9 @@ Basic keywords.
 - ext:  Array like [ Anchor, ... Anchor ]
   cApp extend function file. JS file normally.
 
+- lang: Data language
+  cApp data language, used to filter data.
+
 - params: Object
   cApp params, when type is "DATA" and "app" is not empty
 
