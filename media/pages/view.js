@@ -12,15 +12,24 @@
             block:'',
             name:'',
             content:'',
+            cmtList:'',
             cmtContent:'',
             cmtTarget:'',
             cmtAdd:'',
+            cmtInfo:'',
+            cmtBlock:'',
+            cmtAnchor:'',
         },
+        page:{
+            count:1,
+            step:20,
+            max:1,
+        }
     };
-
+    var cmts=App.cache.getG("commentCount");
+    var RPC=App.cache.getG("RPC");
     var self={
         show:function(params){
-            var RPC=App.cache.getG("RPC");
             RPC.common.view(params.anchor,params.block,params.owner?params.owner:'',function(res){
                 if(res.empty){
                     self.render("Error",'No such anchor','null',params.anchor,params.block);
@@ -30,6 +39,7 @@
                     var igs=details.imgs&& details.imgs.length>0?self.domImages(details.imgs):'';
                     var owner=App.tools.shorten(res.owner,8);
                     self.render(details.title,(ctx+igs),owner,res.name,res.block);
+                    self.listComments(res.name,res.block);
                 }
                 self.bind();
                 App.fresh();
@@ -43,6 +53,33 @@
             sel.find('.'+cls.owner).html(owner);
             sel.find('.'+cls.name).html(anchor);
             sel.find('.'+cls.block).html(block);
+        },
+        listComments:function(anchor,block){
+            const svc="vSaying",fun="list";
+            const params={
+                anchor:anchor,
+                block:block,
+                page:config.page.count,
+                step:config.page.step,
+            }
+            RPC.extra.auto(svc,fun,params,(res)=>{
+                //console.log(res);
+                var dom=self.structComments(res);
+                $('#'+config.cls.cmtList).html(dom);
+                self.bind();
+                App.fresh();
+            });
+        },
+        structComments:function(list){
+            var dom ='';
+            for(var i=0;i<list.length;i++){
+                var row=list[i];
+                //console.log(row);
+                var raw=JSON.parse(row.data.raw);
+                var protocol=JSON.parse(row.data.protocol);
+                dom+=`<div class="row">${row.block}:${protocol.auth}<br>${raw.content}</div>`;
+            }
+            return dom;
         },
         domImages:function(imgs){
             var len=imgs.length,num = 12/len;
@@ -69,7 +106,19 @@
             };
         },
         bind:function(){
-            //console.log("binding comment action");
+            var cls=config.cls;
+            $("#"+cls.entry).find('#'+cls.cmtAdd).off('click').on('click',function(){
+                var data=self.getData();
+                console.log("ready to add comments");
+                console.log(data);
+            });
+        },
+        getData:function(){
+            return {
+                comment:'',
+                anchor:'',
+                block:0,
+            };
         },
 
         struct:function(){
@@ -85,8 +134,9 @@
         template:function(){
             var css = self.getCSS();
             var dom = self.getDom();
+            var list=self.getList();
             var cmt=self.getComment();
-            return `${css}<div id="${config.cls.entry}">${dom}${cmt}</div>`;
+            return `${css}<div id="${config.cls.entry}">${dom}${list}${cmt}</div>`;
         },
         getCSS:function(){
             var cls=config.cls;
@@ -103,19 +153,22 @@
                 <div class="col-12 pt-2 ${cls.content}"></div>
             </div>`;
         },
+        getList:function(){
+            var cls=config.cls;
+            return `<div id="${cls.cmtList}"></div>`;
+        },
         getComment:function(){
             var cls=config.cls;
             return `<div class="row">
                 <div class="col-12 gy-2">
                     <textarea class="form-control ${cls.cmtContent}" placeholder="Comment..." rows="3"></textarea>
                 </div>
-                <div class="col-2 gy-2 text-end">
-                    Enable
-                </div>
-                <div class="col-6 gy-2">
-                    <input type="text" disabled="disabled" class="form-control ${cls.cmtTarget}" placeholder="Anchor name..." value="" >
+                <div class="col-8 gy-2 ${cls.cmtInfo}">
+                    
                 </div>
                 <div class="col-4 gy-2 text-end">
+                    <input type="hidden" class="${cls.cmtAnchor}" value="">
+                    <input type="hidden" class="${cls.cmtBlock}" value="">
                     <button class="btn btn-md btn-primary" id="${cls.cmtAdd}">Comment</button>
                 </div>
             </div>`;

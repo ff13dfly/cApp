@@ -42,7 +42,6 @@
                 if(check){
                     if(G[k]===undefined || k==='funs') return false;
                 }
-
                 G[k]=v;
                 return true;
             },
