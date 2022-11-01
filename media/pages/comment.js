@@ -16,7 +16,7 @@
             add:'',
         },
     };
-
+    var cmts=App.cache.getG("commentCount");
     var self={
         show:function(params){
             //console.log(params);
@@ -55,7 +55,10 @@
 
                 if(RPC.extra.comment){
                     RPC.extra.comment(ctx,anchor,block,(res)=>{
-                        console.log(res);
+                        //console.log(res);
+                        if(res.success){
+                            cmts[anchor][block]=0;
+                        }
                     });
                 }else{
                     RPC.extra.verify(function(pair){

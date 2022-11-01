@@ -12,7 +12,13 @@
             block:'',
             name:'',
             content:'',
+            rowAvatar:'',
+            rowAccount:'',
+            rowContent:'',
             cmtList:'',
+            cmtHead:'',
+            cmtSum:'',
+            cmtReply:'',
             cmtContent:'',
             cmtTarget:'',
             cmtAdd:'',
@@ -28,8 +34,11 @@
     };
     var cmts=App.cache.getG("commentCount");
     var RPC=App.cache.getG("RPC");
+    var icons=App.cache.getG("icons");
     var self={
         show:function(params){
+            $("#"+config.cls.cmtSum).html(cmts[params.anchor][params.block]);
+
             RPC.common.view(params.anchor,params.block,params.owner?params.owner:'',function(res){
                 if(res.empty){
                     self.render("Error",'No such anchor','null',params.anchor,params.block);
@@ -70,32 +79,7 @@
                 App.fresh();
             });
         },
-        structComments:function(list){
-            var dom ='';
-            for(var i=0;i<list.length;i++){
-                var row=list[i];
-                //console.log(row);
-                var raw=JSON.parse(row.data.raw);
-                var protocol=JSON.parse(row.data.protocol);
-                dom+=`<div class="row">${row.block}:${protocol.auth}<br>${raw.content}</div>`;
-            }
-            return dom;
-        },
-        domImages:function(imgs){
-            var len=imgs.length,num = 12/len;
-            var dom='';
-            var count=0;
-            for(var i=0;i<len;i++){
-                var img=imgs[i];
-                self.calcImages(img,i,function(){
-
-                });
-                dom+=`<div class="col-${num}">
-                    <p style="height:${450/len}px;background:#FFFFFF url(${img}) no-repeat;background-size:contain;"></p>
-                </div>`;
-            }
-            return dom;
-        },
+        
         calcImages:function(img,index,ck){
             var ig=new Image();
             ig.src=img;
@@ -121,6 +105,67 @@
             };
         },
 
+        
+        domImages:function(imgs){
+            var len=imgs.length,num = 12/len;
+            var dom='';
+            var count=0;
+            for(var i=0;i<len;i++){
+                var img=imgs[i];
+                self.calcImages(img,i,function(){
+
+                });
+                dom+=`<div class="col-${num}">
+                    <p style="height:${450/len}px;background:#FFFFFF url(${img}) no-repeat;background-size:contain;"></p>
+                </div>`;
+            }
+            return dom;
+        },
+        structComments:function(list){
+            var cls=config.cls;
+            var dom ='';
+            for(var i=0;i<list.length;i++){
+                var row=list[i];
+                var raw=JSON.parse(row.data.raw);
+                var protocol=JSON.parse(row.data.protocol);
+                var dt={anchor: row.data.key, block: row.block,owner: row.owner,auth:protocol.auth};
+                dom+=`<div class="row pt-3">
+                    <div class="col-9 ${cls.rowAccount}">
+                        <span page="auth" data='${JSON.stringify({auth:protocol.auth})}'>
+                            ${App.tools.shorten(protocol.auth, 12)}
+                        </span>
+                    </div>
+                    <div class="col-3 text-end">
+                        <img style="widht:12px;height:12px;margin:0px 1px 0px 0px;opacity:0.7;" src="${icons.block}">
+                        <span style="font-size:12px;">${row.block}</span>
+                    </div>
+                    <div class="col-1"></div><div class="col-11  ${cls.rowContent}">${raw.content}</div>
+                    <div class="col-1"></div><div class="col-6 pt-1">
+                        <span page="comment" data='${JSON.stringify(dt)}' class="${cls.cmtReply}"> 
+                        <img style="widht:14px;height:14px;margin:-2px 2px 0px 4px;opacity:0.7;" src="${icons.comment}">
+                        reply
+                        </span>
+                    </div>
+                    <div class="col-5 pt-1 text-end">
+                        <span style="font-size:12px;">x mins before</span>
+                    </div>
+                </div>`;
+            }
+            return dom;
+        },
+        getCSS:function(){
+            var cls=config.cls;
+            return `<style>
+                #${cls.entry} h3{color:#002222}
+                .${cls.intro} {background:#FFFFEE;height:30px;}
+                #${cls.entry} .${cls.content} {font-weight:500;}
+                #${cls.entry} .${cls.cmtHead} {background:#F3F3F3;}
+                #${cls.entry} .${cls.cmtReply} {background:#EEEEEE;border-radius:8px;font-size:12px;padding:4px 8px 6px 4px;}
+                #${cls.entry} .${cls.rowAvatar} {}
+                #${cls.entry} .${cls.rowAccount} {font-size:12px;color:#EF8889}
+                #${cls.entry} .${cls.rowContent} {font-size:14px;font-weight:500;}
+            </style>`;
+        },
         struct:function(){
             var pre=config.prefix;
             var hash=App.tools.hash;
@@ -134,17 +179,10 @@
         template:function(){
             var css = self.getCSS();
             var dom = self.getDom();
-            var list=self.getList();
-            var cmt=self.getComment();
-            return `${css}<div id="${config.cls.entry}">${dom}${list}${cmt}</div>`;
+            var cmt=self.getDialog();
+            return `${css}<div id="${config.cls.entry}">${dom}${cmt}</div>`;
         },
-        getCSS:function(){
-            var cls=config.cls;
-            return `<style>
-                #${cls.entry} h3{color:#002222}
-                .${cls.intro} {background:#FFFFEE;height:30px;}
-            </style>`;
-        },
+        
         getDom:function(){
             var cls=config.cls;
             return `<div class="row">
@@ -153,15 +191,21 @@
                 <div class="col-12 pt-2 ${cls.content}"></div>
             </div>`;
         },
-        getList:function(){
+        
+        getDialog:function(){
             var cls=config.cls;
-            return `<div id="${cls.cmtList}"></div>`;
-        },
-        getComment:function(){
-            var cls=config.cls;
-            return `<div class="row">
+            return `<div class="row mt-4 pt-1 pb-1 ${cls.cmtHead}">
+                <div class="col-4">
+                    Comments ( <span style="font-size:14px;" id="${cls.cmtSum}">0</span> )
+                </div>
+                <div class="col-8 text-end">
+                    <span style="font-size:14px;">more...</span>
+                </div>
+            </div>
+            <div id="${cls.cmtList}"></div>
+            <div class="row pt-2">
                 <div class="col-12 gy-2">
-                    <textarea class="form-control ${cls.cmtContent}" placeholder="Comment..." rows="3"></textarea>
+                    <textarea class="form-control ${cls.cmtContent}" placeholder="Your thinking about the article..." rows="3"></textarea>
                 </div>
                 <div class="col-8 gy-2 ${cls.cmtInfo}">
                     
