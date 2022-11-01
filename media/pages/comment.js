@@ -14,15 +14,29 @@
             comment:'',
             mine:'',
             add:'',
+            cmtList:'',
+            cmtHead:'',
+            cmtSum:'',
+            cmtReply:'',
+            rowContent:'',
         },
+        page:{
+            count:1,
+            step:2,
+            max:1,
+        }
     };
     var cmts=App.cache.getG("commentCount");
+    var RPC=App.cache.getG("RPC");
+    var icons=App.cache.getG("icons");
+
     var self={
         show:function(params){
-            //console.log(params);
             var relate="#"+params.title+"#";
             self.bind();
-            self.render(params.title,params.anchor,params.block,params.owner);   
+            self.render(params.title,params.anchor,params.block,params.owner); 
+            self.listComments(params.anchor,params.block);  
+
         },
         render:function(title,anchor,block,owner){
             var cls=config.cls;
@@ -74,6 +88,53 @@
                 }
             });
         },
+        listComments:function(anchor,block){
+            const svc="vSaying",fun="list";
+            const params={
+                anchor:anchor,
+                block:block,
+                page:config.page.count,
+                step:config.page.step,
+            }
+            RPC.extra.auto(svc,fun,params,(res)=>{
+                var dom=self.structComments(res);
+                $('#'+config.cls.cmtList).html(dom);
+                self.bind();
+                App.fresh();
+            });
+        },
+        structComments:function(list){
+            var cls=config.cls;
+            var dom ='';
+            for(var i=0;i<list.length;i++){
+                var row=list[i];
+                var raw=JSON.parse(row.data.raw);
+                var protocol=JSON.parse(row.data.protocol);
+                var dt={anchor: row.data.key, block: row.block,owner: row.owner,auth:protocol.auth};
+                dom+=`<div class="row pt-3">
+                    <div class="col-9 ${cls.rowAccount}">
+                        <span page="auth" data='${JSON.stringify({auth:protocol.auth})}'>
+                            ${App.tools.shorten(protocol.auth, 12)}
+                        </span>
+                    </div>
+                    <div class="col-3 text-end">
+                        <img style="widht:12px;height:12px;margin:0px 1px 0px 0px;opacity:0.7;" src="${icons.block}">
+                        <span style="font-size:12px;">${row.block}</span>
+                    </div>
+                    <div class="col-1"></div><div class="col-11  ${cls.rowContent}">${raw.content}</div>
+                    <div class="col-1"></div><div class="col-6 pt-1">
+                        <span page="comment" data='${JSON.stringify(dt)}' class="${cls.cmtReply}"> 
+                        <img style="widht:14px;height:14px;margin:-2px 2px 0px 4px;opacity:0.7;" src="${icons.comment}">
+                        reply
+                        </span>
+                    </div>
+                    <div class="col-5 pt-1 text-end">
+                        <span style="font-size:12px;">x mins before</span>
+                    </div>
+                </div>`;
+            }
+            return dom;
+        },
         struct: function () {
             var pre = config.prefix;
             var hash = App.tools.hash;
@@ -92,26 +153,43 @@
         getCSS:function(){
             var cls=config.cls;
             return `<style>
+                #${cls.entry} .${cls.cmtHead} {background:#F3F3F3;}
+                #${cls.entry} .${cls.cmtReply} {background:#EEEEEE;border-radius:8px;font-size:12px;padding:4px 8px 6px 4px;}
+                #${cls.entry} .${cls.rowAvatar} {}
+                #${cls.entry} .${cls.rowAccount} {font-size:12px;color:#EF8889}
+                #${cls.entry} .${cls.rowContent} {font-size:14px;font-weight:500;}
             </style>`;
         },
         getDom:function(){
             var cls=config.cls;
             return `<div class="row">
-                <div class="col-12 gy-2"><h5 class="${cls.relate}">#Title#<h5></div>
-                <div class="col-12 gy-2 ${cls.location}">Anchor on block 0</div>
-                <div class="col-12 gy-2">
-                    <textarea class="form-control ${cls.content}" placeholder="Adding comment..." rows="10"></textarea>   
+                    <div class="col-12 gy-2"><h5 class="${cls.relate}">#Title#<h5></div>
+                    <div class="col-12 gy-2 ${cls.location}">Anchor on block 0</div>
                 </div>
-                <div class="col-6 gy-2">
-                    <input type="text" class="form-control ${cls.mine}" disabled="disabled" value="" >
+                <div class="row mt-4 pt-1 pb-1 ${cls.cmtHead}">
+                    <div class="col-4">
+                        Comments ( <span style="font-size:14px;" id="${cls.cmtSum}">0</span> )
+                    </div>
+                    <div class="col-8 text-end">
+                        <span style="font-size:14px;">more...</span>
+                    </div>
                 </div>
-                <div class="col-6 gy-2 text-end">
-                    <input type="hidden" class="form-control ${cls.title}" disabled="disabled" value="" >
-                    <input type="hidden" class="form-control ${cls.block}" disabled="disabled" value="" >
-                    <input type="hidden" class="form-control ${cls.anchor}" disabled="disabled" value="" >
-                    <button class="btn btn-md btn-primary" id="${cls.add}">Comment</button>
-                </div>
-            </div>`;
+                <div id="${cls.cmtList}"></div>
+
+                <div class="row pt-4">
+                    <div class="col-12 gy-2">
+                        <textarea class="form-control ${cls.content}" placeholder="Adding comment..." rows="10"></textarea>   
+                    </div>
+                    <div class="col-6 gy-2">
+                        <input type="text" class="form-control ${cls.mine}" disabled="disabled" value="" >
+                    </div>
+                    <div class="col-6 gy-2 text-end">
+                        <input type="hidden" class="form-control ${cls.title}" disabled="disabled" value="" >
+                        <input type="hidden" class="form-control ${cls.block}" disabled="disabled" value="" >
+                        <input type="hidden" class="form-control ${cls.anchor}" disabled="disabled" value="" >
+                        <button class="btn btn-md btn-primary" id="${cls.add}">Comment</button>
+                    </div>
+                </div>`;
         },
     };
     
