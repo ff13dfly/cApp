@@ -24,6 +24,7 @@ var min = 'anchorMedia.min.js';
 var source = [
     'uploader.js',
     'core.js',
+    'tpl.js',               //basic theme
     'pages/index.js',
     'pages/view.js',
     'pages/history.js',
