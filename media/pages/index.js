@@ -7,14 +7,7 @@
         max:10,                     //history max length
         cls: {
             entry: '',
-            row: '',
-            anchor: '',
-            account:'',
-            operation:'',
-            thumbs:'',
-            fav:'',
-            cmtCount:'',
-            block:'',
+            
             add:'',             //add button class
         }
     };
@@ -30,60 +23,62 @@
     App.cache.setG("icons",icons);
     App.cache.setG("commentCount",cmts);
 
-    //template functions
+    /*****************************************************/
+    /***********common template functions ****************/
+    /*****************************************************/
     var tpl={
-        row:function(row,cls,type){
+        cls:{
+            basic:{
+                row: '',
+                account:'',
+                block:'',
+                operation:'',
+                count:'',
+            },
+            comment:{
+                account:'',
+                content:'',
+                reply:'',
+            },
+            snap:{
+
+            },
+        },
+
+        row:function(row,type){
             if(!tpl[type]) return false;
-            return tpl[type](row,cls);
+            return tpl[type](row,tpl.cls[type]);
         },
-        normal:function(row,cls){
-            var viewer=tpl.funs.getRow(row,cls);
-            var opt=tpl.funs.getOperation(row,cls);
+
+        theme:function(type,entry){
+            var cls=tpl.cls[type];
+            var map={
+                basic:`
+                    #${entry} hr{color:#CCCCCC}
+                    #${entry} .${cls.account}{font-size:10px;color:#EF8889;}
+                    #${entry} .${cls.block}{font-size:10px;}
+                    #${entry} .${cls.operation}{font-size:10px;}
+                    #${entry} .${cls.count}{margin-top:4px;}`,
+                comment:`
+                    #${entry} .${cls.avatar} {}
+                    #${entry} .${cls.account} {font-size:12px;color:#EF8889}
+                    #${entry} .${cls.content} {font-size:14px;font-weight:500;}
+                    #${entry} .${cls.reply}  {background:#EEEEEE;border-radius:8px;font-size:12px;padding:4px 8px 6px 4px;}`,
+                snap:``,
+            }
+            return map[type];
+        },
+        basic:function(row,cls){
+            var ctx = !row.data.raw?row.data:row.data.raw;
+            if(!row.owner) row.owner='';
+
+            var dt = { anchor: row.name, block: row.block, owner: row.owner };
+            var igs=ctx.imgs && ctx.imgs.length>0?tpl.getImages(ctx.imgs):'';
+            var ss="opacity:0.7;";
+            var cmt= { anchor: row.name, block: row.block, owner: !row.owner?'':row.owner,title:!ctx.title?'':ctx.title};
+            var ct=JSON.stringify(cmt);
             return `<div class="row">
-                ${viewer}${opt}
-                <div class="col-12"><hr /></div>
-            </div>`;
-        },
-        comment:function(row,cls){
-            var raw=JSON.parse(row.data.raw);
-            var protocol=JSON.parse(row.data.protocol);
-            var dt={anchor: row.data.key, block: row.block,owner: row.owner,auth:protocol.auth};
-            return `<div class="row pt-3">
-                <div class="col-9 ${cls.rowAccount}">
-                    <span page="auth" data='${JSON.stringify({auth:protocol.auth})}'>
-                        ${App.tools.shorten(protocol.auth, 12)}
-                    </span>
-                </div>
-                <div class="col-3 text-end">
-                    <img style="widht:12px;height:12px;margin:0px 1px 0px 0px;opacity:0.7;" src="${icons.block}">
-                    <span style="font-size:12px;">${row.block}</span>
-                </div>
-                <div class="col-1"></div><div class="col-11  ${cls.rowContent}">${raw.content}</div>
-                <div class="col-1"></div><div class="col-6 pt-1">
-                    <span page="comment" data='${JSON.stringify(dt)}' class="${cls.cmtReply}"> 
-                    <img style="widht:14px;height:14px;margin:-2px 2px 0px 4px;opacity:0.7;" src="${icons.comment}">
-                    reply
-                    </span>
-                </div>
-                <div class="col-5 pt-1 text-end">
-                    <span style="font-size:12px;">x mins before</span>
-                </div>
-            </div>`;
-        },
-        snap:function(row,cls){
-
-        },
-        funs:{
-            getRow:function(row,cls){
-                console.log(row);
-
-                var ctx = !row.data.raw?row.data:row.data.raw;
-                if(!row.owner) row.owner='';
-
-                var dt = { anchor: row.name, block: row.block, owner: row.owner };
-                var igs=ctx.imgs && ctx.imgs.length>0?tpl.funs.getImages(ctx.imgs,cls):'';
-                var ss="opacity:0.7;";
-                return `<div class="col-12 pt-2 ${cls.row}" >
+                <div class="col-12 pt-2 ${cls.row}" >
                     <span page="view" data='${JSON.stringify(dt)}'><h5>${ctx.title}</h5></span>
                 </div>
                 <div class="col-4 ${cls.account}">
@@ -97,37 +92,75 @@
                 <div class="col-12 gy-2 ${cls.row}">
                     <span page="view" data='${JSON.stringify(dt)}'>${!ctx.desc ? "" : ctx.desc}</span>
                 </div>
-                    <span page="view" data='${JSON.stringify(dt)}'>${igs}</span>
-                `;
-            },
-            getImages:function(imgs,cls){
-                var len=imgs.length,num = 12/len;
-                var dom='';
-                for(var i=0;i<len;i++){
-                    var img=imgs[i];
-                    dom+=`<div class="col-${num}">
-                        <p style="height:${300/len}px;background:#FFFFFF url(${img}) no-repeat;background-size:contain;"></p>
-                    </div>`;
-                }
-                return dom;
-            },
-            getOperation:function(row,cls){
-                var ctx = !row.data.raw?row.data:row.data.raw;
-                var cmt= { anchor: row.name, block: row.block, owner: !row.owner?'':row.owner,title:!ctx.title?'':ctx.title};
-                var dt=JSON.stringify(cmt);
-                return `<div class="col-12 text-end gy-2 ${cls.operation}">
-                    <span page="comment" data='${dt}'>
+                <span page="view" data='${JSON.stringify(dt)}'>${igs}</span>
+                <div class="col-12 text-end gy-2 ${cls.operation}">
+                    <span page="comment" data='${ct}'>
                         <img style="widht:21px;height:21px;" src="${icons.comment}">
                     </span>
-                    <span class="${cls.cmtCount}" id="${row.name}_${row.block}">0</span>
+                    <span class="${cls.count}" id="${row.name}_${row.block}">0</span>
+                </div>
+                <div class="col-12"><hr /></div>
+            </div>`;
+        },
+        
+        comment:function(row,cls){
+            var raw=JSON.parse(row.data.raw);
+            var protocol=JSON.parse(row.data.protocol);
+            var dt={anchor: row.data.key, block: row.block,owner: row.owner,auth:protocol.auth};
+            return `<div class="row pt-3">
+                <div class="col-9 ${cls.account}">
+                    <span page="auth" data='${JSON.stringify({auth:protocol.auth})}'>
+                        ${App.tools.shorten(protocol.auth, 12)}
+                    </span>
+                </div>
+                <div class="col-3 text-end">
+                    <img style="widht:12px;height:12px;margin:0px 1px 0px 0px;opacity:0.7;" src="${icons.block}">
+                    <span style="font-size:12px;">${row.block}</span>
+                </div>
+                <div class="col-1"></div><div class="col-11  ${cls.content}">${raw.content}</div>
+                <div class="col-1"></div><div class="col-6 pt-1">
+                    <span page="comment" data='${JSON.stringify(dt)}' class="${cls.reply}"> 
+                    <img style="widht:14px;height:14px;margin:-2px 2px 0px 4px;opacity:0.7;" src="${icons.comment}">
+                    reply
+                    </span>
+                </div>
+                <div class="col-5 pt-1 text-end">
+                    <span style="font-size:12px;">x mins before</span>
+                </div>
+            </div>`;
+        },
+        snap:function(row,cls){
+
+        },
+        getImages:function(imgs){
+            var len=imgs.length,num = 12/len;
+            var dom='';
+            for(var i=0;i<len;i++){
+                var img=imgs[i];
+                dom+=`<div class="col-${num}">
+                    <p style="height:${300/len}px;background:#FFFFFF url(${img}) no-repeat;background-size:contain;"></p>
                 </div>`;
-            },
+            }
+            return dom;
+        },
+        struct:function(){
+            var pre='t';
+            var hash = App.tools.hash;
+            for (var type in tpl.cls) {
+                for(var k in tpl.cls[type]){
+                    if (!tpl.cls[type][k]) tpl.cls[type][k] = pre + hash();
+                }
+            }
         },
     };
+    tpl.struct();
     App.cache.setG("tpl",tpl);
 
+    /*****************************************************/
+    /**************page index functions ******************/
+    /*****************************************************/
+
     var his=[];
-    
     var RPC = App.cache.getG("RPC");
     var self = {
         listening: function () {
@@ -191,7 +224,7 @@
         },
         decode: function (row) {
             self.setCmtAmount(row.name,row.block);
-            var dom=tpl.row(row,config.cls,'normal');
+            var dom=tpl.row(row,'basic');
             $("#" + config.cls.entry).prepend(dom);
         },
         bind:function(){
@@ -247,16 +280,11 @@
         },
         getCSS:function(){
             var cls=config.cls;
-            var cmap = `<style>
-                #${cls.entry} hr{color:#CCCCCC}
-                #${cls.entry} .${cls.account}{font-size:10px;color:#EF8889;}
-                #${cls.entry} .${cls.block}{font-size:10px;}
-                #${cls.entry} .${cls.operation}{font-size:10px;}
+            var more=tpl.theme('basic',cls.entry);
+            return `<style>${more}
                 #${cls.entry} .${cls.add}{width:100px;height:48px;background:#F4F4F4;opacity: 0.9;position:fixed;right:20px;bottom:25%;border-radius:24px;border:1px solid #AAAAAA;line-height:48px;text-align: center;box-shadow: 3px 3px 3px #BBBBBB;}
                 #${cls.entry} .${cls.add} img{opacity: 0.8;}
-                #${cls.entry} .${cls.cmtCount}{margin-top:4px;} 
             </style>`;
-            return cmap;
         },
         getAdd:function(){
             var cls=config.cls;

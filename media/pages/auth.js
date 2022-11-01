@@ -5,15 +5,6 @@
         prefix:"s",
         cls:{
             entry:'',
-            row: '',
-            anchor: '',
-            account:'',
-            operation:'',
-            thumbs:'',
-            fav:'',
-            cmtCount:'',
-            block:'',
-            add:'',             //add button class
         },
         page:{
             count:1,
@@ -46,7 +37,7 @@
                 var dom='';
                 for(var i=0;i<list.length;i++){
                     var row=list[i];
-                    dom+=tpl.row(row,config.cls,'normal');
+                    dom+=tpl.row(row,'basic');
                 }
                 $('#'+config.cls.entry).html(dom);
             });
@@ -67,16 +58,10 @@
         },
         getCSS:function(){
             var cls=config.cls;
-            var cmap=`<style>
-                #${cls.entry} hr{color:#CCCCCC}
-                #${cls.entry} .${cls.account}{font-size:10px;color:#EF8889;}
-                #${cls.entry} .${cls.block}{font-size:10px;}
-                #${cls.entry} .${cls.operation}{font-size:10px;}
-                #${cls.entry} .${cls.add}{width:100px;height:48px;background:#F4F4F4;opacity: 0.9;position:fixed;right:20px;bottom:25%;border-radius:24px;border:1px solid #AAAAAA;line-height:48px;text-align: center;box-shadow: 3px 3px 3px #BBBBBB;}
-                #${cls.entry} .${cls.add} img{opacity: 0.8;}
-                #${cls.entry} .${cls.cmtCount}{margin-top:4px;}
+            var more=tpl.theme('basic',cls.entry);
+            return `<style>${more}
+                #${cls.entry}{}
             </style>`;
-            return cmap;
         },
         getDom:function(){
             var cls=config.cls;

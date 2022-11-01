@@ -11,14 +11,9 @@
             location:'',
             title:'',
             content:'',
-            comment:'',
             mine:'',
-            add:'',
-            cmtList:'',
-            cmtHead:'',
             cmtSum:'',
-            cmtReply:'',
-            rowContent:'',
+            cmtList:'',
         },
         page:{
             count:1,
@@ -31,11 +26,9 @@
     var tpl=App.cache.getG("tpl");
     var self={
         show:function(params){
-            var relate="#"+params.title+"#";
-            self.bind();
             self.render(params.title,params.anchor,params.block,params.owner); 
             self.listComments(params.anchor,params.block);  
-
+            self.bind();
         },
         render:function(title,anchor,block,owner){
             var cls=config.cls;
@@ -107,10 +100,7 @@
             var dom ='';
             for(var i=0;i<list.length;i++){
                 var row=list[i];
-                var raw=JSON.parse(row.data.raw);
-                var protocol=JSON.parse(row.data.protocol);
-                var dt={anchor: row.data.key, block: row.block,owner: row.owner,auth:protocol.auth};
-                dom+=tpl.row(row,config.cls,'comment');
+                dom+=tpl.row(row,'comment');
             }
             return dom;
         },
@@ -131,12 +121,9 @@
         },
         getCSS:function(){
             var cls=config.cls;
-            return `<style>
+            var more=tpl.theme('comment',cls.entry);
+            return `<style>${more}
                 #${cls.entry} .${cls.cmtHead} {background:#F3F3F3;}
-                #${cls.entry} .${cls.cmtReply} {background:#EEEEEE;border-radius:8px;font-size:12px;padding:4px 8px 6px 4px;}
-                #${cls.entry} .${cls.rowAvatar} {}
-                #${cls.entry} .${cls.rowAccount} {font-size:12px;color:#EF8889}
-                #${cls.entry} .${cls.rowContent} {font-size:14px;font-weight:500;}
             </style>`;
         },
         getDom:function(){

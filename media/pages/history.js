@@ -5,15 +5,6 @@
         prefix:"h",
         cls:{
             entry:'',
-            row: '',
-            anchor: '',
-            account:'',
-            operation:'',
-            thumbs:'',
-            fav:'',
-            cmtCount:'',
-            block:'',
-            add:'',             //add button class
         },
     };
     var RPC=App.cache.getG("RPC");
@@ -26,7 +17,7 @@
                     var dom='';
                     for(var i=0;i<list.length;i++){
                         var row=list[i];
-                        dom+=tpl.row(row,config.cls,'normal');
+                        dom+=tpl.row(row,'basic');
                     }
 
                     $("#"+config.cls.entry).html(dom);
@@ -53,9 +44,9 @@
         },
         getCSS:function(){
             var cls=config.cls;
-            return `<style>
-                .${cls.account}{font-size:10px;color:#EF2356;}
-                .${cls.info}{font-size:10px;}
+            var more=tpl.theme('basic',cls.entry);
+            return `<style>${more}
+                #${cls.entry}{}
             </style>`;
         },
         getDom:function(){

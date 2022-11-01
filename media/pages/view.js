@@ -12,15 +12,9 @@
             block:'',
             name:'',
             content:'',
-            rowAvatar:'',
-            rowAccount:'',
-            rowContent:'',
             cmtList:'',
             cmtHead:'',
             cmtSum:'',
-            cmtReply:'',
-            cmtContent:'',
-            cmtTarget:'',
             cmtAdd:'',
             cmtInfo:'',
             cmtBlock:'',
@@ -120,25 +114,21 @@
             return dom;
         },
         structComments:function(list){
-            var cls=config.cls;
             var dom ='';
             for(var i=0;i<list.length;i++){
                 var row=list[i];
-                dom+=tpl.row(row,config.cls,'comment');
+                dom+=tpl.row(row,'comment');
             }
             return dom;
         },
         getCSS:function(){
             var cls=config.cls;
-            return `<style>
+            var more=tpl.theme('comment',cls.entry);
+            return `<style>${more}
                 #${cls.entry} h3{color:#002222}
                 .${cls.intro} {background:#FFFFEE;height:30px;}
                 #${cls.entry} .${cls.content} {font-weight:500;}
                 #${cls.entry} .${cls.cmtHead} {background:#F3F3F3;}
-                #${cls.entry} .${cls.cmtReply} {background:#EEEEEE;border-radius:8px;font-size:12px;padding:4px 8px 6px 4px;}
-                #${cls.entry} .${cls.rowAvatar} {}
-                #${cls.entry} .${cls.rowAccount} {font-size:12px;color:#EF8889}
-                #${cls.entry} .${cls.rowContent} {font-size:14px;font-weight:500;}
             </style>`;
         },
         struct:function(){
@@ -162,7 +152,9 @@
             var cls=config.cls;
             return `<div class="row">
                 <div class="col-12 pt-4 pb-2"><h3 class="${cls.title}">Loading</h3></div>
-                <div class="col-12 text-end ${cls.intro}">Auth: <span class="${cls.owner}">null</span> on <span class="${cls.block}">0</span> of <span class="${cls.name}">null</span></div>
+                <div class="col-12 text-end ${cls.intro}">
+                    Auth: <span class="${cls.owner}">null</span> on <span class="${cls.block}">0</span> of <span class="${cls.name}">null</span>
+                </div>
                 <div class="col-12 pt-2 ${cls.content}"></div>
             </div>`;
         },
