@@ -30,6 +30,102 @@
     App.cache.setG("icons",icons);
     App.cache.setG("commentCount",cmts);
 
+    //template functions
+    var tpl={
+        row:function(row,cls,type){
+            if(!tpl[type]) return false;
+            return tpl[type](row,cls);
+        },
+        normal:function(row,cls){
+            var viewer=tpl.funs.getRow(row,cls);
+            var opt=tpl.funs.getOperation(row,cls);
+            return `<div class="row">
+                ${viewer}${opt}
+                <div class="col-12"><hr /></div>
+            </div>`;
+        },
+        comment:function(row,cls){
+            var raw=JSON.parse(row.data.raw);
+            var protocol=JSON.parse(row.data.protocol);
+            var dt={anchor: row.data.key, block: row.block,owner: row.owner,auth:protocol.auth};
+            return `<div class="row pt-3">
+                <div class="col-9 ${cls.rowAccount}">
+                    <span page="auth" data='${JSON.stringify({auth:protocol.auth})}'>
+                        ${App.tools.shorten(protocol.auth, 12)}
+                    </span>
+                </div>
+                <div class="col-3 text-end">
+                    <img style="widht:12px;height:12px;margin:0px 1px 0px 0px;opacity:0.7;" src="${icons.block}">
+                    <span style="font-size:12px;">${row.block}</span>
+                </div>
+                <div class="col-1"></div><div class="col-11  ${cls.rowContent}">${raw.content}</div>
+                <div class="col-1"></div><div class="col-6 pt-1">
+                    <span page="comment" data='${JSON.stringify(dt)}' class="${cls.cmtReply}"> 
+                    <img style="widht:14px;height:14px;margin:-2px 2px 0px 4px;opacity:0.7;" src="${icons.comment}">
+                    reply
+                    </span>
+                </div>
+                <div class="col-5 pt-1 text-end">
+                    <span style="font-size:12px;">x mins before</span>
+                </div>
+            </div>`;
+        },
+        snap:function(row,cls){
+
+        },
+        funs:{
+            getRow:function(row,cls){
+                console.log(row);
+
+                var ctx = !row.data.raw?row.data:row.data.raw;
+                if(!row.owner) row.owner='';
+
+                var dt = { anchor: row.name, block: row.block, owner: row.owner };
+                var igs=ctx.imgs && ctx.imgs.length>0?tpl.funs.getImages(ctx.imgs,cls):'';
+                var ss="opacity:0.7;";
+                return `<div class="col-12 pt-2 ${cls.row}" >
+                    <span page="view" data='${JSON.stringify(dt)}'><h5>${ctx.title}</h5></span>
+                </div>
+                <div class="col-4 ${cls.account}">
+                    <span page="auth" data='${JSON.stringify({auth: row.owner})}'>${App.tools.shorten(row.owner, 8)}</span>
+                </div>
+                <div class="col-8 ${cls.block} text-end">
+                <img style="widht:10px;height:10px;margin:-2px 6px 0px 0px;${ss}" src="${icons.block}"><strong>${row.block}</strong> , 
+                <img style="widht:12px;height:12px;margin:-2px 0px 0px 0px;${ss}" src="${icons.anchor}">
+                    <span page="history" data='${JSON.stringify({ anchor: row.name })}'><strong>${row.name}</strong></span></strong> 
+                </div>
+                <div class="col-12 gy-2 ${cls.row}">
+                    <span page="view" data='${JSON.stringify(dt)}'>${!ctx.desc ? "" : ctx.desc}</span>
+                </div>
+                    <span page="view" data='${JSON.stringify(dt)}'>${igs}</span>
+                `;
+            },
+            getImages:function(imgs,cls){
+                var len=imgs.length,num = 12/len;
+                var dom='';
+                for(var i=0;i<len;i++){
+                    var img=imgs[i];
+                    dom+=`<div class="col-${num}">
+                        <p style="height:${300/len}px;background:#FFFFFF url(${img}) no-repeat;background-size:contain;"></p>
+                    </div>`;
+                }
+                return dom;
+            },
+            getOperation:function(row,cls){
+                var ctx = !row.data.raw?row.data:row.data.raw;
+                var cmt= { anchor: row.name, block: row.block, owner: !row.owner?'':row.owner,title:!ctx.title?'':ctx.title};
+                var dt=JSON.stringify(cmt);
+                return `<div class="col-12 text-end gy-2 ${cls.operation}">
+                    <span page="comment" data='${dt}'>
+                        <img style="widht:21px;height:21px;" src="${icons.comment}">
+                    </span>
+                    <span class="${cls.cmtCount}" id="${row.name}_${row.block}">0</span>
+                </div>`;
+            },
+        },
+    };
+    App.cache.setG("tpl",tpl);
+
     var his=[];
     
     var RPC = App.cache.getG("RPC");
@@ -95,57 +191,8 @@
         },
         decode: function (row) {
             self.setCmtAmount(row.name,row.block);
-            var viewer=self.getRow(row);
-            var opt=self.getOperation(row);
-            var dom = `<div class="row">
-                ${viewer}${opt}
-                <div class="col-12"><hr /></div>
-            </div>`;
+            var dom=tpl.row(row,config.cls,'normal');
             $("#" + config.cls.entry).prepend(dom);
-        },
-        getRow:function(row){
-            var ctx = row.data.raw, cls = config.cls;
-            var dt = { anchor: row.name, block: row.block, owner: row.owner };
-            var igs=ctx.imgs && ctx.imgs.length>0?self.getImages(ctx.imgs):'';
-            var ss="opacity:0.7;";
-            return `<div class="col-12 pt-2 ${cls.row}" >
-                <span page="view" data='${JSON.stringify(dt)}'><h5>${ctx.title}</h5></span>
-            </div>
-            <div class="col-4 ${cls.account}">
-                <span page="auth" data='${JSON.stringify({auth: row.owner})}'>${App.tools.shorten(row.owner, 8)}</span>
-            </div>
-            <div class="col-8 ${cls.block} text-end">
-            <img style="widht:10px;height:10px;margin:-2px 6px 0px 0px;${ss}" src="${icons.block}"><strong>${row.block}</strong> , 
-            <img style="widht:12px;height:12px;margin:-2px 0px 0px 0px;${ss}" src="${icons.anchor}">
-                <span page="history" data='${JSON.stringify({ anchor: row.name })}'><strong>${row.name}</strong></span></strong> 
-            </div>
-            <div class="col-12 gy-2 ${cls.row}">
-                <span page="view" data='${JSON.stringify(dt)}'>${!ctx.desc ? "" : ctx.desc}</span>
-            </div>
-                <span page="view" data='${JSON.stringify(dt)}'>${igs}</span>
-            `;
-        },
-        getImages:function(imgs){
-            var len=imgs.length,num = 12/len;
-            var dom='';
-            for(var i=0;i<len;i++){
-                var img=imgs[i];
-                dom+=`<div class="col-${num}">
-                    <p style="height:${300/len}px;background:#FFFFFF url(${img}) no-repeat;background-size:contain;"></p>
-                </div>`;
-            }
-            return dom;
-        },
-        getOperation:function(row){
-            var ctx = row.data.raw, cls = config.cls;
-            var cmt= { anchor: row.name, block: row.block, owner: row.owner,title:ctx.title };
-            var dt=JSON.stringify(cmt);
-            return `<div class="col-12 text-end gy-2 ${cls.operation}">
-                <span page="comment" data='${dt}'>
-                    <img style="widht:21px;height:21px;" src="${icons.comment}">
-                </span>
-                <span class="${cls.cmtCount}" id="${row.name}_${row.block}">0</span>
-            </div>`;
         },
         bind:function(){
             var cls=config.cls;

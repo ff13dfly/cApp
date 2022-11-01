@@ -21,9 +21,9 @@
             max:1,
         }
     };
-    //var cmts=App.cache.getG("commentCount");
+
     var RPC=App.cache.getG("RPC");
-    var icons=App.cache.getG("icons");
+    var tpl=App.cache.getG("tpl");
 
     var self={
         show:function(params){
@@ -33,77 +33,23 @@
                 return App.back();
             }
             App.toast('Ready to get data.');
-            self.list(params.auth,self.fill);
-            
+            self.list(params.auth);
         },
-        fill:function(list){
-            var cls=config.cls;
-            var dom=''
-;            for(var i=0;i<list.length;i++){
-                var row=list[i];
-                var viewer=self.getRow(row);
-                var opt=self.getOperation(row);
-                dom+=`<div class="row">
-                        ${viewer}${opt}
-                        <div class="col-12"><hr /></div>
-                    </div>`;
-            }
-            $('#'+cls.entry).html(dom);
-        },
-        list:function(auth,ck){
+        list:function(auth){
             var svc="vAuth",fun="list";
             var params={
                 account:auth,
                 page:config.page.count,
                 step:config.page.step,
             }
-            RPC.extra.auto(svc,fun,params,(res)=>{
-                ck && ck(res);
+            RPC.extra.auto(svc,fun,params,(list)=>{
+                var dom='';
+                for(var i=0;i<list.length;i++){
+                    var row=list[i];
+                    dom+=tpl.row(row,config.cls,'normal');
+                }
+                $('#'+config.cls.entry).html(dom);
             });
-        },
-        getRow:function(row){
-            var cls = config.cls;
-            var ctx=row.data;
-            var dt = { anchor: row.anchor, block: row.block };
-            var igs=ctx.imgs && ctx.imgs.length>0?self.getImages(ctx.imgs):'';
-            var ss="opacity:0.7;";
-            return `<div class="col-12 pt-2 ${cls.row}" >
-                <span page="view" data='${JSON.stringify(dt)}'><h5>${ctx.title}</h5></span>
-            </div>
-            <div class="col-4 ${cls.account}">
-                owner SS58;
-            </div>
-            <div class="col-8 ${cls.block} text-end">
-            <img style="widht:10px;height:10px;margin:-2px 6px 0px 0px;${ss}" src="${icons.block}"><strong>${row.block}</strong> , 
-            <img style="widht:12px;height:12px;margin:-2px 0px 0px 0px;${ss}" src="${icons.anchor}">
-                <span page="history" data='${JSON.stringify({ anchor: row.anchor })}'><strong>${row.anchor}</strong></span></strong> 
-            </div>
-            <div class="col-12 gy-2 ${cls.row}">
-                <span page="view" data='${JSON.stringify(dt)}'>${!ctx.desc ? "" : ctx.desc}</span>
-            </div>
-                <span page="view" data='${JSON.stringify(dt)}'>${igs}</span>`;
-        },
-        getOperation:function(row){
-            var ctx = row.data.raw, cls = config.cls;
-            var cmt= { anchor: row.anchor, block: row.block};
-            var dt=JSON.stringify(cmt);
-            return `<div class="col-12 text-end gy-2 ${cls.operation}">
-                <span page="comment" data='${dt}'>
-                    <img style="widht:21px;height:21px;" src="${icons.comment}">
-                </span>
-                <span class="${cls.cmtCount}" id="${row.name}_${row.block}">0</span>
-            </div>`;
-        },
-        getImages:function(imgs){
-            var len=imgs.length,num = 12/len;
-            var dom='';
-            for(var i=0;i<len;i++){
-                var img=imgs[i];
-                dom+=`<div class="col-${num}">
-                    <p style="height:${300/len}px;background:#FFFFFF url(${img}) no-repeat;background-size:contain;"></p>
-                </div>`;
-            }
-            return dom;
         },
         struct:function(){
             var pre=config.prefix;

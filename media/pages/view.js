@@ -33,8 +33,8 @@
         }
     };
     var cmts=App.cache.getG("commentCount");
+    var tpl=App.cache.getG("tpl");
     var RPC=App.cache.getG("RPC");
-    var icons=App.cache.getG("icons");
     var self={
         show:function(params){
             $("#"+config.cls.cmtSum).html(cmts[params.anchor][params.block]);
@@ -104,8 +104,6 @@
                 block:0,
             };
         },
-
-        
         domImages:function(imgs){
             var len=imgs.length,num = 12/len;
             var dom='';
@@ -126,30 +124,7 @@
             var dom ='';
             for(var i=0;i<list.length;i++){
                 var row=list[i];
-                var raw=JSON.parse(row.data.raw);
-                var protocol=JSON.parse(row.data.protocol);
-                var dt={anchor: row.data.key, block: row.block,owner: row.owner,auth:protocol.auth};
-                dom+=`<div class="row pt-3">
-                    <div class="col-9 ${cls.rowAccount}">
-                        <span page="auth" data='${JSON.stringify({auth:protocol.auth})}'>
-                            ${App.tools.shorten(protocol.auth, 12)}
-                        </span>
-                    </div>
-                    <div class="col-3 text-end">
-                        <img style="widht:12px;height:12px;margin:0px 1px 0px 0px;opacity:0.7;" src="${icons.block}">
-                        <span style="font-size:12px;">${row.block}</span>
-                    </div>
-                    <div class="col-1"></div><div class="col-11  ${cls.rowContent}">${raw.content}</div>
-                    <div class="col-1"></div><div class="col-6 pt-1">
-                        <span page="comment" data='${JSON.stringify(dt)}' class="${cls.cmtReply}"> 
-                        <img style="widht:14px;height:14px;margin:-2px 2px 0px 4px;opacity:0.7;" src="${icons.comment}">
-                        reply
-                        </span>
-                    </div>
-                    <div class="col-5 pt-1 text-end">
-                        <span style="font-size:12px;">x mins before</span>
-                    </div>
-                </div>`;
+                dom+=tpl.row(row,config.cls,'comment');
             }
             return dom;
         },
