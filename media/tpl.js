@@ -35,36 +35,34 @@
         theme:function(type,entry){
             var c=cls[type];
             var map={
-                basic:`
-                    #${entry} hr{color:#CCCCCC}
+                basic:`#${entry} hr{color:#CCCCCC}
                     #${entry} .${c.account}{font-size:10px;color:#EF8889;}
                     #${entry} .${c.block}{font-size:10px;}
                     #${entry} .${c.operation}{font-size:10px;}
                     #${entry} .${c.count}{margin-top:4px;}
                     #${entry} .${c.icon}{opacity:0.7;}`,
-                comment:`
-                    #${entry} .${c.avatar} {}
+                comment:`#${entry} .${c.avatar} {}
                     #${entry} .${c.account} {font-size:12px;color:#EF8889}
                     #${entry} .${c.content} {font-size:14px;font-weight:500;}
                     #${entry} .${c.reply}  {background:#EEEEEE;border-radius:8px;font-size:12px;padding:4px 8px 6px 4px;}`,
-                snap:``,
+                snap:`#${entry}{}
+                    #${entry} .${c.name}{}`,
             };
             return map[type];
         },
         basic:function(row,cls){
-            var ctx = !row.data.raw?row.data:row.data.raw;
-            if(!row.owner) row.owner='';
-
-            var dt = { anchor: row.name, block: row.block, owner: row.owner };
+            console.log(row);
+            var ctx = row.raw;
+            var dt = { anchor: row.name, block: row.block, owner: row.signer };
             var igs=ctx.imgs && ctx.imgs.length>0?self.getImages(ctx.imgs):'';
-            var cmt= { anchor: row.name, block: row.block, owner: !row.owner?'':row.owner,title:!ctx.title?'':ctx.title};
+            var cmt= { anchor: row.name, block: row.block,owner:row.signer,title:!ctx.title?'':ctx.title};
             var ct=JSON.stringify(cmt);
             return `<div class="row">
                 <div class="col-12 pt-2 ${cls.row}" >
                     <span page="view" data='${JSON.stringify(dt)}'><h5>${ctx.title}</h5></span>
                 </div>
                 <div class="col-4 ${cls.account}">
-                    <span page="auth" data='${JSON.stringify({auth: row.owner})}'>${App.tools.shorten(row.owner, 8)}</span>
+                    <span page="auth" data='${JSON.stringify({auth: row.signer})}'>${App.tools.shorten(row.signer, 8)}</span>
                 </div>
                 <div class="col-8 ${cls.block} text-end">
                     <img class="${cls.icon}" style="widht:10px;height:10px;margin:-2px 6px 0px 0px;" src="${icons.block}">
@@ -89,9 +87,9 @@
         },
         
         comment:function(row,cls){
-            var raw=JSON.parse(row.data.raw);
-            var protocol=JSON.parse(row.data.protocol);
-            var dt={anchor: row.data.key, block: row.block,owner: row.owner,auth:protocol.auth};
+            console.log(row);
+            var protocol=row.protocol,raw=row.raw;
+            var dt={anchor: row.key, block: row,owner: row.signer,auth:protocol.auth};
             return `<div class="row pt-3">
                 <div class="col-9 ${cls.account}">
                     <span page="auth" data='${JSON.stringify({auth:protocol.auth})}'>
@@ -115,7 +113,7 @@
             </div>`;
         },
         snap:function(row,cls){
-
+            return ``;
         },
         getImages:function(imgs){
             var len=imgs.length,num = 12/len;

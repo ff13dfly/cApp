@@ -1,6 +1,6 @@
-;(function(){
+; (function (App) {
 	var me={
-		appName:'cUpload',
+		//appName:'cUpload',
 		prefix:'a_',			//class prefix
 		cls:{
 			title:'',			//title class
@@ -251,6 +251,6 @@
 			};
 		},
 	};
-
-	window[me.appName]=self;
-})();
+	//window[me.appName]=self;
+	App.cache.setG("uploader",self);
+})(cMedia);

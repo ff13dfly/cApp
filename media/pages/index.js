@@ -6,19 +6,17 @@
         prefix: "i",
         max:10,                     //history max length
         cls: {
-            entry: '',
-            
+            entry: '',          
             add:'',             //add button class
         }
     };
 
-    var cmts={};
+    var cmts={},his=[];
     App.cache.setG("commentCount",cmts);
-
-    var his=[];
     var RPC = App.cache.getG("RPC");
     var tpl=App.cache.getG("tpl");
     var icons=App.cache.getG("icons");
+
     var self = {
         listening: function () {
             var name = App.cache.getG("name");
@@ -26,13 +24,10 @@
                 if (list.length == 0) return false;
                 for (var i = 0; i < list.length; i++) {
                     var row = list[i];
-                    if(!row.data) continue;
-                    var data=row.data;
-                    if (data.protocol && data.protocol.type === "data" && data.protocol.app === name) {
+                    if (row.protocol && row.protocol.type === "data" && row.protocol.app === name) {
                         self.pushHistory(row);
                         self.decode(row);
-                        self.bind();
-                        App.fresh();        //fresh page to bind action 
+                        self.auto();
                     }
                 }
             });
@@ -40,28 +35,25 @@
         showHistory:function(){
             var decode=self.decode;
             if(his.length===0){
-                console.log(config.cache);
                 self.getLatest(config.cache,function(list){
                     for(var i=0;i<list.length;i++){
                         if(list[i].empty) continue;
                         his.push(list[i]);
                     }
                     for(var i=0;i<his.length;i++) decode(his[i]);
-                    self.bind();
-                    App.fresh();        //fresh page to bind action 
+                    self.auto();
                 });
             }else{
                 for(var i=0;i<his.length;i++) decode(his[i]);
-                self.bind();
-                App.fresh();        //fresh page to bind action 
+                self.auto();
             }
         },
         
         getLatest:function(anchor,ck){
             RPC.common.search(anchor,function(res){
-                if(res.owner===null) return ck && ck([]);
-                if(!res.data || !res.data.raw || !res.data.raw.recommend)return ck && ck([]);
-                var ans=res.data.raw.recommend;
+                if(res.empty) return ck && ck([]);
+                if(!res.raw || !res.raw.recommend)return ck && ck([]);
+                var ans=res.raw.recommend;
                 RPC.common.multi(ans,function(list){
                     ck && ck(list);
                 });
@@ -80,17 +72,14 @@
             var dom=tpl.row(row,'basic');
             $("#" + config.cls.entry).prepend(dom);
         },
-        bind:function(){
-            var cls=config.cls;
-            // $("#"+cls.entry).find('.'+cls.thumbs).off('click').on('click',function(){
-            //     console.log('thumbs up by ');       //实名点赞
-            // });
-
-            // $("#"+cls.entry).find('.'+cls.fav).off('click').on('click',function(){
-            //     console.log('fav');
-            // });
-
+        auto:function(){
+            self.bind();
             self.getCount();
+            App.fresh();        //fresh page to bind action 
+        },
+        bind:function(){
+            //var cls=config.cls;
+            
         },
         getCount:function(){
             var show=self.showCount;

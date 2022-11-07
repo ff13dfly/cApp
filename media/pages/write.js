@@ -12,13 +12,15 @@
             add:'',
         },
     };
-
+    var RPC = App.cache.getG("RPC");
+    var app_name = App.cache.getG("name");
+    var uploader = App.cache.getG("uploader");
     var self={
         show:function(params){
-            self.uploader();
+            self.upload();
             self.bind();
         },
-        uploader:function(){
+        upload:function(){
             //var con='#upload_con';
             var cfg={
                 container:'upload_con',
@@ -28,13 +30,11 @@
                     console.log(cache);
                 },
             };
-            cUpload.init(cfg,agent);
+            uploader.init(cfg,agent);
         },
         bind:function(){
             var cls=config.cls;
-            var RPC = App.cache.getG("RPC");
-            var app_name = App.cache.getG("name");
-            console.log(app_name);
+            
             $("#"+cls.add).off('click').on('click',function(){
                 var title=$("#" + cls.entry).find('.'+cls.title).val().trim();
                 var ctx=$("#" + cls.entry).find('.'+cls.content).val().trim();
@@ -45,17 +45,15 @@
                     "desc": desc,
                     "content":ctx,
                 };
-                var imgs=cUpload.getResult();
+                var imgs=uploader.getResult();
                 if(imgs.length!=0) raw.imgs=imgs;
 
                 var proto={"type":"data","format":"JSON","app":app_name};
                 RPC.extra.verify(function(pair){
-                    var link=RPC.common.write(pair,anchor,raw,proto,function(res){
+                    RPC.common.write(pair,anchor,raw,proto,function(res){
+                        console.log(res);
                         if(res.status.isInBlock){
-                            link.then((unsub)=>{
-                                unsub();
-                                App.back();
-                            });
+                            App.back();
                         }
                     });
                 });

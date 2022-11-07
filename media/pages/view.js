@@ -33,11 +33,11 @@
         show:function(params){
             $("#"+config.cls.cmtSum).html(cmts[params.anchor][params.block]);
 
-            RPC.common.view(params.anchor,params.block,params.owner?params.owner:'',function(res){
+            RPC.common.target(params.anchor,params.block,function(res){
                 if(res.empty){
                     self.render("Error",'No such anchor','null',params.anchor,params.block);
                 }else{
-                    var details=res.data.raw;
+                    var details=res.raw;
                     var ctx=App.tools.convert(details.content,{"page":"view","class":"text-info"});
                     var igs=details.imgs&& details.imgs.length>0?self.domImages(details.imgs):'';
                     var owner=App.tools.shorten(res.owner,8);
