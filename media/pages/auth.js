@@ -24,9 +24,11 @@
                 return App.back();
             }
             App.toast('Ready to get data.');
-            self.list(params.auth);
+            self.list(params.auth,function(){
+                App.fresh();
+            });
         },
-        list:function(auth){
+        list:function(auth,ck){
             var svc="vAuth",fun="list";
             var params={
                 account:auth,
@@ -37,9 +39,10 @@
                 var dom='';
                 for(var i=0;i<list.length;i++){
                     var row=list[i];
-                    dom+=tpl.row(row,'basic');
+                    dom+=tpl.row(row,'auth');
                 }
                 $('#'+config.cls.entry).html(dom);
+                ck && ck();
             });
         },
         struct:function(){
@@ -58,7 +61,7 @@
         },
         getCSS:function(){
             var cls=config.cls;
-            var more=tpl.theme('basic',cls.entry);
+            var more=tpl.theme('auth',cls.entry);
             return `<style>${more}
                 #${cls.entry}{}
             </style>`;

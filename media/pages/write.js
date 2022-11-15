@@ -51,7 +51,7 @@
                 var proto={"type":"data","format":"JSON","app":app_name};
                 RPC.extra.verify(function(pair){
                     RPC.common.write(pair,anchor,raw,proto,function(res){
-                        console.log(res);
+                        //console.log(res);
                         if(res.status.isInBlock){
                             App.back();
                         }

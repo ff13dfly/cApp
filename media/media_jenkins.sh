@@ -15,9 +15,14 @@ cp $config $path/$folder/gulpfile.js
 cd $path/$folder
 
 #安装基本的构建环境,只需要用一次
-npm install gulp
-npm install gulp-uglify-es
-npm install gulp-concat
+#npm install gulp
+#npm install gulp-uglify-es
+#npm install gulp-concat
+
+
+#npm install gulp --global
+#npm install gulp-uglify-es --global
+#npm install gulp-concat --global
 
 #进入构建目录，执行gulpfile
 gulp

@@ -8,11 +8,9 @@
             anchor:'',
             block:'',
             relate:'',
-            location:'',
             title:'',
             content:'',
             mine:'',
-            cmtSum:'',
             cmtList:'',
         },
         page:{
@@ -34,7 +32,7 @@
             var cls=config.cls;
             var sel=$("#"+cls.entry);
             sel.find('.'+cls.relate).html('#'+title+'#');
-            sel.find('.'+cls.location).html(`${anchor} on block ${block},owned by ${App.tools.shorten(owner,8)}`);
+            //sel.find('.'+cls.location).html(`${anchor} on block ${block},owned by ${App.tools.shorten(owner,8)}`);
             sel.find('.'+cls.title).val(title);
             sel.find('.'+cls.block).val(block);
             sel.find('.'+cls.anchor).val(anchor);
@@ -61,19 +59,16 @@
 
                 if(RPC.extra.comment){
                     RPC.extra.comment(ctx,anchor,block,(res)=>{
-                        //console.log(res);
                         if(res.success){
                             cmts[anchor][block]=0;
                         }
+                        App.back();
                     });
                 }else{
                     RPC.extra.verify(function(pair){
-                        var link=RPC.common.write(pair,mine,raw,proto,function(res){
+                        RPC.common.write(pair,mine,raw,proto,function(res){
                             if(res.status.isInBlock){
-                                link.then((unsub)=>{
-                                    unsub();
-                                    App.back();
-                                });
+                                App.back();
                             }
                         });
                     });
@@ -89,6 +84,8 @@
                 step:config.page.step,
             }
             RPC.extra.auto(svc,fun,params,(res)=>{
+                if(res.length==0) return self.hideHeader();
+                self.showHeader();
                 var dom=self.structComments(res);
                 $('#'+config.cls.cmtList).html(dom);
                 self.bind();
@@ -103,6 +100,14 @@
                 dom+=tpl.row(row,'comment');
             }
             return dom;
+        },
+        hideHeader:function(){
+            var cls=config.cls;
+            $('#'+cls.entry).find('.'+cls.cmtHead).hide();
+        },
+        showHeader:function(){
+            var cls=config.cls;
+            $('#'+cls.entry).find('.'+cls.cmtHead).show();
         },
         struct: function () {
             var pre = config.prefix;
@@ -130,14 +135,10 @@
             var cls=config.cls;
             return `<div class="row">
                     <div class="col-12 gy-2"><h5 class="${cls.relate}">#Title#<h5></div>
-                    <div class="col-12 gy-2 ${cls.location}">Anchor on block 0</div>
                 </div>
-                <div class="row mt-4 pt-1 pb-1 ${cls.cmtHead}">
-                    <div class="col-4">
-                        Comments ( <span style="font-size:14px;" id="${cls.cmtSum}">0</span> )
-                    </div>
-                    <div class="col-8 text-end">
-                        <span style="font-size:14px;">more...</span>
+                <div class="row mt-4 pt-1 pb-1 ${cls.cmtHead}" style="display:none">
+                    <div class="col-12">
+                        Recent comments
                     </div>
                 </div>
                 <div id="${cls.cmtList}"></div>
@@ -176,6 +177,7 @@
                 self.show(params);
             },
             "after":function(params,ck){
+                self.hideHeader();
                 ck && ck();
             },
         },

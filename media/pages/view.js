@@ -5,15 +5,16 @@
         prefix:"v",
         cls:{
             entry:'',
-            row:'',
-            anchor:'',
             intro:'',
-            owner:'',
-            block:'',
-            name:'',
+            title:'',
+            account:'',
+            stamp:'',
+            avatar:'',
             content:'',
             cmtList:'',
             cmtHead:'',
+            cmtPage:'',
+            cmtContent:'',
             cmtSum:'',
             cmtAdd:'',
             cmtInfo:'',
@@ -31,30 +32,34 @@
     var RPC=App.cache.getG("RPC");
     var self={
         show:function(params){
-            $("#"+config.cls.cmtSum).html(cmts[params.anchor][params.block]);
+            const anchor=params.anchor,block=params.block;
+            $("#"+config.cls.cmtSum).html(cmts[anchor][block]);
 
-            RPC.common.target(params.anchor,params.block,function(res){
+            RPC.common.target(anchor,block,function(res){
+                console.log(res);
                 if(res.empty){
-                    self.render("Error",'No such anchor','null',params.anchor,params.block);
+                    self.render("Error",'No such anchor','null',anchor,block,0);
                 }else{
                     var details=res.raw;
                     var ctx=App.tools.convert(details.content,{"page":"view","class":"text-info"});
                     var igs=details.imgs&& details.imgs.length>0?self.domImages(details.imgs):'';
                     var owner=App.tools.shorten(res.owner,8);
-                    self.render(details.title,(ctx+igs),owner,res.name,res.block);
+                    self.render(details.title,(ctx+igs),owner,res.owner,res.block,res.stamp);
                     self.listComments(res.name,res.block);
                 }
                 self.bind();
                 App.fresh();
             });
         },
-        render:function(title,content,owner,anchor,block){
+        render:function(title,content,owner,origin,block,stamp){
             var cls=config.cls;
             var sel=$("#"+cls.entry);
             sel.find('.'+cls.title).html(title);
+            sel.find('.'+cls.account).html(owner);
+            sel.find('.'+cls.avatar).attr("src",`https://robohash.org/${origin}.png`);
+            sel.find('.'+cls.stamp).html(App.tools.time(stamp));
             sel.find('.'+cls.content).html(App.tools.wrap(content));
             sel.find('.'+cls.owner).html(owner);
-            sel.find('.'+cls.name).html(anchor);
             sel.find('.'+cls.block).html(block);
         },
         listComments:function(anchor,block){
@@ -126,7 +131,7 @@
             var more=tpl.theme('comment',cls.entry);
             return `<style>${more}
                 #${cls.entry} h3{color:#002222}
-                .${cls.intro} {background:#FFFFEE;height:30px;}
+                #${cls.entry} .${cls.avatar} {widht:30px;height:30px;border-radius:15px;background:#FFAABB}
                 #${cls.entry} .${cls.content} {font-weight:500;}
                 #${cls.entry} .${cls.cmtHead} {background:#F3F3F3;}
             </style>`;
@@ -137,7 +142,6 @@
             for(var k in config.cls){
                 if(!config.cls[k]) config.cls[k]=pre+hash();
             }
-
             page.data.preload=self.template();
             return true;
         },
@@ -152,9 +156,11 @@
             var cls=config.cls;
             return `<div class="row">
                 <div class="col-12 pt-4 pb-2"><h3 class="${cls.title}">Loading</h3></div>
-                <div class="col-12 text-end ${cls.intro}">
-                    Auth: <span class="${cls.owner}">null</span> on <span class="${cls.block}">0</span> of <span class="${cls.name}">null</span>
+                <div class="col-8">
+                    <img src="https://robohash.org/null.png" class="${cls.avatar}">
+                    <span class="${cls.account}">null</span>
                 </div>
+                <div class="col-4 text-end ${cls.stamp}"></div>
                 <div class="col-12 pt-2 ${cls.content}"></div>
             </div>`;
         },
@@ -163,10 +169,10 @@
             var cls=config.cls;
             return `<div class="row mt-4 pt-1 pb-1 ${cls.cmtHead}">
                 <div class="col-4">
-                    Comments ( <span style="font-size:14px;" id="${cls.cmtSum}">0</span> )
+                    Comments ( <span id="${cls.cmtSum}">0</span> )
                 </div>
                 <div class="col-8 text-end">
-                    <span style="font-size:14px;">more...</span>
+                    <span id="${cls.cmtPage}" page="" data=''>more...</span>
                 </div>
             </div>
             <div id="${cls.cmtList}"></div>
@@ -174,9 +180,7 @@
                 <div class="col-12 gy-2">
                     <textarea class="form-control ${cls.cmtContent}" placeholder="Your thinking about the article..." rows="3"></textarea>
                 </div>
-                <div class="col-8 gy-2 ${cls.cmtInfo}">
-                    
-                </div>
+                <div class="col-8 gy-2 ${cls.cmtInfo}"></div>
                 <div class="col-4 gy-2 text-end">
                     <input type="hidden" class="${cls.cmtAnchor}" value="">
                     <input type="hidden" class="${cls.cmtBlock}" value="">
@@ -196,10 +200,11 @@
         },      
         "events":{
             "before":function(params,ck){
-                var result={code:1,message:"successful",overwrite:true};
-                ck && ck(result);
+                //var result={code:1,message:"successful",overwrite:true};
+                ck && ck();
             },
             "loading":function(params){
+                App.title(`${params.anchor} on ${params.block}`);
                 self.show(params);
             },
             "after":function(params,ck){

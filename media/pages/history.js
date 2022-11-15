@@ -17,7 +17,7 @@
                     var dom='';
                     for(var i=0;i<list.length;i++){
                         var row=list[i];
-                        dom+=tpl.row(row,'basic');
+                        dom+=tpl.row(row,'history');
                     }
 
                     $("#"+config.cls.entry).html(dom);
@@ -25,7 +25,6 @@
                 });
             }
         },
-        
         //prepare the basic data when code loaded
         struct: function () {
             var pre=config.prefix;
@@ -44,13 +43,13 @@
         },
         getCSS:function(){
             var cls=config.cls;
-            var more=tpl.theme('basic',cls.entry);
+            var more=tpl.theme('history',cls.entry);
             return `<style>${more}
                 #${cls.entry}{}
             </style>`;
         },
         getDom:function(){
-            var cls=config.cls;
+            //var cls=config.cls;
             return ``;
         },
     };
@@ -58,7 +57,7 @@
     var page={
         "data":{
             "name":config.name,
-            "title":"History details",     //default page title
+            "title":"Anchor history",     //default page title
             "params":{},
             "preload":"",
             "snap":"",
@@ -68,6 +67,7 @@
                 ck && ck();
             },
             "loading":function(params){
+                App.title(params.anchor+" history");
                 self.show(params);
             },
             "after":function(params,ck){

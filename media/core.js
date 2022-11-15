@@ -95,7 +95,14 @@
             }
             return `<span ${more} data='${JSON.stringify(details)}'>${name}</span>`;
         },
-        summary:function(str){
+        time:function(stamp){
+            var p = parseInt(Date.parse(new Date())) - parseInt(stamp);
+            if (p > 86400000) return "日期";
+            if (p > 3600000) return Math.ceil(p / 3600000) + " hours ago";
+            if (p > 60000) return Math.ceil(p / 60000) + " mins ago";
+            return Math.ceil(p * 0.001) + " seconds ago";
+        },
+        summary:function(str){  //对字符串进行概要提取
             
         },
         wrap:function(str){return str.replace(/\n/g,"<br />");},
@@ -293,6 +300,10 @@
             var cls=config.cls;
             $("#"+cls.entry).find('.'+cls.back).show();
         },
+        title:function(txt){
+            var cls=config.cls;
+            $("#"+cls.entry).find("."+cls.title).html(txt);
+        },
         error:function(txt){
             console.log(txt);
         },
@@ -353,6 +364,7 @@
         tools:tools,                        //Global untils
         fresh:self.bind,                    //auto decode anchor link
         back:self.back,                     //history back function
+        title:self.title,                   //set title
         toast:self.toast,                   //show toast function
         page:function(name,pg){
             pages[name]=$.extend({},pg);    //need to clone.

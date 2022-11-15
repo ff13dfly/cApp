@@ -15,8 +15,31 @@
             operation:'',
             count:'',
             icon:'',
+            time:'',
+            avatar:'',
+        },
+        history:{
+            row: '',
+            account:'',
+            block:'',
+            operation:'',
+            count:'',
+            icon:'',
+            time:'',
+            avatar:'',
+        },
+        auth:{
+            row: '',
+            account:'',
+            block:'',
+            operation:'',
+            count:'',
+            icon:'',
+            time:'',
+            avatar:'',
         },
         comment:{
+            avatar:'',
             account:'',
             content:'',
             reply:'',
@@ -40,10 +63,29 @@
                     #${entry} .${c.block}{font-size:10px;}
                     #${entry} .${c.operation}{font-size:10px;}
                     #${entry} .${c.count}{margin-top:4px;}
+                    #${entry} .${c.time}{color:#AAAAAA;font-size:10px;}
+                    #${entry} .${c.avatar}{widht:30px;height:30px;border-radius:15px;background:#FFAABB}
+                    #${entry} .${c.icon}{opacity:0.7;}`,
+                history:`#${entry} hr{color:#CCCCCC}
+                    #${entry} .${c.account}{font-size:10px;color:#EF8889;}
+                    #${entry} .${c.block}{font-size:10px;}
+                    #${entry} .${c.operation}{font-size:10px;}
+                    #${entry} .${c.count}{margin-top:4px;}
+                    #${entry} .${c.time}{color:#AAAAAA;font-size:10px;}
+                    #${entry} .${c.avatar}{widht:30px;height:30px;border-radius:15px;background:#FFAABB}
+                    #${entry} .${c.icon}{opacity:0.7;}`,
+                auth:`#${entry} hr{color:#CCCCCC}
+                    #${entry} .${c.account}{font-size:10px;color:#EF8889;}
+                    #${entry} .${c.block}{font-size:10px;}
+                    #${entry} .${c.operation}{font-size:10px;}
+                    #${entry} .${c.count}{margin-top:4px;}
+                    #${entry} .${c.time}{color:#AAAAAA;font-size:10px;}
+                    #${entry} .${c.avatar}{widht:30px;height:30px;border-radius:15px;background:#FFAABB}
                     #${entry} .${c.icon}{opacity:0.7;}`,
                 comment:`#${entry} .${c.avatar} {}
                     #${entry} .${c.account} {font-size:12px;color:#EF8889}
                     #${entry} .${c.content} {font-size:14px;font-weight:500;}
+                    #${entry} .${c.avatar}{widht:30px;height:30px;border-radius:15px;background:#FFAABB}
                     #${entry} .${c.reply}  {background:#EEEEEE;border-radius:8px;font-size:12px;padding:4px 8px 6px 4px;}`,
                 snap:`#${entry}{}
                     #${entry} .${c.name}{}`,
@@ -52,6 +94,7 @@
         },
         basic:function(row,cls){
             console.log(row);
+            console.log(App.tools.time(row.stamp));
             var ctx = row.raw;
             var dt = { anchor: row.name, block: row.block, owner: row.signer };
             var igs=ctx.imgs && ctx.imgs.length>0?self.getImages(ctx.imgs):'';
@@ -61,10 +104,13 @@
                 <div class="col-12 pt-2 ${cls.row}" >
                     <span page="view" data='${JSON.stringify(dt)}'><h5>${ctx.title}</h5></span>
                 </div>
-                <div class="col-4 ${cls.account}">
-                    <span page="auth" data='${JSON.stringify({auth: row.signer})}'>${App.tools.shorten(row.signer, 8)}</span>
+                <div class="col-8 ${cls.account}">
+                    <span page="auth" data='${JSON.stringify({auth: row.signer})}'>
+                        <img src="https://robohash.org/${row.signer}.png" class="${cls.avatar}">
+                        ${App.tools.shorten(row.signer, 8)}
+                    </span>
                 </div>
-                <div class="col-8 ${cls.block} text-end">
+                <div class="col-4 ${cls.block} pt-2 text-end">
                     <img class="${cls.icon}" style="widht:10px;height:10px;margin:-2px 6px 0px 0px;" src="${icons.block}">
                     <strong>${row.block}</strong> , 
                     <img class="${cls.icon}" style="widht:12px;height:12px;margin:-2px 0px 0px 0px;" src="${icons.anchor}">
@@ -76,7 +122,10 @@
                     <span page="view" data='${JSON.stringify(dt)}'>${!ctx.desc ? "" : ctx.desc}</span>
                 </div>
                 <span page="view" data='${JSON.stringify(dt)}'>${igs}</span>
-                <div class="col-12 text-end gy-2 ${cls.operation}">
+                <div class="col-8 gy-2 ${cls.time}">
+                    ${App.tools.time(row.stamp)}
+                </div>
+                <div class="col-4 text-end gy-2 ${cls.operation}">
                     <span page="comment" data='${ct}'>
                         <img style="widht:21px;height:21px;" src="${icons.comment}">
                     </span>
@@ -85,7 +134,86 @@
                 <div class="col-12"><hr /></div>
             </div>`;
         },
-        
+
+        history:function(row,cls){
+            console.log(row);
+            var ctx = row.raw;
+            var dt = { anchor: row.name, block: row.block, owner: row.signer };
+            var igs=ctx.imgs && ctx.imgs.length>0?self.getImages(ctx.imgs):'';
+            var cmt= { anchor: row.name, block: row.block,owner:row.signer,title:!ctx.title?'':ctx.title};
+            var ct=JSON.stringify(cmt);
+            return `<div class="row">
+                <div class="col-12 pt-2 ${cls.row}" >
+                    <span page="view" data='${JSON.stringify(dt)}'><h5>${ctx.title}</h5></span>
+                </div>
+                <div class="col-8 ${cls.account}">
+                    <span page="auth" data='${JSON.stringify({auth: row.signer})}'>
+                        <img src="https://robohash.org/${row.signer}.png" class="${cls.avatar}">
+                        ${App.tools.shorten(row.signer, 8)}
+                    </span>
+                </div>
+                <div class="col-4 ${cls.block} pt-2 text-end">
+                    <img class="${cls.icon}" style="widht:10px;height:10px;margin:-2px 6px 0px 0px;" src="${icons.block}">
+                    <strong>${row.block}</strong>
+                </div>
+                <div class="col-12 gy-2 ${cls.row}">
+                    <span page="view" data='${JSON.stringify(dt)}'>${!ctx.desc ? "" : ctx.desc}</span>
+                </div>
+                <span page="view" data='${JSON.stringify(dt)}'>${igs}</span>
+                <div class="col-8 gy-2 ${cls.time}">
+                    ${App.tools.time(row.stamp)}
+                </div>
+                <div class="col-4 text-end gy-2 ${cls.operation}">
+                    <span page="comment" data='${ct}'>
+                        <img style="widht:21px;height:21px;" src="${icons.comment}">
+                    </span>
+                    <span class="${cls.count}" id="${self.getID(row.name,row.block)}">0</span>
+                </div>
+                <div class="col-12"><hr /></div>
+            </div>`;
+        },
+        auth:function(row,cls){
+            console.log(row);
+            console.log(App.tools.time(row.stamp));
+            var ctx = row.raw;
+            var dt = { anchor: row.name, block: row.block, owner: row.signer };
+            var igs=ctx.imgs && ctx.imgs.length>0?self.getImages(ctx.imgs):'';
+            var cmt= { anchor: row.name, block: row.block,owner:row.signer,title:!ctx.title?'':ctx.title};
+            var ct=JSON.stringify(cmt);
+            return `<div class="row">
+                <div class="col-12 pt-2 ${cls.row}" >
+                    <span page="view" data='${JSON.stringify(dt)}'><h5>${ctx.title}</h5></span>
+                </div>
+                <div class="col-8 ${cls.account}">
+                    <span>
+                        <img src="https://robohash.org/${row.signer}.png" class="${cls.avatar}">
+                        ${App.tools.shorten(row.signer, 8)}
+                    </span>
+                </div>
+                <div class="col-4 ${cls.block} pt-2 text-end">
+                    <img class="${cls.icon}" style="widht:10px;height:10px;margin:-2px 6px 0px 0px;" src="${icons.block}">
+                    <strong>${row.block}</strong> , 
+                    <img class="${cls.icon}" style="widht:12px;height:12px;margin:-2px 0px 0px 0px;" src="${icons.anchor}">
+                    <span page="history" data='${JSON.stringify({ anchor: row.name })}'>
+                        <strong>${row.name}</strong>
+                    </span>
+                </div>
+                <div class="col-12 gy-2 ${cls.row}">
+                    <span page="view" data='${JSON.stringify(dt)}'>${!ctx.desc ? "" : ctx.desc}</span>
+                </div>
+                <span page="view" data='${JSON.stringify(dt)}'>${igs}</span>
+                <div class="col-8 gy-2 ${cls.time}">
+                    ${App.tools.time(row.stamp)}
+                </div>
+                <div class="col-4 text-end gy-2 ${cls.operation}">
+                    <span page="comment" data='${ct}'>
+                        <img style="widht:21px;height:21px;" src="${icons.comment}">
+                    </span>
+                    <span class="${cls.count}" id="${self.getID(row.name,row.block)}">0</span>
+                </div>
+                <div class="col-12"><hr /></div>
+            </div>`;
+        },
         comment:function(row,cls){
             console.log(row);
             var protocol=row.protocol,raw=row.raw;
@@ -93,6 +221,7 @@
             return `<div class="row pt-3">
                 <div class="col-9 ${cls.account}">
                     <span page="auth" data='${JSON.stringify({auth:protocol.auth})}'>
+                        <img src="https://robohash.org/${row.signer}.png" class="${cls.avatar}">
                         ${App.tools.shorten(protocol.auth, 12)}
                     </span>
                 </div>
@@ -108,7 +237,9 @@
                     </span>
                 </div>
                 <div class="col-5 pt-1 text-end">
-                    <span style="font-size:12px;">x mins before</span>
+                    <span style="font-size:12px;">
+                        ${App.tools.time(row.stamp)}
+                    </span>
                 </div>
             </div>`;
         },
