@@ -18,6 +18,7 @@
             entry:"",
             mask:"",
             toast:"",
+            locker:"",          //lock lay to prevent all events
             nav:"",
             title:"",
             back:"",
@@ -98,9 +99,9 @@
         time:function(stamp){
             var p = parseInt(Date.parse(new Date())) - parseInt(stamp);
             if (p > 86400000) return "日期";
-            if (p > 3600000) return Math.ceil(p / 3600000) + " hours ago";
-            if (p > 60000) return Math.ceil(p / 60000) + " mins ago";
-            return Math.ceil(p * 0.001) + " seconds ago";
+            if (p > 3600000) return Math.floor(p / 3600000) + " hours ago";
+            if (p > 60000) return Math.floor(p / 60000) + " mins ago";
+            return Math.floor(p * 0.001) + " secs ago";
         },
         summary:function(str){  //对字符串进行概要提取
             
@@ -266,22 +267,23 @@
             sel.find('.'+cls.body).html(cache.preload.body);
             if(cfg.animate) $("#"+cls.mask).hide();
         },
-        toast:function(txt,type){
+        toast:function(txt,type,ck,at){
             var cls=config.cls;
             var dom='';
             switch (type) {
                 case 'info':
                     dom=`<div class="col-12 text-center">${txt}</div>`;
+                    $("#"+cls.toast).html(dom).show();
                     break;
-            
+
+                case 'clean':
+                    $("#"+cls.toast).html('').hide();
+                    break;
+
                 default:
 
                     break;
             }
-            $("#"+cls.toast).html(dom).show();
-            setTimeout(() => {
-                $("#"+cls.toast).hide();
-            }, config.toast);
         },
         getCurDom:function(){
             var cls=config.cls;
@@ -339,12 +341,14 @@
                 .${cls.back}{color:#222222;}  
                 #${cls.mask} {display:none;position:fixed;z-index:99;background:#FFFFFF;width:100%;height:100%;top:0px;}
                 #${cls.mask} .${cls.body} {margin-top:0px;height:100%;width:100%;background:#FFFFFF;}
-                #${cls.toast}{display:none;width:40%;height:25%;background:#EEEEEE;z-index:199}
+                #${cls.toast}{display:none;position:fixed;margin:0 10% 0 10%;top:56px;width:80%;line-height:30px;border-radius:15px;background:#DDEEDD;z-index:999;opacity:1;}
             </style>`;
         },
         getDom:function(){
             var cls=config.cls;
-            return `<div class="row" id="${cls.entry}">
+            return `
+            <div id="${cls.toast}"></div>
+            <div class="row" id="${cls.entry}">
                 <div class="col-12 ${cls.nav}">
                     <div class="row pt-2">
                         <div class="col-2"><p class="${cls.back}"> < </p></div>
@@ -354,8 +358,8 @@
                 </div>
                 <div class="col-12 ${cls.body}"></div>
             </div>
-            <div class="row" id="${cls.toast}"></div>
-            <div class="row" id="${cls.mask}"></div>`;
+            <div class="row" id="${cls.mask}"></div>
+            `;
         },
     };
 
@@ -375,7 +379,6 @@
             }
         }
     };
-
     window[config.app]=exports;
     self.struct();
 })(agent,con,error);

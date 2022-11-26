@@ -93,8 +93,8 @@
             return map[type];
         },
         basic:function(row,cls){
-            console.log(row);
-            console.log(App.tools.time(row.stamp));
+            //console.log(row);
+            //console.log(App.tools.time(row.stamp));
             var ctx = row.raw;
             var dt = { anchor: row.name, block: row.block, owner: row.signer };
             var igs=ctx.imgs && ctx.imgs.length>0?self.getImages(ctx.imgs):'';
@@ -104,15 +104,15 @@
                 <div class="col-12 pt-2 ${cls.row}" >
                     <span page="view" data='${JSON.stringify(dt)}'><h5>${ctx.title}</h5></span>
                 </div>
-                <div class="col-8 ${cls.account}">
+                <div class="col-6 ${cls.account}">
                     <span page="auth" data='${JSON.stringify({auth: row.signer})}'>
                         <img src="https://robohash.org/${row.signer}.png" class="${cls.avatar}">
                         ${App.tools.shorten(row.signer, 8)}
                     </span>
                 </div>
-                <div class="col-4 ${cls.block} pt-2 text-end">
+                <div class="col-6 ${cls.block} pt-2 text-end">
                     <img class="${cls.icon}" style="widht:10px;height:10px;margin:-2px 6px 0px 0px;" src="${icons.block}">
-                    <strong>${row.block}</strong> , 
+                    <strong>${parseInt(row.block).toLocaleString()}</strong> , 
                     <img class="${cls.icon}" style="widht:12px;height:12px;margin:-2px 0px 0px 0px;" src="${icons.anchor}">
                     <span page="history" data='${JSON.stringify({ anchor: row.name })}'>
                         <strong>${row.name}</strong>
@@ -154,7 +154,7 @@
                 </div>
                 <div class="col-4 ${cls.block} pt-2 text-end">
                     <img class="${cls.icon}" style="widht:10px;height:10px;margin:-2px 6px 0px 0px;" src="${icons.block}">
-                    <strong>${row.block}</strong>
+                    <strong>${parseInt(row.block).toLocaleString()}</strong>
                 </div>
                 <div class="col-12 gy-2 ${cls.row}">
                     <span page="view" data='${JSON.stringify(dt)}'>${!ctx.desc ? "" : ctx.desc}</span>
@@ -192,7 +192,7 @@
                 </div>
                 <div class="col-4 ${cls.block} pt-2 text-end">
                     <img class="${cls.icon}" style="widht:10px;height:10px;margin:-2px 6px 0px 0px;" src="${icons.block}">
-                    <strong>${row.block}</strong> , 
+                    <strong>${parseInt(row.block).toLocaleString()}</strong> , 
                     <img class="${cls.icon}" style="widht:12px;height:12px;margin:-2px 0px 0px 0px;" src="${icons.anchor}">
                     <span page="history" data='${JSON.stringify({ anchor: row.name })}'>
                         <strong>${row.name}</strong>
@@ -227,7 +227,7 @@
                 </div>
                 <div class="col-3 text-end">
                     <img style="widht:12px;height:12px;margin:0px 1px 0px 0px;opacity:0.7;" src="${icons.block}">
-                    <span style="font-size:12px;">${row.block}</span>
+                    <span style="font-size:12px;">${parseInt(row.block).toLocaleString()}</span>
                 </div>
                 <div class="col-1"></div><div class="col-11  ${cls.content}">${raw.content}</div>
                 <div class="col-1"></div><div class="col-6 pt-1">

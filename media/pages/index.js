@@ -22,14 +22,18 @@
             var name = App.cache.getG("name");
             RPC.common.subscribe(function (list) {
                 if (list.length == 0) return false;
-                for (var i = 0; i < list.length; i++) {
-                    var row = list[i];
-                    if (row.protocol && row.protocol.type === "data" && row.protocol.app === name) {
-                        self.pushHistory(row);
-                        self.decode(row);
-                        self.auto();
+                App.toast("New subcribe ...","info");
+                setTimeout(() => {
+                    App.toast("","clean");
+                    for (var i = 0; i < list.length; i++) {
+                        var row = list[i];
+                        if (row.protocol && row.protocol.type === "data" && row.protocol.app === name) {
+                            self.pushHistory(row);
+                            self.decode(row);
+                            self.auto();
+                        }
                     }
-                }
+                },1500);
             });
         },
         showHistory:function(){
@@ -153,6 +157,7 @@
         "events": {
             "before": function (params, ck) {
                 var result={code:1,message:"successful"};
+                //App.toast("testing","info");
                 ck && ck(result);
             },
             "loading": function (params, ck) {

@@ -168,10 +168,10 @@
         getDialog:function(){
             var cls=config.cls;
             return `<div class="row mt-4 pt-1 pb-1 ${cls.cmtHead}">
-                <div class="col-4">
+                <div class="col-6">
                     Comments ( <span id="${cls.cmtSum}">0</span> )
                 </div>
-                <div class="col-8 text-end">
+                <div class="col-6 text-end">
                     <span id="${cls.cmtPage}" page="" data=''>more...</span>
                 </div>
             </div>

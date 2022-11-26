@@ -52,7 +52,9 @@
                 RPC.extra.verify(function(pair){
                     RPC.common.write(pair,anchor,raw,proto,function(res){
                         //console.log(res);
+                        App.toast("Ready to write to Anchor chain","info");
                         if(res.status.isInBlock){
+                            App.toast("","clean");
                             App.back();
                         }
                     });

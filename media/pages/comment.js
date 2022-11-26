@@ -10,6 +10,7 @@
             relate:'',
             title:'',
             content:'',
+            add:'',
             mine:'',
             cmtList:'',
         },
@@ -51,6 +52,8 @@
 
                 var mine=$("#" + cls.entry).find('.'+cls.mine).val().trim();
                 if(!mine) return console.log("no anchor to record comment");
+                $(this).attr("disabled","disabled");
+
                 var raw={
                     "title":`#[${title}](anchor://${anchor}/${block})#`,
                     "content":ctx,
@@ -58,10 +61,13 @@
                 var proto={"type":"data","format":"JSON","app":app_name};
 
                 if(RPC.extra.comment){
+                    App.toast("Ready to write to chain","info");
                     RPC.extra.comment(ctx,anchor,block,(res)=>{
                         if(res.success){
                             cmts[anchor][block]=0;
                         }
+                        App.toast("","clean");
+                        $("#"+cls.add).removeAttr("disabled");
                         App.back();
                     });
                 }else{
