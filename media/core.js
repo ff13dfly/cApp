@@ -98,9 +98,18 @@
         },
         time:function(stamp){
             var p = parseInt(Date.parse(new Date())) - parseInt(stamp);
-            if (p > 86400000) return "日期";
-            if (p > 3600000) return Math.floor(p / 3600000) + " hours ago";
-            if (p > 60000) return Math.floor(p / 60000) + " mins ago";
+            if (p > 86400000){
+                var dt=new Date(stamp);
+                return dt.toLocaleDateString();
+            }
+            if (p > 3600000){
+                var n=Math.floor(p / 3600000);
+                return n + (n==1?" hour ago":" hours ago");
+            } 
+            if (p > 60000){
+                var m= Math.floor(p / 60000);
+                return m+(m==1?" minute ago":" mins ago");
+            }
             return Math.floor(p * 0.001) + " secs ago";
         },
         summary:function(str){  //对字符串进行概要提取

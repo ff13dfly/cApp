@@ -30,6 +30,8 @@
     var cmts=App.cache.getG("commentCount");
     var tpl=App.cache.getG("tpl");
     var RPC=App.cache.getG("RPC");
+    var common=App.cache.getG("common");
+
     var self={
         show:function(params){
             const anchor=params.anchor,block=params.block;
@@ -39,12 +41,14 @@
                 console.log(res);
                 if(res.empty){
                     self.render("Error",'No such anchor','null',anchor,block,0);
+                    self.cmtRender('',0);
                 }else{
                     var details=res.raw;
                     var ctx=App.tools.convert(details.content,{"page":"view","class":"text-info"});
                     var igs=details.imgs&& details.imgs.length>0?self.domImages(details.imgs):'';
                     var owner=App.tools.shorten(res.owner,8);
                     self.render(details.title,(ctx+igs),owner,res.owner,res.block,res.stamp);
+                    self.cmtRender(res.name,block);
                     self.listComments(res.name,res.block);
                 }
                 self.bind();
@@ -61,6 +65,13 @@
             sel.find('.'+cls.content).html(App.tools.wrap(content));
             sel.find('.'+cls.owner).html(owner);
             sel.find('.'+cls.block).html(block);
+        },
+        cmtRender:function(anchor,block){
+            var cls=config.cls;
+            var sel=$("#"+cls.entry);
+            console.log(`${anchor} on ${block}`);
+            sel.find('.'+cls.cmtBlock).val(block);
+            sel.find('.'+cls.cmtAnchor).val(anchor);
         },
         listComments:function(anchor,block){
             const svc="vSaying",fun="list";
@@ -83,24 +94,48 @@
             var ig=new Image();
             ig.src=img;
             ig.onload=function(res){
-                console.log(res);
-                console.log(`Size:[${ig.width},${ig.height}]`);
+                //console.log(res);
+                //console.log(`Size:[${ig.width},${ig.height}]`);
                 ck && ck({index:index,size:[ig.width,ig.height]});
             };
         },
         bind:function(){
             var cls=config.cls;
-            $("#"+cls.entry).find('#'+cls.cmtAdd).off('click').on('click',function(){
+            var sel=$("#"+cls.entry);
+            sel.find('.'+cls.cmtAdd).off('click').on('click',function(){
                 var data=self.getData();
-                console.log("ready to add comments");
-                console.log(data);
+                if(!data.anchor || !data.title){
+                    App.toast("No content to comment","info");
+                    setTimeout(function(){
+                        App.toast("","clean");
+                    },500);
+                    return false;
+                } 
+                if(!data.comment){
+                    sel.find("."+cls.cmtContent).focus();
+                    return false;
+                }
+                sel.find("."+cls.cmtAdd).attr("disabled","disabled");
+                var anchor=data.anchor,block=data.block,ctx=data.comment,title=data.title;
+                common.comment(ctx,anchor,block,title,function(){
+                    sel.find("."+cls.cmtAdd).removeAttr("disabled");
+                    self.listComments(anchor,block);
+                });
             });
         },
         getData:function(){
+            var cls=config.cls;
+            var sel=$("#"+cls.entry);
+            var ctx=sel.find('.'+cls.cmtContent).val().trim();
+            var anchor=sel.find('.'+cls.cmtAnchor).val();
+            var block=sel.find('.'+cls.cmtBlock).val();
+            var title=sel.find('.'+cls.title).html().trim();
+            //console.log(block);
             return {
-                comment:'',
-                anchor:'',
-                block:0,
+                title:title,
+                comment:ctx,
+                anchor:anchor,
+                block:block,
             };
         },
         domImages:function(imgs){
@@ -184,7 +219,7 @@
                 <div class="col-4 gy-2 text-end">
                     <input type="hidden" class="${cls.cmtAnchor}" value="">
                     <input type="hidden" class="${cls.cmtBlock}" value="">
-                    <button class="btn btn-md btn-primary" id="${cls.cmtAdd}">Comment</button>
+                    <button class="btn btn-md btn-primary ${cls.cmtAdd}">Comment</button>
                 </div>
             </div>`;
         },

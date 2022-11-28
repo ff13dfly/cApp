@@ -98,7 +98,7 @@
                     <input type="text" class="form-control ${cls.anchor}" placeholder="Anchor name..." value="" >
                 </div>
                 <div class="col-6 gy-2 text-end">
-                    <button class="btn btn-md btn-primary" id="${cls.add}">Add</button>
+                    <button class="btn btn-md btn-primary" id="${cls.add}">New Saying</button>
                 </div>
                 <div class="col-12" id="upload_con"></div>
             </div>`;

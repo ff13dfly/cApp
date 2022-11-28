@@ -16,11 +16,11 @@
         },
         page:{
             count:1,
-            step:2,
+            step:3,
             max:1,
         }
     };
-    var cmts=App.cache.getG("commentCount");
+    var common=App.cache.getG("common");
     var RPC=App.cache.getG("RPC");
     var tpl=App.cache.getG("tpl");
     var self={
@@ -33,52 +33,29 @@
             var cls=config.cls;
             var sel=$("#"+cls.entry);
             sel.find('.'+cls.relate).html('#'+title+'#');
-            //sel.find('.'+cls.location).html(`${anchor} on block ${block},owned by ${App.tools.shorten(owner,8)}`);
             sel.find('.'+cls.title).val(title);
             sel.find('.'+cls.block).val(block);
             sel.find('.'+cls.anchor).val(anchor);
-            sel.find('.'+cls.mine).val(anchor);
+            sel.find('.'+cls.mine).val(anchor);         //设置当前anchor
         },
         bind:function(){
             var cls=config.cls;
-            var RPC = App.cache.getG("RPC");
             var app_name = App.cache.getG("name");
+            var sel=$("#"+cls.entry);
+            sel.find("."+cls.add).off('click').on('click',function(){
+                var anchor=sel.find('.'+cls.anchor).val().trim();
+                var block=parseInt(sel.find('.'+cls.block).val().trim());
+                var title=sel.find('.'+cls.title).val().trim();
+                var ctx=sel.find('.'+cls.content).val().trim();
 
-            $("#"+cls.add).off('click').on('click',function(){
-                var anchor=$("#" + cls.entry).find('.'+cls.anchor).val().trim();
-                var block=parseInt($("#" + cls.entry).find('.'+cls.block).val().trim());
-                var title=$("#" + cls.entry).find('.'+cls.title).val().trim();
-                var ctx=$("#" + cls.entry).find('.'+cls.content).val().trim();
-
-                var mine=$("#" + cls.entry).find('.'+cls.mine).val().trim();
+                var mine=sel.find('.'+cls.mine).val().trim();
                 if(!mine) return console.log("no anchor to record comment");
                 $(this).attr("disabled","disabled");
 
-                var raw={
-                    "title":`#[${title}](anchor://${anchor}/${block})#`,
-                    "content":ctx,
-                };
-                var proto={"type":"data","format":"JSON","app":app_name};
-
-                if(RPC.extra.comment){
-                    App.toast("Ready to write to chain","info");
-                    RPC.extra.comment(ctx,anchor,block,(res)=>{
-                        if(res.success){
-                            cmts[anchor][block]=0;
-                        }
-                        App.toast("","clean");
-                        $("#"+cls.add).removeAttr("disabled");
-                        App.back();
-                    });
-                }else{
-                    RPC.extra.verify(function(pair){
-                        RPC.common.write(pair,mine,raw,proto,function(res){
-                            if(res.status.isInBlock){
-                                App.back();
-                            }
-                        });
-                    });
-                }
+                common.comment(ctx,anchor,block,title,function(){
+                    sel.find("."+cls.add).removeAttr("disabled");
+                    App.back();
+                });
             });
         },
         listComments:function(anchor,block){
@@ -160,7 +137,7 @@
                         <input type="hidden" class="form-control ${cls.title}" disabled="disabled" value="" >
                         <input type="hidden" class="form-control ${cls.block}" disabled="disabled" value="" >
                         <input type="hidden" class="form-control ${cls.anchor}" disabled="disabled" value="" >
-                        <button class="btn btn-md btn-primary" id="${cls.add}">Comment</button>
+                        <button class="btn btn-md btn-primary ${cls.add}">Comment</button>
                     </div>
             </div>`;
         },
