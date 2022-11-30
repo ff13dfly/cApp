@@ -110,7 +110,7 @@
                 var m= Math.floor(p / 60000);
                 return m+(m==1?" minute ago":" mins ago");
             }
-            return Math.floor(p * 0.001) + " secs ago";
+            return Math.floor(p * 0.001) + "s ago";
         },
         summary:function(str){  //对字符串进行概要提取
             
@@ -118,6 +118,11 @@
         wrap:function(str){return str.replace(/\n/g,"<br />");},
         hash:function(n) { return Math.random().toString(36).substr(n != undefined ? n : 6) },
         shorten:function(address,n){if (n === undefined) n = 10;return address.substr(0, n) + '...' + address.substr(address.length - n, n);},
+        tailor:function(str,len,s){
+			if(str.length<len)return str;
+			var len=len||30,s=s||'...';
+			return str.substring(0,len)+s;
+		},
     };
 
     var self={

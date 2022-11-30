@@ -23,7 +23,7 @@
         },
         page:{
             count:1,
-            step:20,
+            step:3,         //comments amount after content
             max:1,
         }
     };
@@ -31,6 +31,7 @@
     var tpl=App.cache.getG("tpl");
     var RPC=App.cache.getG("RPC");
     var common=App.cache.getG("common");
+    var icons=App.cache.getG("icons");
 
     var self={
         show:function(params){
@@ -60,18 +61,26 @@
             var sel=$("#"+cls.entry);
             sel.find('.'+cls.title).html(title);
             sel.find('.'+cls.account).html(owner);
-            sel.find('.'+cls.avatar).attr("src",`https://robohash.org/${origin}.png`);
+
+            //sel.find('.'+cls.avatar).attr("src",`https://robohash.org/${origin}.png`);
+
             sel.find('.'+cls.stamp).html(App.tools.time(stamp));
             sel.find('.'+cls.content).html(App.tools.wrap(content));
             sel.find('.'+cls.owner).html(owner);
             sel.find('.'+cls.block).html(block);
+
+            common.getAvatar(origin,function(img){
+                sel.find('.'+cls.avatar).attr("src",img.src);
+            });
         },
         cmtRender:function(anchor,block){
             var cls=config.cls;
             var sel=$("#"+cls.entry);
-            console.log(`${anchor} on ${block}`);
             sel.find('.'+cls.cmtBlock).val(block);
             sel.find('.'+cls.cmtAnchor).val(anchor);
+
+            sel.find('.'+cls.cmtPage).attr("page","board");
+            sel.find('.'+cls.cmtPage).attr("data",JSON.stringify({anchor:anchor,block:block}));
         },
         listComments:function(anchor,block){
             const svc="vSaying",fun="list";
@@ -104,11 +113,11 @@
             var sel=$("#"+cls.entry);
             sel.find('.'+cls.cmtAdd).off('click').on('click',function(){
                 var data=self.getData();
-                if(!data.anchor || !data.title){
-                    App.toast("No content to comment","info");
+                if(!data.anchor){
+                    App.toast("No anchor to comment","info");
                     setTimeout(function(){
                         App.toast("","clean");
-                    },500);
+                    },1500);
                     return false;
                 } 
                 if(!data.comment){
@@ -116,12 +125,15 @@
                     return false;
                 }
                 sel.find("."+cls.cmtAdd).attr("disabled","disabled");
-                var anchor=data.anchor,block=data.block,ctx=data.comment,title=data.title;
-                common.comment(ctx,anchor,block,title,function(){
+                var anchor=data.anchor,block=data.block;
+                common.comment(data.comment,anchor,block,!data.title?'':data.title,function(){
                     sel.find("."+cls.cmtAdd).removeAttr("disabled");
                     self.listComments(anchor,block);
                 });
             });
+        },
+        preComments:function(){
+
         },
         getData:function(){
             var cls=config.cls;
@@ -165,6 +177,7 @@
             var cls=config.cls;
             var more=tpl.theme('comment',cls.entry);
             return `<style>${more}
+                #${cls.entry}{padding-bottom:40px;}
                 #${cls.entry} h3{color:#002222}
                 #${cls.entry} .${cls.avatar} {widht:30px;height:30px;border-radius:15px;background:#FFAABB}
                 #${cls.entry} .${cls.content} {font-weight:500;}
@@ -192,11 +205,12 @@
             return `<div class="row">
                 <div class="col-12 pt-4 pb-2"><h3 class="${cls.title}">Loading</h3></div>
                 <div class="col-8">
-                    <img src="https://robohash.org/null.png" class="${cls.avatar}">
+                    <img src="${icons.auth}" class="${cls.avatar}">
+                    <!--<img src="https://robohash.org/null.png" class="${cls.avatar}">-->
                     <span class="${cls.account}">null</span>
                 </div>
                 <div class="col-4 text-end ${cls.stamp}"></div>
-                <div class="col-12 pt-2 ${cls.content}"></div>
+                <div class="col-12 pt-3 ${cls.content}"></div>
             </div>`;
         },
         
@@ -207,7 +221,7 @@
                     Comments ( <span id="${cls.cmtSum}">0</span> )
                 </div>
                 <div class="col-6 text-end">
-                    <span id="${cls.cmtPage}" page="" data=''>more...</span>
+                    <span class="${cls.cmtPage}" page="" data=''>more...</span>
                 </div>
             </div>
             <div id="${cls.cmtList}"></div>

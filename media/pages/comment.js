@@ -40,7 +40,6 @@
         },
         bind:function(){
             var cls=config.cls;
-            var app_name = App.cache.getG("name");
             var sel=$("#"+cls.entry);
             sel.find("."+cls.add).off('click').on('click',function(){
                 var anchor=sel.find('.'+cls.anchor).val().trim();

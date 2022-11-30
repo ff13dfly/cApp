@@ -133,7 +133,7 @@
             var cls=config.cls;
             var more=tpl.theme('basic',cls.entry);
             return `<style>${more}
-                #${cls.entry} .${cls.add}{width:100px;height:48px;background:#F4F4F4;opacity: 0.9;position:fixed;right:20px;bottom:25%;border-radius:24px;border:1px solid #AAAAAA;line-height:48px;text-align: center;box-shadow: 3px 3px 3px #BBBBBB;}
+                #${cls.entry} .${cls.add}{width:100px;height:48px;background:#F4F4F4;opacity: 0.9;position:fixed;right:20px;bottom:25%;border-radius:24px;border:2px solid #EF8889;line-height:48px;text-align: center;box-shadow: 3px 3px 3px #EF8889;}
                 #${cls.entry} .${cls.add} img{opacity: 0.8;}
             </style>`;
         },
@@ -161,6 +161,7 @@
                 ck && ck(result);
             },
             "loading": function (params, ck) {
+                //console.log(`History:${JSON.stringify(his)},Params:${JSON.stringify(params)}`);
                 self.showHistory();
                 self.listening();
                 ck && ck();

@@ -36,12 +36,13 @@
             var cls=config.cls;
             
             $("#"+cls.add).off('click').on('click',function(){
-                var title=$("#" + cls.entry).find('.'+cls.title).val().trim();
+                //var title=$("#" + cls.entry).find('.'+cls.title).val().trim();
                 var ctx=$("#" + cls.entry).find('.'+cls.content).val().trim();
-                var desc=$("#" + cls.entry).find('.'+cls.desc).val().trim();
+                var desc=App.tools.tailor(ctx);
                 var anchor=$("#" + cls.entry).find('.'+cls.anchor).val().trim();
+                var title='';
                 var raw={
-                    "title":title,
+                    "title":!title?'':title,
                     "desc": desc,
                     "content":ctx,
                 };
@@ -85,19 +86,19 @@
         getDom:function(){
             var cls=config.cls;
             return `<div class="row">
-                <div class="col-12 gy-2">
+                <!--<div class="col-12 gy-2">
                     <input type="text" class="form-control ${cls.title}" placeholder="Title..." value="" >  
-                </div>
+                </div>-->
                 <div class="col-12 gy-2">
                     <textarea class="form-control ${cls.content}" placeholder="Adding new content to anchor network..." rows="10"></textarea>   
                 </div>
-                <div class="col-12 gy-2">
+                <!--<div class="col-12 gy-2">
                      <textarea class="form-control ${cls.desc}" placeholder="Description..." rows="3"></textarea>   
-                </div>
-                <div class="col-6 gy-2">
+                </div>-->
+                <div class="col-6 gy-2 pb-3">
                     <input type="text" class="form-control ${cls.anchor}" placeholder="Anchor name..." value="" >
                 </div>
-                <div class="col-6 gy-2 text-end">
+                <div class="col-6 gy-2 pb-3 text-end">
                     <button class="btn btn-md btn-primary" id="${cls.add}">New Saying</button>
                 </div>
                 <div class="col-12" id="upload_con"></div>
