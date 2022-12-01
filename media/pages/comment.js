@@ -11,12 +11,11 @@
             title:'',
             content:'',
             add:'',
-            mine:'',
             cmtList:'',
         },
         page:{
             count:1,
-            step:3,
+            step:10,
             max:1,
         }
     };
@@ -25,18 +24,17 @@
     var tpl=App.cache.getG("tpl");
     var self={
         show:function(params){
-            self.render(params.title,params.anchor,params.block,params.owner); 
+            console.log(params);
+            self.render(params.content,params.anchor,params.block,params.owner); 
             self.listComments(params.anchor,params.block);  
             self.bind();
         },
-        render:function(title,anchor,block,owner){
+        render:function(ctx,anchor,block,owner){
             var cls=config.cls;
             var sel=$("#"+cls.entry);
-            sel.find('.'+cls.relate).html('#'+title+'#');
-            sel.find('.'+cls.title).val(title);
+            sel.find('.'+cls.relate).html(ctx);
             sel.find('.'+cls.block).val(block);
             sel.find('.'+cls.anchor).val(anchor);
-            sel.find('.'+cls.mine).val(anchor);         //设置当前anchor
         },
         bind:function(){
             var cls=config.cls;
@@ -44,14 +42,10 @@
             sel.find("."+cls.add).off('click').on('click',function(){
                 var anchor=sel.find('.'+cls.anchor).val().trim();
                 var block=parseInt(sel.find('.'+cls.block).val().trim());
-                var title=sel.find('.'+cls.title).val().trim();
                 var ctx=sel.find('.'+cls.content).val().trim();
-
-                var mine=sel.find('.'+cls.mine).val().trim();
-                if(!mine) return console.log("no anchor to record comment");
+                if(!ctx) return console.log("no comment content");
                 $(this).attr("disabled","disabled");
-
-                common.comment(ctx,anchor,block,title,function(){
+                common.comment(ctx,anchor,block,'',function(){
                     sel.find("."+cls.add).removeAttr("disabled");
                     App.back();
                 });
@@ -116,7 +110,7 @@
         getDom:function(){
             var cls=config.cls;
             return `<div class="row">
-                    <div class="col-12 gy-2"><h5 class="${cls.relate}">#Title#<h5></div>
+                    <div class="col-12 gy-2"><p class="${cls.relate}"><p></div>
                 </div>
                 <div class="row mt-4 pt-1 pb-1 ${cls.cmtHead}" style="display:none">
                     <div class="col-12">
@@ -129,11 +123,8 @@
                     <div class="col-12 gy-2">
                         <textarea class="form-control ${cls.content}" placeholder="Adding comment..." rows="10"></textarea>   
                     </div>
-                    <div class="col-6 gy-2">
-                        <input type="text" class="form-control ${cls.mine}" disabled="disabled" value="" >
-                    </div>
+                    <div class="col-6 gy-2"></div>
                     <div class="col-6 gy-2 text-end">
-                        <input type="hidden" class="form-control ${cls.title}" disabled="disabled" value="" >
                         <input type="hidden" class="form-control ${cls.block}" disabled="disabled" value="" >
                         <input type="hidden" class="form-control ${cls.anchor}" disabled="disabled" value="" >
                         <button class="btn btn-md btn-primary ${cls.add}">Comment</button>

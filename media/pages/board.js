@@ -5,6 +5,7 @@
         prefix:"bd",
         cls:{
             entry:'',
+            title:'',
             list:'',
             content:'',
             anchor:'',
@@ -24,11 +25,14 @@
 
     var self={
         show:function(params){
-            self.render(params.anchor,params.block);
+            //console.log(params);
+            self.render(params.anchor,params.block,params.title);
             self.list(params.anchor,params.block);
         },
-        render:function(anchor,block){
+        render:function(anchor,block,title){
             var cls=config.cls,sel=$('#'+cls.entry);
+            var ctx=`<p>${title}<br>${anchor} on ${block}</p>`;
+            sel.find('.'+cls.title).html(ctx);
             sel.find('.'+cls.anchor).val(anchor);
             sel.find('.'+cls.block).val(block);
         },
@@ -97,7 +101,8 @@
         },
         getDom:function(){
             var cls=config.cls;
-            return `<div class="${cls.list}"></div>
+            return `<div class="${cls.title}"></div>
+            <div class="${cls.list}"></div>
                 <div class="row">
                     <div class="col-12 pt-4">
                         <textarea class="form-control ${cls.content}" placeholder="Your thinking about the article..." rows="3"></textarea>
@@ -130,6 +135,14 @@
                 self.show(params);
             },
             "after":function(params,ck){
+                // console.log(`After:${JSON.stringify(params)}`);
+                // var cls=config.cls;
+                // var sel=$('#'+cls.entry);
+                // var anchor=sel.find('.'+cls.anchor).val();
+                // var block= parseInt(sel.find('.'+cls.block).val());
+                // console.log(`anchor:${anchor},block:${block}`);
+
+                self.show(params);
                 ck && ck();
             },
         },

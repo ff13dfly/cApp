@@ -6,7 +6,7 @@
         comment:function(comment,anchor,block,title,ck){
             var app_name = App.cache.getG("name");
             var cmts=App.cache.getG("commentCount");
-            var link=!title?'Commnet':title;
+            var link=!title?'Commet':title;
             var raw={
                 "title":`#[${link}](anchor://${anchor}/${block})#`,
                 "content":comment,
@@ -16,7 +16,7 @@
             if(RPC.extra.comment){
                 App.toast("Ready to write to chain","info");
                 RPC.extra.comment(comment,anchor,block,(res)=>{
-                    console.log(res);
+                    //console.log(res);
                     if(res.success){
                         if(!cmts[anchor]) cmts[anchor]={};
                         if(!cmts[anchor][block])cmts[anchor][block]=0;
@@ -28,7 +28,7 @@
             }else{
                 RPC.extra.verify(function(pair){
                     RPC.common.write(pair,mine,raw,proto,function(res){
-                        console.log(res);
+                        //console.log(res);
                         if(res.status.isInBlock){
                             return ck && ck();
                         }
@@ -47,6 +47,9 @@
                 return true;
             }
             ck && ck(avs[ss58]);
+        },
+        freshCount:function(){
+
         },
     };
 

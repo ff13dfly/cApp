@@ -83,8 +83,8 @@
 			var cls=me.cls,con=me.setting.container;
 			return `<style>
 				#${con} .${cls.thumb}{height:100px;line-height:100px;background:#EEEEEE;text-align:center;margin-top:8px;}
-				#${con} .${cls.add}{height:100px;line-height:100px;background:#EEEEEE;text-align:center;margin-top:8px;}
-				#${con} .${cls.add} span{width:100%;height:100px;font-size:100px;margin:0 auto;opacity:1;color:#BBBBBB;margin-top:-16px;}
+				#${con} .${cls.add}{height:116px;line-height:100px;background:#EEEEEE;text-align:center;margin-top:8px;padding:0px 0px 0px 0px;}
+				#${con} .${cls.add} span{width:100%;height:100px;font-size:100px;margin:0 auto;opacity:1;color:#BBBBBB;}
 				#${con} .${cls.thumb}.active{background:#CCCCCC;}
 				#${con} .${cls.remove}{background:#FFFFFF;color:#FFBE00;padding:5px 10px 5px 10px;border-radius:5px;}
 			</style>`;

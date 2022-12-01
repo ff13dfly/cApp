@@ -30,7 +30,7 @@ var source = [
     'pages/view.js',
     'pages/history.js',
     'pages/write.js',
-    'pages/comment.js',
+    //'pages/comment.js',
     'pages/share.js',
     'pages/auth.js',
     'pages/board.js',

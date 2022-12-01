@@ -39,7 +39,7 @@
             $("#"+config.cls.cmtSum).html(cmts[anchor][block]);
 
             RPC.common.target(anchor,block,function(res){
-                console.log(res);
+                //console.log(res);
                 if(res.empty){
                     self.render("Error",'No such anchor','null',anchor,block,0);
                     self.cmtRender('',0);
@@ -103,8 +103,6 @@
             var ig=new Image();
             ig.src=img;
             ig.onload=function(res){
-                //console.log(res);
-                //console.log(`Size:[${ig.width},${ig.height}]`);
                 ck && ck({index:index,size:[ig.width,ig.height]});
             };
         },
@@ -132,9 +130,6 @@
                 });
             });
         },
-        preComments:function(){
-
-        },
         getData:function(){
             var cls=config.cls;
             var sel=$("#"+cls.entry);
@@ -151,16 +146,15 @@
             };
         },
         domImages:function(imgs){
-            var len=imgs.length,num = 12/len;
+            var len=imgs.length;
             var dom='';
-            var count=0;
             for(var i=0;i<len;i++){
                 var img=imgs[i];
-                self.calcImages(img,i,function(){
-
-                });
-                dom+=`<div class="col-${num}">
-                    <p style="height:${450/len}px;background:#FFFFFF url(${img}) no-repeat;background-size:contain;"></p>
+                // self.calcImages(img,i,function(res){
+                //     console.log(res);
+                // });
+                dom+=`<div class="col-12">
+                    <img src="${img}" style="width:100%;" id="img_${i}">
                 </div>`;
             }
             return dom;
@@ -180,7 +174,7 @@
                 #${cls.entry}{padding-bottom:40px;}
                 #${cls.entry} h3{color:#002222}
                 #${cls.entry} .${cls.avatar} {widht:30px;height:30px;border-radius:15px;background:#FFAABB}
-                #${cls.entry} .${cls.content} {font-weight:500;}
+                #${cls.entry} .${cls.content} {font-weight:500;min-height:60px;}
                 #${cls.entry} .${cls.cmtHead} {background:#F3F3F3;}
             </style>`;
         },
@@ -203,7 +197,7 @@
         getDom:function(){
             var cls=config.cls;
             return `<div class="row">
-                <div class="col-12 pt-4 pb-2"><h3 class="${cls.title}">Loading</h3></div>
+                <div class="col-12 pt-4 pb-2"><h3 class="${cls.title}"></h3></div>
                 <div class="col-8">
                     <img src="${icons.auth}" class="${cls.avatar}">
                     <!--<img src="https://robohash.org/null.png" class="${cls.avatar}">-->

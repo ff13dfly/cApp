@@ -99,10 +99,12 @@
             var igs=ctx.imgs && ctx.imgs.length>0?self.getImages(ctx.imgs):'';
             var cmt= { anchor: row.name, block: row.block,owner:row.signer,title:!ctx.title?'':ctx.title};
             var ct=JSON.stringify(cmt);
-            common.getAvatar(row.signer,function(img){
-                console.log(`Basic row showing ${row.signer}`);
-                $('.'+row.signer).attr("src",img.src);
-            });
+            setTimeout(function(){
+                common.getAvatar(row.signer,function(img){
+                    //console.log(`Basic row showing ${row.signer}`);
+                    $('.'+row.signer).attr("src",img.src);
+                });
+            },50);
             var tdom=!ctx.title?`<div class="col-12 pt-2 ${cls.row}" ></div>`:`<div class="col-12 pt-2 ${cls.row}" >
                 <span page="view" data='${JSON.stringify(dt)}'><h5>${ctx.title}</h5></span>
             </div>`;
@@ -125,7 +127,11 @@
                 <div class="col-12 gy-2 ${cls.row}">
                     <span page="view" data='${JSON.stringify(dt)}'>${!ctx.desc ? "" : ctx.desc}</span>
                 </div>
-                <span page="view" data='${JSON.stringify(dt)}'>${igs}</span>
+                <div class="col-12">
+                    <span page="view" data='${JSON.stringify(dt)}'>
+                        <div class="row">${igs}</div>
+                    </span>
+                </div>
                 <div class="col-8 gy-2 ${cls.time}">
                     ${App.tools.time(row.stamp)}
                 </div>
@@ -140,15 +146,17 @@
         },
 
         history:function(row,cls){
-            console.log(row);
+            //console.log(row);
             var ctx = row.raw;
             var dt = { anchor: row.name, block: row.block, owner: row.signer };
             var igs=ctx.imgs && ctx.imgs.length>0?self.getImages(ctx.imgs):'';
             var cmt= { anchor: row.name, block: row.block,owner:row.signer,title:!ctx.title?'':ctx.title};
             var ct=JSON.stringify(cmt);
-            common.getAvatar(row.signer,function(img){
-                $('.'+row.signer).attr("src",img.src);
-            });
+            setTimeout(function(){
+                common.getAvatar(row.signer,function(img){
+                    $('.'+row.signer).attr("src",img.src);
+                });
+            },50);
             return `<div class="row">
                 <div class="col-12 pt-2 ${cls.row}" >
                     <span page="view" data='${JSON.stringify(dt)}'><h5>${ctx.title}</h5></span>
@@ -187,9 +195,11 @@
             var igs=ctx.imgs && ctx.imgs.length>0?self.getImages(ctx.imgs):'';
             var cmt= { anchor: row.name, block: row.block,owner:row.signer,title:!ctx.title?'':ctx.title};
             var ct=JSON.stringify(cmt);
-            common.getAvatar(row.signer,function(img){
-                $('.'+row.signer).attr("src",img.src);
-            });
+            setTimeout(function(){
+                common.getAvatar(row.signer,function(img){
+                    $('.'+row.signer).attr("src",img.src);
+                });
+            },50);
             return `<div class="row">
                 <div class="col-12 pt-2 ${cls.row}" >
                     <span page="view" data='${JSON.stringify(dt)}'><h5>${ctx.title}</h5></span>
@@ -225,19 +235,26 @@
             </div>`;
         },
         comment:function(row,cls){
-            console.log(row);
-            var protocol=row.protocol,raw=row.raw;
-            var auth=protocol.auth;
-            var dt={anchor:row.name,block:row.block,owner: row.signer,auth:auth};
-            console.log(dt);
-            common.getAvatar(auth,function(img){
-                $('.'+auth).attr("src",img.src);
-            });
+            //console.log(row);
+            var protocol=row.protocol,raw=row.raw,auth=protocol.auth;
+            var dt={
+                anchor:row.name,
+                block:row.block,
+                owner:row.signer,
+                auth:auth,
+                title:raw.content
+            };
+            setTimeout(function(){
+                common.getAvatar(auth,function(img){
+                    $('.'+auth).attr("src",img.src);
+                });
+            },50);
+            
             return `<div class="row">
                 <div class="col-9 mt-4 ${cls.account}">
-                    <span page="auth" data='${JSON.stringify({auth:protocol.auth})}'>
+                    <span page="auth" data='${JSON.stringify({auth:auth})}'>
                         <img src="${icons.auth}" class="${cls.avatar} ${auth}">
-                        ${App.tools.shorten(protocol.auth, 12)}
+                        ${App.tools.shorten(auth, 12)}
                     </span>
                 </div>
                 <div class="col-3 mt-4 text-end">
@@ -246,7 +263,7 @@
                 </div>
                 <div class="col-1"></div><div class="col-11  ${cls.content}">${raw.content}</div>
                 <div class="col-1"></div><div class="col-11 pt-1">
-                    <span page="comment" data='${JSON.stringify(dt)}' class="${cls.reply}"> 
+                    <span page="board" data='${JSON.stringify(dt)}' class="${cls.reply}"> 
                     <img style="widht:14px;height:14px;margin:-2px 2px 0px 4px;opacity:0.7;" src="${icons.comment}">
                     reply
                     </span>
@@ -265,7 +282,7 @@
             for(var i=0;i<len;i++){
                 var img=imgs[i];
                 dom+=`<div class="col-${num}">
-                    <p style="height:${300/len}px;background:#FFFFFF url(${img}) no-repeat;background-size:contain;"></p>
+                    <div style="height:${300/len}px;background:#FFFFFF url(${img}) no-repeat center center;background-size:cover;"></div>
                 </div>`;
             }
             return dom;

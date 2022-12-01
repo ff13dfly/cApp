@@ -20,20 +20,29 @@
     var self = {
         listening: function () {
             var name = App.cache.getG("name");
-            RPC.common.subscribe(function (list) {
+            RPC.common.subscribe(function(list) {
                 if (list.length == 0) return false;
-                App.toast("New subcribe ...","info");
-                setTimeout(() => {
-                    App.toast("","clean");
-                    for (var i = 0; i < list.length; i++) {
-                        var row = list[i];
-                        if (row.protocol && row.protocol.type === "data" && row.protocol.app === name) {
+                
+                var ls=[];
+                for (var i = 0; i < list.length; i++){
+                    var row = list[i];
+                    if (row.protocol && row.protocol.type === "data" && row.protocol.app === name) {
+                        ls.push(row);
+                    }
+                }
+
+                if(ls.length!==0){
+                    App.toast("New subcribe ...","info");
+                    setTimeout(function(){
+                        App.toast("","clean");
+                        for (var i = 0; i < ls.length; i++) {
+                            var row = ls[i];
                             self.pushHistory(row);
                             self.decode(row);
                             self.auto();
                         }
-                    }
-                },1500);
+                    },1500);
+                }
             });
         },
         showHistory:function(){
@@ -72,6 +81,7 @@
         },
         
         decode: function (row) {
+            if(!row.stamp) row.stamp=Date.now()-1001;
             self.setCmtAmount(row.name,row.block);
             var dom=tpl.row(row,'basic');
             $("#" + config.cls.entry).prepend(dom);
@@ -167,6 +177,8 @@
                 ck && ck();
             },
             "after": function (params, ck) {
+                console.log('Index page after event');
+                console.log(params);
                 ck && ck();
             },
         },

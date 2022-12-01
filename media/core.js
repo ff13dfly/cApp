@@ -350,7 +350,7 @@
             return `<style>
                 #${cls.entry}{width:${obj.width}px;height:100%;background:#FFFFFF}
                 #${cls.entry} .${cls.body} {margin-top:45px;height:100%;width:100%;background:#FFFFFF;}
-                #${cls.entry} .${cls.nav} {color:#222222;background:#EEEEEE;height:45px;position:fixed;top:0px;left:0px;width:100%}
+                #${cls.entry} .${cls.nav} {color:#222222;background:#EEEEEE;height:45px;position:fixed;top:0px;left:0px;width:100%;z-index:98;}
                 .${cls.nav} .row {background:#EEEEEE;height:45px;font-size:18px;}
                 .${cls.back}{color:#222222;}  
                 #${cls.mask} {display:none;position:fixed;z-index:99;background:#FFFFFF;width:100%;height:100%;top:0px;}
