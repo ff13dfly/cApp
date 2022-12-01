@@ -190,7 +190,9 @@
 
             cache.preload=self.preload(cache);
             self.animateLoad(cache,function(){
-                events.loading(params);
+                if(events.loading) events.loading(params,function(){
+                    if(events.done) events.done();
+                });
             },cfg);
         },
         preload:function(data){
@@ -207,20 +209,27 @@
         decodeBefore:function(fmt){
             //depend on fmt, can stop loading page
         },
-        
         back:function(){
             $(this).attr("disabled","disabled");
             if(G.queue.length===0) return false;
 
             var cur=G.queue.pop(),atom=G.queue[G.queue.length-1];
             var evs=pages[cur.name].events;
-            evs.after((!atom || !atom.params)?{}:atom.params,function(){
+            if(!evs.after){
                 self.animateBack(atom.snap,function(){
                     if(G.queue.length===1) self.hideBack();
                     $(this).removeAttr("disabled");
                     self.goto(atom.name,atom.params,true);
                 });
-            });
+            }else{
+                evs.after((!atom || !atom.params)?{}:atom.params,function(){
+                    self.animateBack(atom.snap,function(){
+                        if(G.queue.length===1) self.hideBack();
+                        $(this).removeAttr("disabled");
+                        self.goto(atom.name,atom.params,true);
+                    });
+                });
+            }
         },
         bind:function(){
             var cls=config.cls;

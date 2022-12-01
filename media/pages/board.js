@@ -6,12 +6,18 @@
         cls:{
             entry:'',
             title:'',
+            target:'',
+            location:'',
+            pos:'',
+            details:'',
+            icon:'',
             list:'',
             content:'',
             anchor:'',
             block:'',
             add:'',
             info:'',
+            container:'',
         },
         page:{
             count:1,
@@ -22,6 +28,7 @@
     var RPC=App.cache.getG("RPC");
     var tpl=App.cache.getG("tpl");
     var common=App.cache.getG("common");
+    var icons=App.cache.getG("icons");
 
     var self={
         show:function(params){
@@ -31,8 +38,10 @@
         },
         render:function(anchor,block,title){
             var cls=config.cls,sel=$('#'+cls.entry);
-            var ctx=`<p>${title}<br>${anchor} on ${block}</p>`;
-            sel.find('.'+cls.title).html(ctx);
+            console.log(title);
+            sel.find('.'+cls.details).html(title);
+            sel.find('.'+cls.target).html(anchor);
+            sel.find('.'+cls.pos).html(parseInt(block).toLocaleString());
             sel.find('.'+cls.anchor).val(anchor);
             sel.find('.'+cls.block).val(block);
         },
@@ -54,10 +63,15 @@
         },
         domComments:function(list){
             var dom ='';
+            var cmts=[];
             for(var i=0;i<list.length;i++){
                 var row=list[i];
+                cmts.push([row.name,row.block]);
                 dom+=tpl.row(row,'comment');
             }
+            setTimeout(function(){
+                common.freshCount(cmts);
+            },50);
             return dom;
         },
         bind:function(){
@@ -67,14 +81,33 @@
                 var anchor=sel.find('.'+cls.anchor).val();
                 var block= parseInt(sel.find('.'+cls.block).val());
                 var comment=sel.find('.'+cls.content).val().trim();
-                sel.find("."+cls.add).attr("disabled","disabled");
+                if(!comment){
+                    return  sel.find('.'+cls.content).trigger('focus');
+                }
 
+                self.disable(cls);
                 common.comment(comment,anchor,block,'',function(){
-                    sel.find("."+cls.add).removeAttr("disabled");
+                    self.enable(cls);
                     sel.find('.'+cls.content).val('');
                     self.list(anchor,block);
                 });
             });
+        },
+        showInput:function(cls){
+            $('#'+cls.entry).find("."+cls.container).show();
+        },
+        hideInput:function(cls){
+            $('#'+cls.entry).find("."+cls.container).hide();
+        },
+        disable:function(cls){
+            var sel=$('#'+cls.entry);
+            sel.find("."+cls.content).attr("disabled","disabled");
+            sel.find("."+cls.add).attr("disabled","disabled");
+        },
+        enable:function(cls){
+            var sel=$('#'+cls.entry);
+            sel.find("."+cls.content).removeAttr("disabled");
+            sel.find("."+cls.add).removeAttr("disabled");
         },
         struct: function () {
             var pre = config.prefix;
@@ -86,6 +119,17 @@
             page.data.preload = self.template();
             return true;
         },
+        beforeBack:function(params){
+            
+            //console.log(`After:${JSON.stringify(params)}`);
+            var cls=config.cls,sel=$('#'+cls.entry);
+            var anchor=sel.find('.'+cls.anchor).val();
+            var block= parseInt(sel.find('.'+cls.block).val());
+            //console.log(`anchor:${anchor},block:${block}`);
+            self.hideInput(cls);
+            common.freshCount([[anchor,block]],true);
+            self.show(params);
+        },
         template: function () {
             var css = self.getCSS();
             var dom = self.getDom();
@@ -96,13 +140,25 @@
             var more=tpl.theme('comment',cls.entry);
             return `<style>${more}
                 #${cls.entry}{padding-bottom:40px;}
-                #${cls.entry} .${cls.cmtHead} {background:#F3F3F3;}
+                #${cls.entry} .${cls.icon} {widht:14px;height:14px;margin:-2px 2px 0px 4px;opacity:0.7;}
+                #${cls.entry} .${cls.location} {font-size:10px;}
+                #${cls.entry} .${cls.details} {color:#000000;}
+                #${cls.entry} .${cls.list} {padding-bottom:160px;}
+                #${cls.entry} .${cls.container} {display:none;position:fixed;left:0px;bottom:64px;background:#FFFFFF;width:100%;padding:5px 3% 5px 3%;}
             </style>`;
         },
         getDom:function(){
             var cls=config.cls;
-            return `<div class="${cls.title}"></div>
+            return `<div class="row ${cls.title}">
+                <div class="col-2 pt-4 ${cls.location}">Original</div>
+                <div class="col-10 pt-4 text-end ${cls.location}">
+                    <img class="${cls.icon}" src="${icons.anchor}"> <span class="${cls.target}"></span><img class="${cls.icon}" src="${icons.block}"> <span class="${cls.pos}"></span>
+                </div>
+                <div class="col-12 pt-2 ${cls.details}"></div>
+                <div class="col-12"><hr /></div>
+            </div>
             <div class="${cls.list}"></div>
+            <div class="${cls.container}">
                 <div class="row">
                     <div class="col-12 pt-4">
                         <textarea class="form-control ${cls.content}" placeholder="Your thinking about the article..." rows="3"></textarea>
@@ -114,7 +170,7 @@
                         <button class="btn btn-md btn-primary ${cls.add}">Comment</button>
                     </div>
                 </div>
-                `;
+            </div>`;
         },
     };
     
@@ -128,21 +184,19 @@
         },      
         "events":{
             "before":function(params,ck){
+                self.hideInput(config.cls);
                 var result={code:1,message:"successful",overwrite:true};
                 ck && ck(result);
             },
-            "loading":function(params){
+            "loading":function(params,ck){
                 self.show(params);
+                ck && ck();
+            },
+            "done":function(){
+                self.showInput(config.cls);
             },
             "after":function(params,ck){
-                // console.log(`After:${JSON.stringify(params)}`);
-                // var cls=config.cls;
-                // var sel=$('#'+cls.entry);
-                // var anchor=sel.find('.'+cls.anchor).val();
-                // var block= parseInt(sel.find('.'+cls.block).val());
-                // console.log(`anchor:${anchor},block:${block}`);
-
-                self.show(params);
+                self.beforeBack(params);
                 ck && ck();
             },
         },

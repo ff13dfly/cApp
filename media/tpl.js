@@ -61,11 +61,12 @@
             var map={
                 basic:`#${entry} hr{color:#CCCCCC}
                     #${entry} .${c.account}{font-size:10px;color:#EF8889;}
+                    #${entry} .${c.row}{font-weight:500;}
                     #${entry} .${c.block}{font-size:10px;}
                     #${entry} .${c.operation}{font-size:10px;}
                     #${entry} .${c.count}{margin-top:4px;}
                     #${entry} .${c.time}{color:#AAAAAA;font-size:10px;}
-                    #${entry} .${c.avatar}{widht:30px;height:30px;border-radius:15px;background:#FFAABB}
+                    #${entry} .${c.avatar}{width:30px;height:30px;border-radius:15px;background:#FFAABB}
                     #${entry} .${c.icon}{opacity:0.7;}`,
                 history:`#${entry} hr{color:#CCCCCC}
                     #${entry} .${c.account}{font-size:10px;color:#EF8889;}
@@ -73,7 +74,7 @@
                     #${entry} .${c.operation}{font-size:10px;}
                     #${entry} .${c.count}{margin-top:4px;}
                     #${entry} .${c.time}{color:#AAAAAA;font-size:10px;}
-                    #${entry} .${c.avatar}{widht:30px;height:30px;border-radius:15px;background:#FFAABB}
+                    #${entry} .${c.avatar}{width:30px;height:30px;border-radius:15px;background:#FFAABB}
                     #${entry} .${c.icon}{opacity:0.7;}`,
                 auth:`#${entry} hr{color:#CCCCCC}
                     #${entry} .${c.account}{font-size:10px;color:#EF8889;}
@@ -81,12 +82,12 @@
                     #${entry} .${c.operation}{font-size:10px;}
                     #${entry} .${c.count}{margin-top:4px;}
                     #${entry} .${c.time}{color:#AAAAAA;font-size:10px;}
-                    #${entry} .${c.avatar}{widht:30px;height:30px;border-radius:15px;background:#FFAABB}
+                    #${entry} .${c.avatar}{width:30px;height:30px;border-radius:15px;background:#FFAABB}
                     #${entry} .${c.icon}{opacity:0.7;}`,
                 comment:`#${entry} .${c.avatar} {}
                     #${entry} .${c.account} {font-size:12px;color:#EF8889}
                     #${entry} .${c.content} {font-size:14px;font-weight:500;}
-                    #${entry} .${c.avatar}{widht:30px;height:30px;border-radius:15px;background:#FFAABB}
+                    #${entry} .${c.avatar}{width:30px;height:30px;border-radius:15px;background:#FFAABB}
                     #${entry} .${c.reply}  {background:#EEEEEE;border-radius:8px;font-size:12px;padding:4px 8px 6px 4px;}`,
                 snap:`#${entry}{}
                     #${entry} .${c.name}{}`,
@@ -97,11 +98,10 @@
             var ctx = row.raw;
             var dt = { anchor: row.name, block: row.block, owner: row.signer };
             var igs=ctx.imgs && ctx.imgs.length>0?self.getImages(ctx.imgs):'';
-            var cmt= { anchor: row.name, block: row.block,owner:row.signer,title:!ctx.title?'':ctx.title};
+            var cmt= { anchor: row.name, block: row.block,owner:row.signer,title:!ctx.desc?'':ctx.desc};
             var ct=JSON.stringify(cmt);
             setTimeout(function(){
                 common.getAvatar(row.signer,function(img){
-                    //console.log(`Basic row showing ${row.signer}`);
                     $('.'+row.signer).attr("src",img.src);
                 });
             },50);
@@ -237,9 +237,10 @@
         comment:function(row,cls){
             //console.log(row);
             var protocol=row.protocol,raw=row.raw,auth=protocol.auth;
+            var anchor=row.name,block=row.block;
             var dt={
-                anchor:row.name,
-                block:row.block,
+                anchor:anchor,
+                block:block,
                 owner:row.signer,
                 auth:auth,
                 title:raw.content
@@ -259,13 +260,13 @@
                 </div>
                 <div class="col-3 mt-4 text-end">
                     <img style="widht:12px;height:12px;margin:0px 1px 0px 0px;opacity:0.7;" src="${icons.block}">
-                    <span style="font-size:12px;">${parseInt(row.block).toLocaleString()}</span>
+                    <span style="font-size:12px;">${parseInt(block).toLocaleString()}</span>
                 </div>
                 <div class="col-1"></div><div class="col-11  ${cls.content}">${raw.content}</div>
                 <div class="col-1"></div><div class="col-11 pt-1">
                     <span page="board" data='${JSON.stringify(dt)}' class="${cls.reply}"> 
                     <img style="widht:14px;height:14px;margin:-2px 2px 0px 4px;opacity:0.7;" src="${icons.comment}">
-                    reply
+                    reply <i id="${self.getID(anchor,block)}"></i>
                     </span>
                     <span style="font-size:12px;margin:4px 0px 0px 10px;color:#AAAAAA">
                         ${App.tools.time(row.stamp)}

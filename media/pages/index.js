@@ -12,10 +12,11 @@
     };
 
     var cmts={},his=[];
-    App.cache.setG("commentCount",cmts);
+    //App.cache.setG("commentCount",cmts);
     var RPC = App.cache.getG("RPC");
     var tpl=App.cache.getG("tpl");
     var icons=App.cache.getG("icons");
+    var common=App.cache.getG("common");
 
     var self = {
         listening: function () {
@@ -37,9 +38,10 @@
                         App.toast("","clean");
                         for (var i = 0; i < ls.length; i++) {
                             var row = ls[i];
+                            var cmts=[[row.name,row.block]];
                             self.pushHistory(row);
                             self.decode(row);
-                            self.auto();
+                            self.auto(cmts);
                         }
                     },1500);
                 }
@@ -47,18 +49,25 @@
         },
         showHistory:function(){
             var decode=self.decode;
+            var cmts=[];
             if(his.length===0){
                 self.getLatest(config.cache,function(list){
                     for(var i=0;i<list.length;i++){
                         if(list[i].empty) continue;
                         his.push(list[i]);
                     }
-                    for(var i=0;i<his.length;i++) decode(his[i]);
-                    self.auto();
+                    for(var i=0;i<his.length;i++){
+                        cmts.push([his[i].name,his[i].block]);
+                        decode(his[i]);
+                    } 
+                    self.auto(cmts);
                 });
             }else{
-                for(var i=0;i<his.length;i++) decode(his[i]);
-                self.auto();
+                for(var i=0;i<his.length;i++){
+                    cmts.push([his[i].name,his[i].block]);
+                    decode(his[i]);
+                } 
+                self.auto(cmts);
             }
         },
         
@@ -82,49 +91,15 @@
         
         decode: function (row) {
             if(!row.stamp) row.stamp=Date.now()-1001;
-            self.setCmtAmount(row.name,row.block);
+            //self.setCmtAmount(row.name,row.block);
             var dom=tpl.row(row,'basic');
             $("#" + config.cls.entry).prepend(dom);
         },
-        auto:function(){
-            self.bind();
-            self.getCount();
+        auto:function(cmts){
+            //console.log(`List:${JSON.stringify(cmts)}`);
+            common.freshCount(cmts);
             App.fresh();        //fresh page to bind action 
         },
-        bind:function(){
-            //var cls=config.cls;
-            
-        },
-        getCount:function(){
-            var show=self.showCount;
-            for(var anchor in cmts){
-                var bs=cmts[anchor];
-                for(var block in bs){
-                    show(anchor,block,bs[block]);
-                }
-            }
-        },
-        showCount:function(anchor,block,n){
-            var id=tpl.getID(anchor,block);
-
-            if(n!==0) return $("#"+id).html(n);
-            const svc="vSaying",fun="count";
-            const params={
-                anchor:anchor,
-                block:block,
-            }
-            RPC.extra.auto(svc,fun,params,(res)=>{
-                var count=res.count;
-                self.setCmtAmount(anchor,block,count);
-                $('#'+id).html(count);
-            });
-        },
-        setCmtAmount:function(anchor,block,n){
-            if(!cmts[anchor]) cmts[anchor]={};
-            cmts[anchor][block]=!n?0:n;
-            return true;
-        },
-        //prepare the basic data when code loaded
         struct: function () {
             var pre=config.prefix;  
             var hash = App.tools.hash;
@@ -177,8 +152,8 @@
                 ck && ck();
             },
             "after": function (params, ck) {
-                console.log('Index page after event');
-                console.log(params);
+                //console.log('Index page after event');
+                //console.log(params);
                 ck && ck();
             },
         },

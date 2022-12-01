@@ -27,7 +27,7 @@
             };
             var agent={
                 change:function(cache){
-                    console.log(cache);
+                    //console.log(cache);
                 },
             };
             uploader.init(cfg,agent);

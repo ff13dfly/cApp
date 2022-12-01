@@ -27,7 +27,6 @@
             max:1,
         }
     };
-    var cmts=App.cache.getG("commentCount");
     var tpl=App.cache.getG("tpl");
     var RPC=App.cache.getG("RPC");
     var common=App.cache.getG("common");
@@ -35,8 +34,10 @@
 
     var self={
         show:function(params){
-            const anchor=params.anchor,block=params.block;
-            $("#"+config.cls.cmtSum).html(cmts[anchor][block]);
+            var cls=config.cls;
+            var anchor=params.anchor,block=params.block;
+            $("#"+cls.entry).find('.'+cls.cmtSum).attr('id',`${anchor}_${block}`);
+            common.freshCount([[anchor,block]]);
 
             RPC.common.target(anchor,block,function(res){
                 //console.log(res);
@@ -122,13 +123,24 @@
                     sel.find("."+cls.cmtContent).focus();
                     return false;
                 }
-                sel.find("."+cls.cmtAdd).attr("disabled","disabled");
+                self.disable(cls);
                 var anchor=data.anchor,block=data.block;
                 common.comment(data.comment,anchor,block,!data.title?'':data.title,function(){
-                    sel.find("."+cls.cmtAdd).removeAttr("disabled");
+                    self.enable(cls);
+                    sel.find("."+cls.cmtContent).val("");
                     self.listComments(anchor,block);
                 });
             });
+        },
+        disable:function(cls){
+            var sel=$('#'+cls.entry);
+            sel.find("."+cls.cmtContent).attr("disabled","disabled");
+            sel.find("."+cls.cmtAdd).attr("disabled","disabled");
+        },
+        enable:function(cls){
+            var sel=$('#'+cls.entry);
+            sel.find("."+cls.cmtContent).removeAttr("disabled");
+            sel.find("."+cls.cmtAdd).removeAttr("disabled");
         },
         getData:function(){
             var cls=config.cls;
@@ -200,8 +212,7 @@
                 <div class="col-12 pt-4 pb-2"><h3 class="${cls.title}"></h3></div>
                 <div class="col-8">
                     <img src="${icons.auth}" class="${cls.avatar}">
-                    <!--<img src="https://robohash.org/null.png" class="${cls.avatar}">-->
-                    <span class="${cls.account}">null</span>
+                    <span class="${cls.account}"></span>
                 </div>
                 <div class="col-4 text-end ${cls.stamp}"></div>
                 <div class="col-12 pt-3 ${cls.content}"></div>
@@ -212,7 +223,7 @@
             var cls=config.cls;
             return `<div class="row mt-4 pt-1 pb-1 ${cls.cmtHead}">
                 <div class="col-6">
-                    Comments ( <span id="${cls.cmtSum}">0</span> )
+                    Comments ( <span class="${cls.cmtSum}">0</span> )
                 </div>
                 <div class="col-6 text-end">
                     <span class="${cls.cmtPage}" page="" data=''>more...</span>
