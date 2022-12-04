@@ -290,21 +290,42 @@
             sel.find('.'+cls.body).html(cache.preload.body);
             if(cfg.animate) $("#"+cls.mask).hide();
         },
-        toast:function(txt,type,ck,at){
+        toast:function(txt,type,cfg,ck){
             var cls=config.cls;
-            var dom='';
+            var dom='',sel=$("#"+cls.toast);
+
+            if(cfg && cfg.position && G.device!=null){
+                console.log(JSON.stringify(G.device));
+                var base=56;
+                switch (cfg.position) {
+                    case 'top':
+                        sel.css({top:base+'px'});
+                        break;
+                    case 'middle':
+                        sel.css({top:(G.device.height*0.35+base)+'px'});
+                        break;
+                    case 'bottom':
+                        sel.css({top:(G.device.height*0.65+base)+'px'});
+                        break;
+                    default:
+                        sel.css({top:base+'px'});
+                        break;
+                }
+            }
+
             switch (type) {
                 case 'info':
                     dom=`<div class="col-12 text-center">${txt}</div>`;
-                    $("#"+cls.toast).html(dom).show();
+                    sel.html(dom).show();
                     break;
 
                 case 'clean':
-                    $("#"+cls.toast).html('').hide();
+                    sel.html('').hide();
                     break;
 
                 default:
-
+                    dom=`<div class="col-12 text-center">${txt}</div>`;
+                    sel.html(dom).show();
                     break;
             }
         },
@@ -341,7 +362,7 @@
         },
         device:function(con){
             var cls=config.cls;
-            var sel=$("#"+con),w=sel.width(),h=sel.height();
+            var sel=$("#"+con),w=sel.width(),h=$(window).height();
             var offset=sel.offset(),top=$(document).scrollTop(),back=sel.find('.'+cls.back).offset();
             G.device={
                 width:w,

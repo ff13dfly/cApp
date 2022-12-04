@@ -38,7 +38,6 @@
         },
         render:function(anchor,block,title){
             var cls=config.cls,sel=$('#'+cls.entry);
-            console.log(title);
             sel.find('.'+cls.details).html(title);
             sel.find('.'+cls.target).html(anchor);
             sel.find('.'+cls.pos).html(parseInt(block).toLocaleString());

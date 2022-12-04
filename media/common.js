@@ -6,7 +6,6 @@
     var self={
         comment:function(comment,anchor,block,title,ck){
             var app_name = App.cache.getG("name");
-            //var cmts=App.cache.getG("commentCount");
             var link=!title?'Commet':title;
             var raw={
                 "title":`#[${link}](anchor://${anchor}/${block})#`,
@@ -15,14 +14,8 @@
             var proto={"type":"data","format":"JSON","app":app_name};
 
             if(RPC.extra.comment){
-                App.toast("Ready to write to chain","info");
+                App.toast("Ready to write to chain","info",{"position":"bottom"});
                 RPC.extra.comment(comment,anchor,block,(res)=>{
-                    //console.log(res);
-                    // if(res.success){
-                    //     if(!cmts[anchor]) cmts[anchor]={};
-                    //     if(!cmts[anchor][block])cmts[anchor][block]=0;
-                    //     cmts[anchor][block]=0;
-                    // }
                     App.toast("","clean");
                     return ck && ck();
                 });
@@ -54,19 +47,15 @@
                 var row=list[i],anchor=row[0],block=row[1];
                 self.showCount(anchor,block,force);
             }
-            //console.log(`Comments:${JSON.stringify(cmts)}`);
         },
         showCount:function(anchor,block,force){
             var id=`#${anchor}_${block}`;
             if(force || cmts[anchor]==undefined || cmts[anchor][block]==undefined){
                 if(!cmts[anchor]) cmts[anchor]={};
-                //if(!cmts[anchor][block]) cmts[anchor][block]=0;
                 var svc="vSaying",fun="count",params={anchor:anchor,block:block};
                 RPC.extra.auto(svc,fun,params,(res)=>{
-                    //onsole.log(res);
                     cmts[anchor][block]=parseInt(res.count);
                     $(id).html(cmts[anchor][block]);
-                    //console.log(`After:${JSON.stringify(cmts)}`);
                 });
             }else{
                 $(id).html(cmts[anchor][block]);

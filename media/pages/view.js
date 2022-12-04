@@ -257,9 +257,10 @@
                 //var result={code:1,message:"successful",overwrite:true};
                 ck && ck();
             },
-            "loading":function(params){
-                App.title(`${params.anchor} on ${params.block}`);
+            "loading":function(params,ck){
+                App.title(`${params.anchor} on ${parseInt(params.block).toLocaleString()}`);
                 self.show(params);
+                ck && ck();
             },
             "after":function(params,ck){
                 ck && ck();

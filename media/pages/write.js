@@ -62,6 +62,12 @@
                 });
             });
         },
+        disable:function(cls){
+
+        },
+        enable:function(cls){
+            
+        },
         struct: function () {
             var pre = config.prefix;
             var hash = App.tools.hash;
