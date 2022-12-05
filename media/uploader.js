@@ -26,6 +26,7 @@
 	};
 
 	var cache=[];		//image list cache
+	var allow=true;		//enable the upload
 
 	var events={
 		thumb:null,
@@ -53,7 +54,9 @@
 			return true;
 		},
 		hash:function(pre){ return pre+Math.random().toString(36).substr(6)},
-
+		disable:function(){allow=false;},
+		enable:function(){allow=true;},
+		clean:function(){cache=[];},
 		entry:function(con,ids){
 			//1.basic dom struct;
 			$(con).html(self.getCSS()+self.getDom());
@@ -122,6 +125,7 @@
 			var start=me.setting.count;
 			//1.upload function bind
 			$("#"+con).find('.'+cls.file).off('change').on('change',function(){
+				if(!allow) return false;
 				var len=this.files.length;
 				var sum=len+me.setting.count;
 				if(sum > me.setting.max) return self.toast('Max upload'+me.setting.max);
@@ -137,11 +141,13 @@
 			});
 
 			$("#"+con).find('.'+cls.add).off('click').on('click',function(){
+				if(!allow) return false;
 				$("#"+con).find('.'+cls.file).trigger("click");
 			});
 
 			//2.thumb function bind
 			$("#"+con).find('.'+cls.thumb).off('click').on('click',function(){
+				if(!allow) return false;
 				$("#"+con).find('.'+cls.thumb).removeClass('active').html('');
 
 				var btn=`<span class="${cls.remove}">删除</span>`;
@@ -151,7 +157,7 @@
 
 			//3.remove function bind
 			$("#"+con).find('.'+cls.remove).off('click').on('click',function(){
-				//console.log('ready to remove');
+				if(!allow) return false;
 				var sel=$(this).parent().parent();
 				var index=parseInt(sel.attr("index"));
 				sel.remove();

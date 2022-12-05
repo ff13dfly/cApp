@@ -133,10 +133,15 @@
                 var anchor=data.anchor,block=data.block;
                 common.comment(data.comment,anchor,block,!data.title?'':data.title,function(){
                     self.enable(cls);
-                    sel.find("."+cls.cmtContent).val("");
+                    self.clean(cls);
                     self.listComments(anchor,block);
                 });
             });
+        },
+        clean:function(cls){
+            var sel=$('#'+cls.entry);
+            sel.find('.'+cls.cmtContent).val('');
+            sel.find('.'+cls.len).html(0);
         },
         disable:function(cls){
             var sel=$('#'+cls.entry);

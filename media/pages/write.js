@@ -75,27 +75,33 @@
                         if(res.status.isInBlock){
                             App.toast("","clean");
                             self.enable(cls);
-                            sel.find('.'+cls.content).val('');
-                            sel.find('.'+cls.anchor).val('');
+                            self.clean(cls);
                             App.back();
                         }
                     });
                 });
             });
         },
+        clean:function(cls){
+            var sel=$('#'+cls.entry);
+            sel.find('.'+cls.content).val('');
+            sel.find('.'+cls.anchor).val('');
+            sel.find('.'+cls.len).html(0);
+            uploader.clean();
+        },
         disable:function(cls){
             var sel=$('#'+cls.entry);
             $("#"+cls.add).attr("disabled","disabled");
             sel.find("."+cls.content).attr("disabled","disabled");
             sel.find("."+cls.anchor).attr("disabled","disabled");
-            //uploader.disable();
+            uploader.disable();
         },
         enable:function(cls){
             var sel=$('#'+cls.entry);
             $("#"+cls.add).removeAttr("disabled");
             sel.find("."+cls.content).removeAttr("disabled");
             sel.find("."+cls.anchor).removeAttr("disabled");
-            //uploader.enable();
+            uploader.enable();
         },
         struct: function () {
             var pre = config.prefix;

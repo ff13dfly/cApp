@@ -83,7 +83,7 @@
                 const val=ev.target.value;
                 sel.find('.'+cls.len).html(val.length);
             });
-            
+
             sel.find("."+cls.add).off('click').on('click',function(){
                 var anchor=sel.find('.'+cls.anchor).val();
                 var block= parseInt(sel.find('.'+cls.block).val());
@@ -95,7 +95,7 @@
                 self.disable(cls);
                 common.comment(comment,anchor,block,'',function(){
                     self.enable(cls);
-                    sel.find('.'+cls.content).val('');
+                    self.clean(cls);
                     self.list(anchor,block);
                 });
             });
@@ -105,6 +105,11 @@
         },
         hideInput:function(cls){
             $('#'+cls.entry).find("."+cls.container).hide();
+        },
+        clean:function(cls){
+            var sel=$('#'+cls.entry);
+            sel.find('.'+cls.content).val('');
+            sel.find('.'+cls.len).html(0);
         },
         disable:function(cls){
             var sel=$('#'+cls.entry);

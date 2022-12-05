@@ -13,17 +13,21 @@
         show:function(params){
             var anchor=params.anchor;
             if(RPC.common.history){
-                RPC.common.history(anchor,(list)=>{
-                    var dom='';
-                    for(var i=0;i<list.length;i++){
-                        var row=list[i];
-                        dom+=tpl.row(row,'history');
-                    }
-
-                    $("#"+config.cls.entry).html(dom);
+                RPC.common.history(anchor,(res)=>{
+                    var list=!res?[]:res;
+                    self.listHistory(list);
                     App.fresh();
                 });
             }
+        },
+        listHistory:function(list){
+            var dom='';
+            for(var i=0;i<list.length;i++){
+                var row=list[i];
+                dom+=tpl.row(row,'history');
+            }
+
+            $("#"+config.cls.entry).html(dom);
         },
         //prepare the basic data when code loaded
         struct: function () {
