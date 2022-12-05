@@ -18,6 +18,7 @@
             add:'',
             info:'',
             container:'',
+            len:'',
         },
         page:{
             count:1,
@@ -53,8 +54,9 @@
                 step:config.page.step,
             }
             RPC.extra.auto(svc,fun,params,(res)=>{
+                var list=(!res || res.error)?[]:res;
                 var cls=config.cls;
-                var dom=self.domComments(res);
+                var dom=self.domComments(list);
                 $('#'+cls.entry).find("."+cls.list).html(dom);
                 self.bind();
                 App.fresh();
@@ -76,6 +78,12 @@
         bind:function(){
             var cls=config.cls;
             var sel=$('#'+cls.entry);
+
+            sel.find('.'+cls.content).off('keyup').on('keyup',function(ev){
+                const val=ev.target.value;
+                sel.find('.'+cls.len).html(val.length);
+            });
+            
             sel.find("."+cls.add).off('click').on('click',function(){
                 var anchor=sel.find('.'+cls.anchor).val();
                 var block= parseInt(sel.find('.'+cls.block).val());
@@ -162,7 +170,9 @@
                     <div class="col-12 pt-4">
                         <textarea class="form-control ${cls.content}" placeholder="Your thinking about the article..." rows="3"></textarea>
                     </div>
-                    <div class="col-8 pt-2 ${cls.info}"></div>
+                    <div class="col-8 pt-2 ${cls.info}">
+                        <span class="${cls.len}">0</span> / 120
+                    </div>
                     <div class="col-4 pt-2 text-end">
                         <input type="hidden" class="${cls.anchor}" value="">
                         <input type="hidden" class="${cls.block}" value="">

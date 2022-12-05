@@ -20,6 +20,13 @@
 
     var self = {
         listening: function () {
+            if(RPC.ready){
+                self.subscribe();
+            }else{
+                RPC.setQueue(self.subscribe);
+            }            
+        },
+        subscribe:function(){
             var name = App.cache.getG("name");
             RPC.common.subscribe(function(list) {
                 if (list.length == 0) return false;
@@ -97,6 +104,7 @@
         },
         auto:function(cmts){
             //console.log(`List:${JSON.stringify(cmts)}`);
+            App.toast("","clean");
             common.freshCount(cmts);
             App.fresh();        //fresh page to bind action 
         },
@@ -147,6 +155,7 @@
             },
             "loading": function (params, ck) {
                 //console.log(`History:${JSON.stringify(his)},Params:${JSON.stringify(params)}`);
+                App.toast("Loading recommand anchors","info");
                 self.showHistory();
                 self.listening();
                 ck && ck();

@@ -54,6 +54,8 @@
                 if(!cmts[anchor]) cmts[anchor]={};
                 var svc="vSaying",fun="count",params={anchor:anchor,block:block};
                 RPC.extra.auto(svc,fun,params,(res)=>{
+                    console.log(res);
+                    if(!res || res.error) return false;
                     cmts[anchor][block]=parseInt(res.count);
                     $(id).html(cmts[anchor][block]);
                 });

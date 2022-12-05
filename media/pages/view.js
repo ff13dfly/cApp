@@ -20,6 +20,7 @@
             cmtInfo:'',
             cmtBlock:'',
             cmtAnchor:'',
+            len:'',
         },
         page:{
             count:1,
@@ -92,8 +93,8 @@
                 step:config.page.step,
             }
             RPC.extra.auto(svc,fun,params,(res)=>{
-                //console.log(res);
-                var dom=self.structComments(res);
+                var list=!res?[]:res;
+                var dom=self.structComments(list);
                 $('#'+config.cls.cmtList).html(dom);
                 self.bind();
                 App.fresh();
@@ -110,6 +111,11 @@
         bind:function(){
             var cls=config.cls;
             var sel=$("#"+cls.entry);
+            sel.find('.'+cls.cmtContent).off('keyup').on('keyup',function(ev){
+                const val=ev.target.value;
+                sel.find('.'+cls.len).html(val.length);
+            });
+
             sel.find('.'+cls.cmtAdd).off('click').on('click',function(){
                 var data=self.getData();
                 if(!data.anchor){
@@ -234,7 +240,7 @@
                 <div class="col-12 gy-2">
                     <textarea class="form-control ${cls.cmtContent}" placeholder="Your thinking about the article..." rows="3"></textarea>
                 </div>
-                <div class="col-8 gy-2 ${cls.cmtInfo}"></div>
+                <div class="col-8 gy-2 ${cls.cmtInfo}"><span class="${cls.len}">0</span> / 120</div>
                 <div class="col-4 gy-2 text-end">
                     <input type="hidden" class="${cls.cmtAnchor}" value="">
                     <input type="hidden" class="${cls.cmtBlock}" value="">

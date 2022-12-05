@@ -3,6 +3,7 @@
     var config={
         name:'write',
         prefix:"w",
+        max:120,
         cls:{
             entry:'',
             title:'',
@@ -10,11 +11,13 @@
             desc:'',
             anchor:'',
             add:'',
+            len:'',
         },
     };
     var RPC = App.cache.getG("RPC");
     var app_name = App.cache.getG("name");
     var uploader = App.cache.getG("uploader");
+
     var self={
         show:function(params){
             self.upload();
@@ -34,12 +37,22 @@
         },
         bind:function(){
             var cls=config.cls;
-            
+            var sel=$("#" + cls.entry);
+
+            sel.find('.'+cls.content).off('keyup').on('keyup',function(ev){
+                const val=ev.target.value;
+                sel.find('.'+cls.len).html(val.length);
+            });
+
             $("#"+cls.add).off('click').on('click',function(){
-                //var title=$("#" + cls.entry).find('.'+cls.title).val().trim();
-                var ctx=$("#" + cls.entry).find('.'+cls.content).val().trim();
+                var ctx=sel.find('.'+cls.content).val().trim();
                 var desc=App.tools.tailor(ctx);
-                var anchor=$("#" + cls.entry).find('.'+cls.anchor).val().trim();
+                var anchor=sel.find('.'+cls.anchor).val().trim();
+                if(!ctx) return sel.find('.'+cls.content).trigger('focus');
+                if(!anchor) return sel.find('.'+cls.anchor).trigger('focus');
+
+                self.disable(cls);
+
                 var title='';
                 var raw={
                     "title":!title?'':title,
@@ -51,11 +64,19 @@
 
                 var proto={"type":"data","format":"JSON","app":app_name};
                 RPC.extra.verify(function(pair){
+                    if(!pair){
+                        self.enable(cls);
+                        return App.toast("","clean");
+                    }
+                    //console.log(pair);
+                    //console.log('no pair?');
                     RPC.common.write(pair,anchor,raw,proto,function(res){
-                        //console.log(res);
                         App.toast("Ready to write to Anchor chain","info");
                         if(res.status.isInBlock){
                             App.toast("","clean");
+                            self.enable(cls);
+                            sel.find('.'+cls.content).val('');
+                            sel.find('.'+cls.anchor).val('');
                             App.back();
                         }
                     });
@@ -63,10 +84,18 @@
             });
         },
         disable:function(cls){
-
+            var sel=$('#'+cls.entry);
+            $("#"+cls.add).attr("disabled","disabled");
+            sel.find("."+cls.content).attr("disabled","disabled");
+            sel.find("."+cls.anchor).attr("disabled","disabled");
+            //uploader.disable();
         },
         enable:function(cls){
-            
+            var sel=$('#'+cls.entry);
+            $("#"+cls.add).removeAttr("disabled");
+            sel.find("."+cls.content).removeAttr("disabled");
+            sel.find("."+cls.anchor).removeAttr("disabled");
+            //uploader.enable();
         },
         struct: function () {
             var pre = config.prefix;
@@ -92,21 +121,22 @@
         getDom:function(){
             var cls=config.cls;
             return `<div class="row">
-                <!--<div class="col-12 gy-2">
-                    <input type="text" class="form-control ${cls.title}" placeholder="Title..." value="" >  
-                </div>-->
                 <div class="col-12 gy-2">
                     <textarea class="form-control ${cls.content}" placeholder="Adding new content to anchor network..." rows="10"></textarea>   
                 </div>
-                <!--<div class="col-12 gy-2">
-                     <textarea class="form-control ${cls.desc}" placeholder="Description..." rows="3"></textarea>   
-                </div>-->
+                <div class="col-12 gy-2"><span class="${cls.len}">0</span> / ${config.max}</div>
                 <div class="col-6 gy-2 pb-3">
                     <input type="text" class="form-control ${cls.anchor}" placeholder="Anchor name..." value="" >
                 </div>
                 <div class="col-6 gy-2 pb-3 text-end">
                     <button class="btn btn-md btn-primary" id="${cls.add}">New Saying</button>
                 </div>
+                <!--<div class="col-12 gy-2">
+                    <input type="text" class="form-control ${cls.title}" placeholder="Title..." value="" >  
+                </div>-->
+                <!--<div class="col-12 gy-2">
+                     <textarea class="form-control ${cls.desc}" placeholder="Description..." rows="3"></textarea>   
+                </div>-->
                 <div class="col-12" id="upload_con"></div>
             </div>`;
         },
