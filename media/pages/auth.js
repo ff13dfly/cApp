@@ -23,7 +23,7 @@
                 App.toast('No vServer to get data.');
                 return App.back();
             }
-            App.toast('Ready to get data.');
+            //App.toast('Ready to get data.');
             self.list(params.auth,function(){
                 App.fresh();
             });
@@ -35,7 +35,8 @@
                 page:config.page.count,
                 step:config.page.step,
             }
-            RPC.extra.auto(svc,fun,params,(list)=>{
+            RPC.extra.auto(svc,fun,params,(res)=>{
+                var list=!res?[]:res;
                 var dom='';
                 for(var i=0;i<list.length;i++){
                     var row=list[i];

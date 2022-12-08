@@ -174,7 +174,11 @@
                 <div class="col-12 gy-2 ${cls.row}">
                     <span page="view" data='${JSON.stringify(dt)}'>${!ctx.desc ? "" : ctx.desc}</span>
                 </div>
-                <span page="view" data='${JSON.stringify(dt)}'>${igs}</span>
+                <div class="col-12">
+                    <span page="view" data='${JSON.stringify(dt)}'>
+                        <div class="row">${igs}</div>
+                    </span>
+                </div>
                 <div class="col-8 gy-2 ${cls.time}">
                     ${App.tools.time(row.stamp)}
                 </div>

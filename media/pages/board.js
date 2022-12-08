@@ -19,11 +19,13 @@
             info:'',
             container:'',
             len:'',
+            more:'',
+            extend:'',
         },
         page:{
             count:1,
-            step:15,
-            max:1,
+            step:4,
+            max:0,
         }
     };
     var RPC=App.cache.getG("RPC");
@@ -36,6 +38,7 @@
             //console.log(params);
             self.render(params.anchor,params.block,params.title);
             self.list(params.anchor,params.block);
+            
         },
         render:function(anchor,block,title){
             var cls=config.cls,sel=$('#'+cls.entry);
@@ -45,7 +48,7 @@
             sel.find('.'+cls.anchor).val(anchor);
             sel.find('.'+cls.block).val(block);
         },
-        list:function(anchor,block){
+        list:function(anchor,block,append){
             const svc="vSaying",fun="list";
             const params={
                 anchor:anchor,
@@ -54,10 +57,19 @@
                 step:config.page.step,
             }
             RPC.extra.auto(svc,fun,params,(res)=>{
-                var list=(!res || res.error)?[]:res;
+                var list=(!res || res.error)?[]:res.list;
+                var nav=(!res || res.error)?[]:res.nav;
+                //console.log(res);
+                if(nav.max)config.page.max=nav.max;
+
                 var cls=config.cls;
                 var dom=self.domComments(list);
-                $('#'+cls.entry).find("."+cls.list).html(dom);
+                if(append){
+                    $('#'+cls.entry).find("."+cls.list).append(dom);
+                }else{
+                    $('#'+cls.entry).find("."+cls.list).html(dom);
+                }
+                (config.page.max===0 || config.page.max===1) ?self.hideMore(cls):self.showMore(cls);
                 self.bind();
                 App.fresh();
             });
@@ -99,6 +111,26 @@
                     self.list(anchor,block);
                 });
             });
+
+            sel.find('.'+cls.more).off('click').on('click',function(){
+                if(config.page.max==0) return false;
+                if(config.page.count>config.page.max){
+                    config.page.max=0;
+                    return false;
+                }
+                if(config.page.max==config.page.count) return false;
+
+                config.page.count++;
+                var anchor=sel.find('.'+cls.anchor).val();
+                var block= parseInt(sel.find('.'+cls.block).val());
+                self.list(anchor,block,true);
+            });
+        },
+        showMore:function(cls){
+            $('#'+cls.entry).find("."+cls.more).show();
+        },
+        hideMore:function(cls){
+            $('#'+cls.entry).find("."+cls.more).hide();
         },
         showInput:function(cls){
             $('#'+cls.entry).find("."+cls.container).show();
@@ -155,7 +187,8 @@
                 #${cls.entry} .${cls.icon} {widht:14px;height:14px;margin:-2px 2px 0px 4px;opacity:0.7;}
                 #${cls.entry} .${cls.location} {font-size:10px;}
                 #${cls.entry} .${cls.details} {color:#000000;}
-                #${cls.entry} .${cls.list} {padding-bottom:160px;}
+                #${cls.entry} .${cls.extend} {padding-bottom:160px;}
+                #${cls.entry} .${cls.more} {display:none;}
                 #${cls.entry} .${cls.container} {display:none;position:fixed;left:0px;bottom:64px;background:#FFFFFF;width:100%;padding:5px 3% 5px 3%;}
             </style>`;
         },
@@ -170,6 +203,11 @@
                 <div class="col-12"><hr /></div>
             </div>
             <div class="${cls.list}"></div>
+            <div class="row ${cls.extend}">
+                <div class="col-12 pt-4 text-center">
+                    <button class="btn btn-block btn-info btn-md ${cls.more}">Load more comments</button>
+                </div>
+            </div>
             <div class="${cls.container}">
                 <div class="row">
                     <div class="col-12 pt-4">
@@ -199,10 +237,13 @@
         "events":{
             "before":function(params,ck){
                 self.hideInput(config.cls);
+                config.page.count=1;
+                config.page.max=0;
                 var result={code:1,message:"successful",overwrite:true};
                 ck && ck(result);
             },
             "loading":function(params,ck){
+                
                 self.show(params);
                 ck && ck();
             },
@@ -210,6 +251,8 @@
                 self.showInput(config.cls);
             },
             "after":function(params,ck){
+                config.page.count=1;
+                config.page.max=0;
                 self.beforeBack(params);
                 ck && ck();
             },

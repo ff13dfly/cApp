@@ -93,7 +93,10 @@
                 step:config.page.step,
             }
             RPC.extra.auto(svc,fun,params,(res)=>{
-                var list=!res?[]:res;
+                var list=(!res || res.error)?[]:res.list;
+                var nav=(!res || res.error)?[]:res.nav;
+                config.page.max=nav.max;
+                
                 var dom=self.structComments(list);
                 $('#'+config.cls.cmtList).html(dom);
                 self.bind();

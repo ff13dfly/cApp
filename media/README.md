@@ -47,7 +47,7 @@ block:  anchor on target block, not necessary
     {
         "name":"cMedia",
         "raw":"[code]",
-        "protocol":{"type":"app","format":"JS","lib":["jquery","bootstrap"],"ver":"1.2.0"}
+        "protocol":{"type":"app","format":"JS","lib":["jquery","bootstrap"],"ver":"1.2.1"}
     }
 ```
 
